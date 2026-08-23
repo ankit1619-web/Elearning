@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Manikalearning.Application/Manikalearning.Application.csproj" Id="df9fe25d-1591-44b1-89e7-6a8314c18500" />
+  <Project Path="Manikalearning.Domain/Manikalearning.Domain.csproj" />
+  <Project Path="Manikalearning.Infrastructure/Manikalearning.Infrastructure.csproj" />
+  <Project Path="Manikalearning.Tests/Manikalearning.Tests.csproj" />
+  <Project Path="Manikalearning.Web/Manikalearning.Web.csproj" />
+</Solution>
