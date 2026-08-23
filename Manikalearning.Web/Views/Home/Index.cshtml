@@ -1,8 +1,993 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Manikalearning.Web.Models.HomeVM
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@{
+    ViewData["Title"] = "Smart Exam Preparation";
+}
+ 
+
+<section class="hero-section">
+
+    <div class="hero-grid"></div>
+
+    <div class="container position-relative">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-7">
+
+                <div class="hero-badge">
+
+                    <span class="pulse-dot"></span>
+
+                    India's smarter exam preparation platform
+
+                </div>
+
+
+                <h1 class="hero-title">
+
+                    Prepare smarter.
+                    <br />
+
+                    <span>Score higher.</span>
+
+                    <br />
+
+                    Achieve more.
+
+                </h1>
+
+
+                <p class="hero-description">
+
+                    Master your exam with carefully curated PYQs,
+                    realistic mock tests, smart practice and
+                    expert-led courses — all in one place.
+
+                </p>
+
+
+                <div class="hero-buttons">
+
+                    <a href="/PYQ"
+                           class="btn btn-primary-custom btn-lg">
+
+                        Explore PYQs
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+
+                    <a href="/Tests"
+                           class="btn btn-outline-custom btn-lg">
+
+                        <i class="bi bi-play-circle"></i>
+
+                        Take Free Test
+
+                    </a>
+
+                </div>
+
+
+                <!-- TRUST -->
+
+                <div class="hero-trust">
+
+                    <div class="trust-avatars">
+
+                        <div class="avatar">A</div>
+                        <div class="avatar">R</div>
+                        <div class="avatar">S</div>
+                        <div class="avatar">P</div>
+
+                    </div>
+
+                    <div>
+
+                        <div class="stars">
+                            ★★★★★
+                        </div>
+
+                        <small>
+                            Trusted by serious aspirants
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- HERO VISUAL -->
+
+            <div class="col-lg-5">
+
+                <div class="hero-dashboard">
+
+                    <div class="dashboard-glow"></div>
+
+
+                    <!-- TOP -->
+
+                    <div class="dashboard-top">
+
+                        <div>
+
+                            <small>
+                                YOUR PERFORMANCE
+                            </small>
+
+                            <h4>
+                                Keep going! 🔥
+                            </h4>
+
+                        </div>
+
+                        <span class="live-pill">
+                            LIVE
+                        </span>
+
+                    </div>
+
+
+                    <!-- SCORE -->
+
+                    <div class="score-card">
+
+                        <div class="score-circle">
+
+                            <div>
+
+                                <strong>84%</strong>
+
+                                <small>
+                                    Score
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-info">
+
+                            <span>
+                                Weekly Progress
+                            </span>
+
+                            <div class="progress">
+
+                                <div class="progress-bar"
+                                     style="width:84%">
+                                </div>
+
+                            </div>
+
+                            <small>
+                                +12.5% this week
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATS -->
+
+                    <div class="mini-stats">
+
+                        <div>
+
+                            <span>
+                                Questions
+                            </span>
+
+                            <strong>
+                                1,248
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Accuracy
+                            </span>
+
+                            <strong>
+                                91%
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Rank
+                            </span>
+
+                            <strong>
+                                #128
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TEST -->
+
+                    <div class="next-test">
+
+                        <div class="test-icon">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <small>
+                                NEXT TEST
+                            </small>
+
+                            <strong>
+                                Full Length Mock Test
+                            </strong>
+
+                        </div>
+
+                        <i class="bi bi-arrow-up-right ms-auto"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     STATS
+========================== -->
+
+<section class="stats-section">
+
+    <div class="container">
+
+        <div class="stats-card">
+
+            <div class="stat-item">
+
+                <strong>
+                    @Model.TotalStudents.ToString("N0")+
+                </strong>
+
+                <span>
+                    Active Students
+                </span>
+
+            </div>
+
+
+            <div class="stat-item">
+
+                <strong>
+                    @Model.TotalQuestions.ToString("N0")+
+                </strong>
+
+                <span>
+                    Practice Questions
+                </span>
+
+            </div>
+
+
+            <div class="stat-item">
+
+                <strong>
+                    @Model.TotalPYQs.ToString("N0")+
+                </strong>
+
+                <span>
+                    PYQs
+                </span>
+
+            </div>
+
+
+            <div class="stat-item">
+
+                <strong>
+                    @Model.TotalTests.ToString("N0")+
+                </strong>
+
+                <span>
+                    Mock Tests
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     WHY EDUPREP
+========================== -->
+
+<section class="section-padding">
+
+    <div class="container">
+
+        <div class="section-heading text-center">
+
+            <span class="section-badge">
+                EVERYTHING YOU NEED
+            </span>
+
+            <h2>
+                One platform.
+                <span>Complete preparation.</span>
+            </h2>
+
+            <p>
+                Stop jumping between different resources.
+                Everything you need to prepare effectively is here.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4 mt-4">
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon purple">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <h4>
+                        Previous Year Questions
+                    </h4>
+
+                    <p>
+                        Practice real exam questions organized
+                        by exam, subject, topic and year.
+                    </p>
+
+                    <a href="/PYQ">
+                        Explore PYQs
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon blue">
+                        <i class="bi bi-stopwatch"></i>
+                    </div>
+
+                    <h4>
+                        Real Exam Mock Tests
+                    </h4>
+
+                    <p>
+                        Experience the actual exam environment
+                        with timer, negative marking and ranking.
+                    </p>
+
+                    <a href="/Tests">
+                        Take a Test
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon orange">
+                        <i class="bi bi-bar-chart-line"></i>
+                    </div>
+
+                    <h4>
+                        Smart Performance
+                    </h4>
+
+                    <p>
+                        Understand your strengths and weaknesses
+                        with detailed performance analytics.
+                    </p>
+
+                    <a href="/Account/Register">
+                        Start Learning
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     EXAMS
+========================== -->
+
+<section class="light-section section-padding">
+
+    <div class="container">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <span class="section-badge">
+                    CHOOSE YOUR GOAL
+                </span>
+
+                <h2>
+                    Prepare for your
+                    <span>dream exam.</span>
+                </h2>
+
+            </div>
+
+            <a href="/Exams"
+                   class="view-all">
+
+                View All Exams
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="row g-4 mt-3">
+
+            @foreach (var exam in Model.PopularExams)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="exam-card">
+
+                        <div class="exam-image">
+
+                            @if (!string.IsNullOrEmpty(exam.ImageUrl))
+                            {
+                                <img src="@exam.ImageUrl"
+                                     alt="@exam.ExamName" />
+                            }
+                            else
+                            {
+                                <div class="exam-placeholder">
+
+                                    <i class="bi bi-mortarboard"></i>
+
+                                </div>
+                            }
+
+                        </div>
+
+
+                        <div class="exam-content">
+
+                            <h4>
+                                @exam.ExamName
+                            </h4>
+
+                            <div class="exam-meta">
+
+                                <span>
+                                    <i class="bi bi-question-circle"></i>
+                                    @exam.TotalQuestions Questions
+                                </span>
+
+                                <span>
+                                    <i class="bi bi-file-text"></i>
+                                    @exam.TotalPYQs PYQs
+                                </span>
+
+                            </div>
+
+
+                            <a href="/Exams/Details/@exam.ExamId"
+                                   class="exam-link">
+
+                                Explore Exam
+
+                                <i class="bi bi-arrow-up-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     PYQ CTA
+========================== -->
+
+<section class="pyq-section section-padding">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <span class="section-badge badge-white">
+                    MASTER THE PATTERN
+                </span>
+
+                <h2 class="pyq-title">
+
+                    Don't just solve questions.
+                    <span>Understand the exam.</span>
+
+                </h2>
+
+                <p>
+
+                    Practice thousands of previous year questions
+                    chapter-wise and topic-wise. Learn from detailed
+                    explanations and identify the patterns that
+                    repeatedly appear in the exam.
+
+                </p>
+
+
+                <div class="pyq-points">
+
+                    <div>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Year-wise PYQs
+                    </div>
+
+                    <div>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Topic-wise Practice
+                    </div>
+
+                    <div>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detailed Explanations
+                    </div>
+
+                    <div>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Performance Tracking
+                    </div>
+
+                </div>
+
+
+                <a href="/PYQ"
+                       class="btn btn-light btn-lg mt-3">
+
+                    Explore PYQs
+                    <i class="bi bi-arrow-right ms-2"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <div class="pyq-visual">
+
+                    <div class="question-window">
+
+                        <div class="question-header">
+
+                            <span>
+                                QUESTION 24 / 50
+                            </span>
+
+                            <span>
+                                00:42:18
+                            </span>
+
+                        </div>
+
+
+                        <h5>
+                            Which of the following statements
+                            is correct regarding research methodology?
+                        </h5>
+
+
+                        <div class="answer-option active">
+
+                            <span>A</span>
+
+                            Experimental research
+
+                            <i class="bi bi-check-circle-fill ms-auto"></i>
+
+                        </div>
+
+
+                        <div class="answer-option">
+
+                            <span>B</span>
+
+                            Historical research
+
+                        </div>
+
+
+                        <div class="answer-option">
+
+                            <span>C</span>
+
+                            Descriptive research
+
+                        </div>
+
+
+                        <div class="answer-option">
+
+                            <span>D</span>
+
+                            Fundamental research
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="floating-score">
+
+                        <i class="bi bi-trophy-fill"></i>
+
+                        <div>
+
+                            <strong>
+                                92%
+                            </strong>
+
+                            <small>
+                                Accuracy
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     COURSES
+========================== -->
+
+<section class="section-padding">
+
+    <div class="container">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <span class="section-badge">
+                    LEARN FROM EXPERTS
+                </span>
+
+                <h2>
+                    Courses built for
+                    <span>results.</span>
+                </h2>
+
+            </div>
+
+            <a href="/Courses"
+                   class="view-all">
+
+                View All Courses
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="row g-4 mt-3">
+
+            @foreach (var course in Model.FeaturedCourses)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="course-card">
+
+                        <div class="course-thumbnail">
+
+                            @if (!string.IsNullOrEmpty(course.ThumbnailUrl))
+                            {
+                                <img src="@course.ThumbnailUrl"
+                                     alt="@course.CourseName" />
+                            }
+
+                            <span class="course-badge">
+                                POPULAR
+                            </span>
+
+                            <button class="preview-btn">
+
+                                <i class="bi bi-play-fill"></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="course-body">
+
+                            <h4>
+                                @course.CourseName
+                            </h4>
+
+                            <p>
+                                @course.ShortDescription
+                            </p>
+
+
+                            <div class="course-info">
+
+                                <span>
+                                    <i class="bi bi-play-circle"></i>
+                                    @course.TotalLectures Lectures
+                                </span>
+
+                                <span>
+                                    <i class="bi bi-clock"></i>
+                                    @course.TotalHours Hours
+                                </span>
+
+                            </div>
+
+
+                            <div class="course-footer">
+
+                                <div>
+
+                                    @if (course.DiscountPrice.HasValue)
+                                    {
+                                        <strong>
+                                            ₹@course.DiscountPrice
+                                        </strong>
+
+                                        <del>
+                                            ₹@course.Price
+                                        </del>
+                                    }
+                                    else
+                                    {
+                                        <strong>
+                                            ₹@course.Price
+                                        </strong>
+                                    }
+
+                                </div>
+
+
+                                <a href="/Courses/Details/@course.CourseId"
+                                       class="course-arrow">
+
+                                    <i class="bi bi-arrow-up-right"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TESTIMONIALS
+========================== -->
+
+<section class="light-section section-padding">
+
+    <div class="container">
+
+        <div class="section-heading text-center">
+
+            <span class="section-badge">
+                STUDENT STORIES
+            </span>
+
+            <h2>
+                Real students.
+                <span>Real progress.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="row g-4 mt-4">
+
+            @foreach (var item in Model.Testimonials.Take(3))
+            {
+                <div class="col-lg-4">
+
+                    <div class="testimonial-card">
+
+                        <div class="testimonial-stars">
+
+                            @for (int i = 0; i < item.Rating; i++)
+                            {
+                                <i class="bi bi-star-fill"></i>
+                            }
+
+                        </div>
+
+
+                        <p>
+                            "@item.Review"
+                        </p>
+
+
+                        <div class="student-info">
+
+                            <div class="student-avatar">
+
+                                @item.StudentName.Substring(0, 1)
+
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    @item.StudentName
+                                </strong>
+
+                                <small>
+                                    @item.ExamName
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FAQ
+========================== -->
+
+<section class="section-padding">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+                <div class="section-heading text-center">
+
+                    <span class="section-badge">
+                        FAQ
+                    </span>
+
+                    <h2>
+                        Got questions?
+                        <span>We've got answers.</span>
+                    </h2>
+
+                </div>
+
+
+                <div class="accordion mt-4"
+                     id="faqAccordion">
+
+                    @foreach (var faq in Model.FAQs.Take(5))
+                    {
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-@faq.FAQId">
+
+                                    @faq.Question
+
+                                </button>
+
+                            </h2>
+
+
+                            <div id="faq-@faq.FAQId"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#faqAccordion">
+
+                                <div class="accordion-body">
+
+                                    @faq.Answer
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>

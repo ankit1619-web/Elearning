@@ -34,7 +34,7 @@ namespace Manikalearning.Domain.Entities
         public ICollection<Bookmark> Bookmarks { get; set; }
         public ICollection<QuestionMistake> QuestionMistakes { get; set; }
         public ICollection<StudentSubscription> StudentSubscriptions { get; set; }
-        public ICollection<Payment> Payments { get; set; }
+        public ICollection<Payment> Payments { get; set; } 
     }
 
     [Table("Roles")]

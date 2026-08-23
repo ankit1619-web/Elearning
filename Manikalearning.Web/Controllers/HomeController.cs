@@ -15,17 +15,49 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
-    }
+        var model = new HomeVM
+        {
+            SiteTitle = "EduPrep",
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+            HeroTitle = "Prepare smarter. Score higher.",
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
+            HeroDescription =
+                "Master your exam with PYQs, mock tests, practice and expert courses.",
+
+            TotalStudents = 12500,
+
+            TotalQuestions = 50000,
+
+            TotalPYQs = 15000,
+
+            TotalTests = 500
+        };
+        model.PopularExams = new()
+        {
+            new HomeExamVM
+            {
+                ExamId = Guid.NewGuid(),
+                ExamName = "UGC NET",
+                TotalQuestions = 5000,
+                TotalPYQs = 1200
+            },
+        
+            new HomeExamVM
+            {
+                ExamId = Guid.NewGuid(),
+                ExamName = "SSC CGL",
+                TotalQuestions = 8000,
+                TotalPYQs = 2500
+            },
+        
+            new HomeExamVM
+            {
+                ExamId = Guid.NewGuid(),
+                ExamName = "Banking Exams",
+                TotalQuestions = 6500,
+                TotalPYQs = 1800
+            }
+        };
+        return View(model);
+    } 
 }

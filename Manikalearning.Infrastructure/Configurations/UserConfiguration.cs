@@ -24,7 +24,7 @@ namespace Manikalearning.Infrastructure.Configurations
             builder.Property(u => u.Mobile)
                 .HasMaxLength(20);
 
-            builder.Property(u => u.CreatedAt)
+            object value = builder.Property(u => u.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
         }
     }
