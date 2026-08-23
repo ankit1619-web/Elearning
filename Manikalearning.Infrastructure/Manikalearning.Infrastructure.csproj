@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Manikalearning.Application\Manikalearning.Application.csproj" />
     <ProjectReference Include="..\Manikalearning.Domain\Manikalearning.Domain.csproj" />
   </ItemGroup>
 
