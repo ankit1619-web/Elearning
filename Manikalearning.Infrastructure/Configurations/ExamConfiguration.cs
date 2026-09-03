@@ -14,7 +14,7 @@ namespace Manikalearning.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(150);
 
-            builder.HasIndex(e => e.Slug)
+            builder.HasIndex(e => e.ExamCode)
                 .IsUnique();
 
             builder.Property(e => e.CreatedAt)

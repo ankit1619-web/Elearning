@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IO.Pipelines;
-using System.Text;
-using static System.Collections.Specialized.BitVector32;
 
 namespace Manikalearning.Domain.Entities
 {
@@ -18,9 +13,10 @@ namespace Manikalearning.Domain.Entities
         public string ExamName { get; set; } // e.g., 'UGC NET'
 
         [Required, MaxLength(150)]
-        public string Slug { get; set; }     // e.g., 'ugc-net'
+        public string ExamCode { get; set; }     // e.g., 'ugc-net'
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
+        public string? ImageUrl { get; set; }
 
         public bool IsActive { get; set; } = true;
 

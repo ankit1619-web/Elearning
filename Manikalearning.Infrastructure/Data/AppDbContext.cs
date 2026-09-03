@@ -55,7 +55,26 @@ namespace Manikalearning.Infrastructure.Data
                 .HasOne(ss => ss.Payment)
                 .WithMany(p => p.StudentSubscriptions)
                 .HasForeignKey(ss => ss.PaymentId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.SetNull); modelBuilder.Entity<PlanCourse>(entity =>
+                {
+                    entity.ToTable("PlanCourses");
+
+                    entity.HasKey(x => new
+                    {
+                        x.PlanId,
+                        x.CourseId
+                    });
+
+                    entity.HasOne(x => x.Plan)
+                        .WithMany(x => x.PlanCourses)
+                        .HasForeignKey(x => x.PlanId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    entity.HasOne(x => x.Course)
+                        .WithMany(x => x.PlanCourses)
+                        .HasForeignKey(x => x.CourseId)
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
         }
     }
 }

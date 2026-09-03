@@ -1,63 +1,106 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+using Manikalearning.Application.Features.Commands.Home;
 using Manikalearning.Web.Models;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(IMediator mediator)
+        : base(mediator)
     {
-        _logger = logger;
     }
-
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        var dto = await _mediator.Send(new GetHomePageQuery());
+
         var model = new HomeVM
         {
-            SiteTitle = "EduPrep",
+            SiteTitle = dto.SiteTitle,
 
-            HeroTitle = "Prepare smarter. Score higher.",
+            HeroTitle = dto.HeroTitle,
+            HeroDescription = dto.HeroDescription,
+            HeroImageUrl = dto.HeroImageUrl,
+            HeroButtonText = dto.HeroButtonText,
+            HeroButtonUrl = dto.HeroButtonUrl,
 
-            HeroDescription =
-                "Master your exam with PYQs, mock tests, practice and expert courses.",
+            TotalStudents = dto.TotalStudents,
+            TotalQuestions = dto.TotalQuestions,
+            TotalPYQs = dto.TotalPYQs,
+            TotalTests = dto.TotalTests,
 
-            TotalStudents = 12500,
+            PopularExams = dto.PopularExams.Select(x => new HomeExamVM
+            {
+                ExamId = x.ExamId,
+                ExamName = x.ExamName,
+                ImageUrl = x.ImageUrl,
+                TotalQuestions = x.TotalQuestions,
+                TotalPYQs = x.TotalPYQs,
+                TotalTests = x.TotalTests
+            }).ToList(),
 
-            TotalQuestions = 50000,
+            FeaturedCourses = dto.FeaturedCourses.Select(x => new HomeCourseVM
+            {
+                CourseId = x.CourseId,
+                CourseName = x.CourseName,
+                ThumbnailUrl = x.ThumbnailUrl,
+                ShortDescription = x.ShortDescription,
+                Price = x.Price,
+                DiscountPrice = x.DiscountPrice,
+                TotalLectures = x.TotalLectures,
+                TotalHours = x.TotalHours
+            }).ToList(),
 
-            TotalPYQs = 15000,
+            PopularPYQs = dto.PopularPYQs.Select(x => new HomePYQVM
+            {
+                QuestionId = x.QuestionId,
+                QuestionText = x.QuestionText,
+                ExamName = x.ExamName,
+                SubjectName = x.SubjectName,
+                Year = x.Year
+            }).ToList(),
 
-            TotalTests = 500
+            PopularTests = dto.PopularTests.Select(x => new HomeTestVM
+            {
+                TestId = x.TestId,
+                TestName = x.TestName,
+                ExamName = x.ExamName,
+                TotalQuestions = x.TotalQuestions,
+                DurationMinutes = x.DurationMinutes,
+                TotalMarks = x.TotalMarks
+            }).ToList(),
+
+            Features = dto.Features.Select(x => new FeatureVM
+            {
+                Title = x.Title,
+                Description = x.Description,
+                Icon = x.Icon,
+                ImageUrl = x.ImageUrl,
+                DisplayOrder = x.DisplayOrder
+            }).ToList(),
+
+            Testimonials = dto.Testimonials.Select(x => new TestimonialVM
+            {
+                TestimonialId = x.TestimonialId,
+                StudentName = x.StudentName,
+                ProfileImage = x.ProfileImage,
+                ExamName = x.ExamName,
+                Review = x.Review,
+                Rating = x.Rating,
+                DisplayOrder = x.DisplayOrder
+            }).ToList(),
+
+            FAQs = dto.FAQs.Select(x => new FAQVM
+            {
+                FAQId = x.FAQId,
+                Question = x.Question,
+                Answer = x.Answer,
+                DisplayOrder = x.DisplayOrder,
+                IsActive = x.IsActive
+            }).ToList()
         };
-        model.PopularExams = new()
-        {
-            new HomeExamVM
-            {
-                ExamId = Guid.NewGuid(),
-                ExamName = "UGC NET",
-                TotalQuestions = 5000,
-                TotalPYQs = 1200
-            },
-        
-            new HomeExamVM
-            {
-                ExamId = Guid.NewGuid(),
-                ExamName = "SSC CGL",
-                TotalQuestions = 8000,
-                TotalPYQs = 2500
-            },
-        
-            new HomeExamVM
-            {
-                ExamId = Guid.NewGuid(),
-                ExamName = "Banking Exams",
-                TotalQuestions = 6500,
-                TotalPYQs = 1800
-            }
-        };
+
         return View(model);
-    } 
+    }
 }
