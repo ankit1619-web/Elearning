@@ -27,6 +27,19 @@ namespace Manikalearning.Domain.Entities
         public ICollection<Question> Questions { get; set; }
     }
 
+    [Table("ExamCourse")]
+    public class ExamCourse
+    {
+        public Guid ExamId { get; set; }
+
+        public Guid CourseId { get; set; }
+
+
+        public Exam Exam { get; set; } = null!;
+
+        public Course Course { get; set; } = null!;
+    }
+
     [Table("Papers")]
     public class Paper
     {

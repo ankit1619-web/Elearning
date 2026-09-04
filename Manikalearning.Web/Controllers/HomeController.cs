@@ -1,4 +1,4 @@
-using Manikalearning.Application.Features.Commands.Home;
+using Manikalearning.Application.Features.Commands.Web;
 using Manikalearning.Web.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

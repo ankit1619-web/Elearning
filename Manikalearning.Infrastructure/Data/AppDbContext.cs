@@ -20,6 +20,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<Topic> Topics { get; set; }
         public DbSet<SubTopic> SubTopics { get; set; }
          
+        public DbSet<ExamCourse> ExamCourse { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Plan> Plans { get; set; }
@@ -37,8 +38,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<TestAttemptAnswer> TestAttemptAnswers { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<QuestionMistake> QuestionMistakes { get; set; } 
-        public DbSet<QuestionPassage> QuestionPassages
-            => Set<QuestionPassage>();
+        public DbSet<QuestionPassage> QuestionPassages  => Set<QuestionPassage>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -55,7 +55,8 @@ namespace Manikalearning.Infrastructure.Data
                 .HasOne(ss => ss.Payment)
                 .WithMany(p => p.StudentSubscriptions)
                 .HasForeignKey(ss => ss.PaymentId)
-                .OnDelete(DeleteBehavior.SetNull); modelBuilder.Entity<PlanCourse>(entity =>
+                .OnDelete(DeleteBehavior.SetNull); 
+            modelBuilder.Entity<PlanCourse>(entity =>
                 {
                     entity.ToTable("PlanCourses");
 
@@ -75,6 +76,16 @@ namespace Manikalearning.Infrastructure.Data
                         .HasForeignKey(x => x.CourseId)
                         .OnDelete(DeleteBehavior.Cascade);
                 });
+            modelBuilder.Entity<ExamCourse>(entity =>
+            {
+                entity.ToTable("ExamCourse");
+
+                entity.HasKey(x => new
+                {
+                    x.ExamId,
+                    x.CourseId
+                }); 
+            });
         }
     }
 }

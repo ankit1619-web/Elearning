@@ -8,14 +8,11 @@
 
         public string? ShortDescription { get; set; }
 
-        public string? Icon { get; set; }
-
-        public string? CategorySlug { get; set; }
+        public string? Image { get; set; } 
+        public string? CategorySlug { get; set; } 
 
         public int TotalQuestions { get; set; }
-
-        public int Duration { get; set; }
-
+          
         public int TotalPYQs { get; set; }
 
         public int TotalTests { get; set; }
@@ -32,10 +29,7 @@
 
         public string? Description { get; set; }
 
-        public string? ImageUrl { get; set; }
-
-
-        // Statistics
+        public string? ImageUrl { get; set; } 
 
         public int TotalQuestions { get; set; }
 
@@ -44,30 +38,15 @@
         public int TotalTests { get; set; }
 
         public int TotalSubjects { get; set; }
-
-
-        // Subjects
-
+         
         public List<PublicSubjectVM> Subjects { get; set; } = new();
-
-
-        // Tests
-
+          
         public List<PublicTestVM> Tests { get; set; } = new();
-
-
-        // Courses
-
+         
         public List<PublicCourseVM> Courses { get; set; } = new();
-
-
-        // Related Exams
-
+          
         public List<ExamVM> RelatedExams { get; set; } = new();
-
-
-        // List
-
+          
         public List<ExamVM> Items { get; set; } = new();
 
         public string? Search { get; set; }

@@ -7,85 +7,70 @@ namespace Manikalearning.Domain.Entities
     [Table("Questions")]
     public class Question
     {
-        [Key]
-        public Guid QuestionId { get; set; } = Guid.NewGuid();
+        public Guid QuestionId { get; set; }
 
-        // Taxonomy Foreign Keys
-        public Guid? ExamId { get; set; }
-        [ForeignKey("ExamId")]
-        public Exam? Exam { get; set; }
+        public Guid ExamId { get; set; }
 
         public Guid? PaperId { get; set; }
-        [ForeignKey("PaperId")]
-        public Paper? Paper { get; set; }
 
         public Guid? SubjectId { get; set; }
-        [ForeignKey("SubjectId")]
-        public Subject? Subject { get; set; }
 
         public Guid? SectionId { get; set; }
-        [ForeignKey("SectionId")]
-        public Section? Section { get; set; }
 
         public Guid? TopicId { get; set; }
-        [ForeignKey("TopicId")]
-        public Topic? Topic { get; set; }
 
         public Guid? SubTopicId { get; set; }
-        [ForeignKey("SubTopicId")]
-        public SubTopic? SubTopic { get; set; }
 
         public Guid? PassageId { get; set; }
-        [ForeignKey("PassageId")]
-        public QuestionPassage? Passage { get; set; }
 
-        // Question Attributes
+        public Guid? CreatedBy { get; set; }
+
+
+        // =========================
+        // QUESTION DATA
+        // =========================
+
+        public string QuestionText { get; set; } = string.Empty;
+
         public QuestionType QuestionType { get; set; }
 
-        [Required]
-        public string QuestionText { get; set; } = string.Empty;
+        public DifficultyLevel Difficulty { get; set; }
 
         public string? Explanation { get; set; }
 
         public string? ShortExplanation { get; set; }
 
-        [MaxLength(50)]
-        public DifficultyLevel? Difficulty { get; set; }
+        public decimal Marks { get; set; }
 
-        public decimal Marks { get; set; } = 2.00M; // Standard UGC NET mark weight
+        public decimal NegativeMarks { get; set; }
 
-        public decimal NegativeMarks { get; set; } = 0.00M;
-
-        // PYQ Information
-        public bool IsPYQ { get; set; } = false;
+        public bool IsPYQ { get; set; }
 
         public int? PYQYear { get; set; }
 
-        [MaxLength(50)]
-        public string? PYQSession { get; set; } // e.g., 'Morning', 'Evening', 'Shift 1'
+        public string? PYQSession { get; set; }
 
-        [MaxLength(150)]
         public string? SourceName { get; set; }
 
-        // Publishing & Audit
-        public bool IsApproved { get; set; } = false;
-
-        public bool IsActive { get; set; } = true;
-
-        public Guid? CreatedBy { get; set; }
+        [ForeignKey("PassageId")]
+        public QuestionPassage? Passage { get; set; }
         [ForeignKey("CreatedBy")]
         public User? Creator { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public virtual Exam Exam { get; set; } = null!;
 
-        public DateTime? UpdatedAt { get; set; }
+        public virtual Paper? Paper { get; set; }
 
-        // Navigation Properties
-        public ICollection<QuestionOption> Options { get; set; } = new List<QuestionOption>();
-        public ICollection<TestQuestion> TestQuestions { get; set; } = new List<TestQuestion>();
-        public ICollection<TestAttemptAnswer> TestAttemptAnswers { get; set; } = new List<TestAttemptAnswer>();
-        public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
-        public ICollection<QuestionMistake> QuestionMistakes { get; set; } = new List<QuestionMistake>();
+        public virtual Subject? Subject { get; set; }
+
+        public virtual Section? Section { get; set; }
+
+        public virtual Topic? Topic { get; set; }
+
+        public virtual SubTopic? SubTopic { get; set; }
+           
+        public ICollection<QuestionOption> Options { get; set; }
+            = new List<QuestionOption>();
     }
 
     [Table("QuestionOptions")]
@@ -121,10 +106,26 @@ namespace Manikalearning.Domain.Entities
         [Required, MaxLength(200)]
         public string TestName { get; set; }
 
-        public string Description { get; set; }
+        public Guid? ExamId { get; set; }
+        public Guid? PaperId { get; set; }
+        public Guid? SubjectId { get; set; }
+        public Guid? SectionId { get; set; }
+        public Guid? TopicId { get; set; }
+
+        [MaxLength(50)]
+        public string TestType { get; set; }
+
+        public int TotalQuestions { get; set; }
         public int DurationMinutes { get; set; }
         public decimal TotalMarks { get; set; }
+        public decimal NegativeMarking { get; set; }
+
+        public bool IsRandom { get; set; } = false;
+        public bool ShowResultImmediately { get; set; } = true;
         public bool IsPublished { get; set; } = false;
+
+        [MaxLength(450)]
+        public string CreatedBy { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

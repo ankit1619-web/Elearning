@@ -1,4 +1,4 @@
-using Manikalearning.Application.Features.Handlers.Home;
+using Manikalearning.Application.Features.Handlers.Web;
 using Manikalearning.Application.Interface;
 using Manikalearning.Infrastructure.Data;
 using Manikalearning.Infrastructure.Repositories;

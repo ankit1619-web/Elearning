@@ -1,7 +1,7 @@
 ﻿using Manikalearning.Application.DTOs;
 using MediatR;
 
-namespace Manikalearning.Application.Features.Commands.Home
+namespace Manikalearning.Application.Features.Commands.Web
 {
     public class GetHomePageQuery : IRequest<HomeDto>
     {

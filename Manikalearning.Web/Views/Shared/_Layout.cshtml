@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@title - EduPrep</title>
+    <title>@title - Manika Learning</title>
 
     <meta name="description"
           content="Prepare smarter with PYQs, mock tests, practice questions and expert courses." />
@@ -33,47 +33,26 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
-<body>
-
-    <!-- =========================
-         TOP OFFER BAR
-    ========================== -->
-
+<body>  
     <div class="top-offer-bar">
-        <div class="container">
-
-            <div class="d-flex justify-content-center align-items-center gap-2">
-
-                <span class="offer-dot"></span>
-
+        <div class="container"> 
+            <div class="d-flex justify-content-center align-items-center gap-2"> 
+                <span class="offer-dot"></span> 
                 <span>
                     New Batch Starting Soon
-                </span>
-
+                </span> 
                 <a href="/Courses"
                        class="offer-link">
                     Explore Courses
                     <i class="bi bi-arrow-right"></i>
-                </a>
-
-            </div>
-
+                </a> 
+            </div> 
         </div>
     </div>
-
-
-    <!-- =========================
-         NAVBAR
-    ========================== -->
-
-    <header class="main-header">
-
-        <nav class="navbar navbar-expand-lg">
-
-            <div class="container">
-
-                <!-- LOGO -->
-
+      
+    <header class="main-header"> 
+        <nav class="navbar navbar-expand-lg"> 
+            <div class="container">  
                 <a class="navbar-brand brand"
                        asp-controller="Home"
                        asp-action="Index">
@@ -83,29 +62,20 @@
                     </span>
 
                     <span>
-                        Edu<span>Prep</span>
+                        Manika<span>Learning</span>
                     </span>
 
-                </a>
-
-
-                <!-- MOBILE TOGGLE -->
-
+                </a>  
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
-                        data-bs-target="#mainNavbar">
-
+                        data-bs-target="#mainNavbar"> 
                     <i class="bi bi-list"></i>
 
-                </button>
-
-
-                <!-- NAVIGATION -->
+                </button> 
 
                 <div class="collapse navbar-collapse"
-                     id="mainNavbar">
-
+                     id="mainNavbar"> 
                     <ul class="navbar-nav mx-auto">
 
                         <li class="nav-item">
@@ -157,10 +127,7 @@
                         </li>
 
                     </ul>
-
-
-                    <!-- RIGHT -->
-
+                      
                     <div class="nav-actions">
 
                         <a asp-controller="Account"
@@ -247,18 +214,12 @@
 
             <div class="row g-5">
 
-                <div class="col-lg-4">
-
-                    <a class="footer-brand"
-                           asp-controller="Home"
-                           asp-action="Index">
-
+                <div class="col-lg-4"> 
+                    <a class="footer-brand"  asp-controller="Home"  asp-action="Index"> 
                         <span class="brand-icon">
                             <i class="bi bi-mortarboard-fill"></i>
                         </span>
-
-                        Edu<span>Prep</span>
-
+                        Manika<span>Learning</span> 
                     </a>
 
                     <p class="footer-description">
@@ -272,8 +233,10 @@
                         <a href="#">
                             <i class="bi bi-instagram"></i>
                         </a>
-
-                        <a href="#">
+                        @{
+                            var youtube = "https://www.youtube.com/@manikalearningacademy";
+                        }
+                        <a href="@youtube" target="_blank">
                             <i class="bi bi-youtube"></i>
                         </a>
 
@@ -281,7 +244,7 @@
                             <i class="bi bi-telegram"></i>
                         </a>
 
-                        <a href="#">
+                        <a href="https://www.whatsapp.com/channel/0029Vb7XLuMLNSa6IBMp4N0G" target="_blank">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
@@ -328,50 +291,38 @@
 
                 <div class="col-6 col-lg-2">
 
-                    <h6>Legal</h6>
-
+                    <h6>Legal</h6> 
                     <a href="#">Privacy</a>
                     <a href="#">Terms</a>
-                    <a href="#">Refund Policy</a>
-
+                    <a href="#">Refund Policy</a> 
                 </div>
 
-            </div>
-
+            </div> 
 
             <hr />
 
             <div class="footer-bottom">
 
                 <span>
-                    © @DateTime.Now.Year EduPrep. All rights reserved.
+                    © @DateTime.Now.Year Manika Learning Academy. All rights reserved.
                 </span>
 
                 <span>
-                    Made for serious learners.
+                    Made for learners.
                 </span>
 
             </div>
 
         </div>
 
-    </footer>
-
-
-    <!-- WHATSAPP -->
-
-    <a href="#"
-           class="floating-whatsapp">
-
-        <i class="bi bi-whatsapp"></i>
-
-    </a>
-
+    </footer> 
+    <a href="https://www.whatsapp.com/channel/0029Vb7XLuMLNSa6IBMp4N0G" class="floating-whatsapp">
+        <i class="bi bi-whatsapp"></i> 
+    </a> 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
+    <script src="~/js/site.js"  asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

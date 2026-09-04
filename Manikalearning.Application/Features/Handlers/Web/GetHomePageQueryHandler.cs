@@ -1,11 +1,11 @@
 ﻿using Manikalearning.Application.DTOs;
-using Manikalearning.Application.Features.Commands.Home;
+using Manikalearning.Application.Features.Commands.Web;
 using Manikalearning.Application.Interface;
 using Manikalearning.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Manikalearning.Application.Features.Handlers.Home
+namespace Manikalearning.Application.Features.Handlers.Web
 {
     public class GetHomePageQueryHandler: IRequestHandler<GetHomePageQuery, HomeDto>
     {

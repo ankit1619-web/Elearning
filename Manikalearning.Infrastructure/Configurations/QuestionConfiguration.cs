@@ -90,12 +90,7 @@ namespace Manikalearning.Infrastructure.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.SubTopicId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Creator
-            builder.HasOne(x => x.Creator)
-                .WithMany()
-                .HasForeignKey(x => x.CreatedBy)
-                .OnDelete(DeleteBehavior.Restrict);
+             
 
             // Passage
             builder.HasOne(x => x.Passage)
