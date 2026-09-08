@@ -1,4 +1,6 @@
-﻿namespace Manikalearning.Web.Models
+﻿using Manikalearning.Application.DTOs;
+
+namespace Manikalearning.Web.Models
 {
     public class ExamViewModel
     {
@@ -48,6 +50,7 @@
         public List<ExamVM> RelatedExams { get; set; } = new();
           
         public List<ExamVM> Items { get; set; } = new();
+        public List<ExamPYQDto> PYQs { get; set; } = new();
 
         public string? Search { get; set; }
     }
@@ -87,6 +90,7 @@
 
         public string? ThumbnailUrl { get; set; }
 
+        public decimal TotalLectures { get; set; } = 0;
         public decimal Price { get; set; }
 
         public decimal? DiscountPrice { get; set; }

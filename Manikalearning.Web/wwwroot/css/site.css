@@ -1192,3 +1192,476 @@ a {
         gap: 8px;
     }
 }
+/* =========================================================
+   GLOBAL CARD SYSTEM
+========================================================= */
+
+.app-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.app-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+
+    .app-card:hover {
+        transform: translateY(-7px);
+        border-color: #c4b5fd;
+        box-shadow: 0 22px 50px rgba(15, 23, 42, .11);
+    }
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.app-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 22px 22px 0;
+}
+
+
+/* =========================================================
+   CARD ICON
+========================================================= */
+
+.app-card-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: linear-gradient( 135deg, #4f46e5, #7c3aed );
+    color: #ffffff;
+    font-size: 24px;
+    box-shadow: 0 10px 22px rgba(79, 70, 229, .20);
+}
+
+    .app-card-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: inherit;
+    }
+
+
+/* =========================================================
+   CARD BADGE
+========================================================= */
+
+.app-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 30px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+}
+
+
+/* Green Badge */
+
+.app-card-badge-success {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+
+/* Orange Badge */
+
+.app-card-badge-warning {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.app-card-body {
+    flex: 1;
+    padding: 20px 22px;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.app-card-title {
+    margin: 0 0 9px;
+    color: #0f172a;
+    font-size: 21px;
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+    .app-card-title a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+        .app-card-title a:hover {
+            color: #4f46e5;
+        }
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.app-card-description {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+.app-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    margin-top: 19px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.app-card-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+    .app-card-meta-item i {
+        color: #6366f1;
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.app-card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+    padding: 14px 10px;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+.app-card-stat {
+    min-width: 0;
+    text-align: center;
+}
+
+    .app-card-stat strong {
+        display: block;
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    .app-card-stat span {
+        display: block;
+        margin-top: 3px;
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+/* =========================================================
+   HIGHLIGHT
+========================================================= */
+
+.app-card-highlight {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 13px;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+.app-card-highlight-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.app-card-highlight-content {
+    min-width: 0;
+}
+
+.app-card-highlight strong {
+    display: block;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.app-card-highlight span {
+    display: block;
+    margin-top: 2px;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.app-card-footer {
+    display: flex;
+    gap: 10px;
+    padding: 0 22px 22px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.app-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e7ff;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 13px;
+    font-weight: 750;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+    .app-card-btn:hover {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        color: #ffffff;
+        box-shadow: 0 8px 18px rgba(79, 70, 229, .20);
+    }
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.app-card-btn-primary {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+}
+
+    .app-card-btn-primary:hover {
+        background: #4338ca;
+        border-color: #4338ca;
+    }
+
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.app-card-btn-secondary {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+    .app-card-btn-secondary:hover {
+        background: #f8fafc;
+        border-color: #4f46e5;
+        color: #4f46e5;
+    }
+
+
+/* =========================================================
+   FULL WIDTH BUTTON
+========================================================= */
+
+.app-card-footer-single .app-card-btn {
+    width: 100%;
+}
+
+
+/* =========================================================
+   IMAGE CARD
+========================================================= */
+
+.app-card-image {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+}
+
+    .app-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .4s ease;
+    }
+
+.app-card:hover .app-card-image img {
+    transform: scale(1.05);
+}
+
+
+/* Image overlay */
+
+.app-card-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient( to top, rgba(15, 23, 42, .55), transparent 60% );
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.app-card-price {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 17px;
+}
+
+.app-card-price-current {
+    color: #0f172a;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.app-card-price-old {
+    color: #94a3b8;
+    font-size: 13px;
+    text-decoration: line-through;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1199px) {
+
+    .app-card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .app-card-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .app-card {
+        border-radius: 18px;
+    }
+
+    .app-card-header {
+        padding: 18px 18px 0;
+    }
+
+    .app-card-body {
+        padding: 17px 18px;
+    }
+
+    .app-card-footer {
+        padding: 0 18px 18px;
+    }
+
+    .app-card-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        font-size: 21px;
+    }
+
+    .app-card-title {
+        font-size: 19px;
+    }
+
+    .app-card-description {
+        font-size: 13px;
+    }
+
+    .app-card-stats {
+        padding: 12px 6px;
+    }
+
+    .app-card-footer {
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 420px) {
+
+    .app-card-meta {
+        gap: 10px 15px;
+    }
+
+    .app-card-meta-item {
+        font-size: 12px;
+    }
+
+    .app-card-badge {
+        font-size: 10px;
+        padding: 5px 9px;
+    }
+}

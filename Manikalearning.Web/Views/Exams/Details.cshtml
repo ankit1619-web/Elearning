@@ -1,5 +1,2121 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Manikalearning.Web.Models.ExamVM
+
 @{
-}
+    ViewData["Title"] = Model.ExamName;
+} 
+
+<section class="exam-detail-hero">
+    <div class="container">
+        <div class="exam-breadcrumb">
+            <a asp-controller="Home" asp-action="Index">
+                Home
+            </a>
+            <i class="bi bi-chevron-right"></i>
+            <a asp-controller="Exams" asp-action="Index">
+                Exams
+            </a>
+            <i class="bi bi-chevron-right"></i>
+            <span>@Model.ExamName</span>
+        </div>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8">
+                <div class="exam-detail-badge">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    EXAM PREPARATION
+                </div>
+                <h1>
+                    @Model.ExamName
+                </h1>
+                @if (!string.IsNullOrWhiteSpace(Model.ExamCode))
+                {
+                    <div class="exam-code">
+                        @Model.ExamCode
+                    </div>
+                }
+                <p class="exam-detail-description">
+                    @Model.Description
+                </p>
+                <div class="hero-buttons">
+                    <a asp-controller="PYQ" asp-action="Index" asp-route-examId="@Model.ExamId" class="btn btn-primary btn-lg">
+                        <i class="bi bi-journal-text"></i>
+                        Practice PYQs
+                    </a> 
+                    <a asp-controller="Tests"  asp-action="Index"
+                           asp-route-examId="@Model.ExamId"
+                           class="btn btn-outline-light btn-lg">
+
+                        <i class="bi bi-lightning-charge"></i>
+
+                        Start Mock Test
+
+                    </a>
+
+                </div>
+
+            </div>  
+            <div class="col-lg-4">
+
+                <div class="exam-hero-image">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl"
+                             alt="@Model.ExamName" />
+                    }
+                    else
+                    {
+                        <div class="default-exam-icon">
+
+                            <i class="bi bi-mortarboard-fill"></i>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+ 
+
+<section class="exam-stats-section">
+
+    <div class="container">
+
+        <div class="exam-stat-grid">
+
+
+            <div class="exam-stat-card">
+
+                <div class="stat-icon purple">
+
+                    <i class="bi bi-question-circle-fill"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        @Model.TotalQuestions.ToString("N0")
+                    </strong>
+
+                    <span>
+                        Practice Questions
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="exam-stat-card">
+
+                <div class="stat-icon blue">
+
+                    <i class="bi bi-journal-text"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        @Model.TotalPYQs.ToString("N0")
+                    </strong>
+
+                    <span>
+                        Previous Year Questions
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="exam-stat-card">
+
+                <div class="stat-icon orange">
+
+                    <i class="bi bi-stopwatch-fill"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        @Model.TotalTests.ToString("N0")
+                    </strong>
+
+                    <span>
+                        Mock Tests
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="exam-stat-card">
+
+                <div class="stat-icon green">
+
+                    <i class="bi bi-book-fill"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        @Model.TotalSubjects.ToString("N0")
+                    </strong>
+
+                    <span>
+                        Subjects
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+ 
+
+<section class="exam-content-section">
+
+    <div class="container"> 
+
+        <div class="content-header">
+
+            <div>
+
+                <span class="section-label">
+                    EXAM SYLLABUS
+                </span>
+
+                <h2>
+                    Subjects & Topics
+                </h2>
+
+                <p>
+                    Explore subject-wise questions, PYQs and practice material.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @if (Model.Subjects != null && Model.Subjects.Any())
+            {
+                foreach (var subject in Model.Subjects)
+                {
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="subject-card">
+
+                            <div class="subject-icon">
+
+                                <i class="bi bi-book"></i>
+
+                            </div>
+
+
+                            <div class="subject-content">
+
+                                <h3>
+                                    @subject.SubjectName
+                                </h3>
+
+                                <p>
+                                    @subject.TotalQuestions Questions
+                                </p>
+
+                            </div>
+
+
+                            <a href="#"
+                                   class="subject-arrow">
+
+                                <i class="bi bi-arrow-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+
+                    <div class="no-data">
+
+                        <i class="bi bi-book"></i>
+
+                        <h4>
+                            Subjects coming soon
+                        </h4>
+
+                        <p>
+                            Exam subjects and syllabus will be available shortly.
+                        </p>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+         
+
+        <div class="content-header tests-header">
+
+            <div>
+
+                <span class="section-label">
+                    TEST SERIES
+                </span>
+
+                <h2>
+                    Mock Tests
+                </h2>
+
+                <p>
+                    Attempt exam-level tests and improve your preparation.
+                </p>
+
+            </div>
+
+
+            <a asp-controller="Tests"
+                   asp-action="Index"
+                   asp-route-examId="@Model.ExamId"
+                   class="view-all">
+
+                View All
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @if (Model.Tests != null && Model.Tests.Any())
+            {
+                foreach (var test in Model.Tests)
+                {
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="test-card">
+
+                            <div class="test-top">
+
+                                <span class="test-badge">
+
+                                    <i class="bi bi-lightning-fill"></i>
+
+                                    MOCK TEST
+
+                                </span>
+
+                                <span class="test-time">
+
+                                    <i class="bi bi-clock"></i>
+
+                                    @test.DurationMinutes min
+
+                                </span>
+
+                            </div>
+
+
+                            <h3>
+                                @test.TestName
+                            </h3>
+
+
+                            <div class="test-info">
+
+                                <span>
+
+                                    <i class="bi bi-question-circle"></i>
+
+                                    @test.TotalQuestions Questions
+
+                                </span>
+
+                                <span>
+
+                                    <i class="bi bi-award"></i>
+
+                                    @test.TotalMarks Marks
+
+                                </span>
+
+                            </div>
+
+
+                            <a asp-controller="Tests"
+                                   asp-action="Details"
+                                   asp-route-id="@test.TestId"
+                                   class="test-button">
+
+                                Start Test
+
+                                <i class="bi bi-arrow-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+
+                    <div class="no-data">
+
+                        <i class="bi bi-clipboard-check"></i>
+
+                        <h4>
+                            Mock tests coming soon
+                        </h4>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+
+
+        <!-- =====================================================
+             COURSES
+        ====================================================== -->
+
+        <div class="content-header tests-header">
+
+            <div>
+
+                <span class="section-label">
+                    LEARN FROM EXPERTS
+                </span>
+
+                <h2>
+                    Courses for @Model.ExamName
+                </h2>
+
+                <p>
+                    Learn concepts with structured courses and video lectures.
+                </p>
+
+            </div>
+
+
+            <a asp-controller="Courses"
+                   asp-action="Index"
+                   asp-route-examId="@Model.ExamId"
+                   class="view-all">
+
+                View All
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @if (Model.Courses != null && Model.Courses.Any())
+            {
+                foreach (var course in Model.Courses)
+                {
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="course-card">
+
+                            <div class="course-image">
+
+                                @if (!string.IsNullOrWhiteSpace(course.ThumbnailUrl))
+                                {
+                                    <img src="@course.ThumbnailUrl"
+                                         alt="@course.CourseName" />
+                                }
+                                else
+                                {
+                                    <div class="course-placeholder">
+
+                                        <i class="bi bi-play-circle-fill"></i>
+
+                                    </div>
+                                }
+
+                            </div>
+
+
+                            <div class="course-body">
+
+                                <span class="course-tag">
+                                    @Model.ExamName
+                                </span>
+
+                                <h3>
+                                    @course.CourseName
+                                </h3>  
+
+                                <div class="course-meta">
+
+                                    <span>
+
+                                        <i class="bi bi-play-circle"></i>
+
+                                        @course.TotalLectures Lectures
+
+                                    </span> 
+
+                                </div>
+
+
+                                <div class="course-footer">
+
+                                    <div>
+
+                                        @if (course.DiscountPrice.HasValue)
+                                        {
+                                            <strong>
+                                                ₹@course.DiscountPrice.Value.ToString("N0")
+                                            </strong>
+
+                                            <del>
+                                                ₹@course.Price.ToString("N0")
+                                            </del>
+                                        }
+                                        else
+                                        {
+                                            <strong>
+                                                ₹@course.Price.ToString("N0")
+                                            </strong>
+                                        }
+
+                                    </div>
+
+
+                                    <a asp-controller="Courses"
+                                           asp-action="Details"
+                                           asp-route-id="@course.CourseId"
+                                           class="course-button">
+
+                                        View Course
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+
+                    <div class="no-data">
+
+                        <i class="bi bi-play-btn"></i>
+
+                        <h4>
+                            Courses coming soon
+                        </h4>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+         
+        @if (Model.RelatedExams != null && Model.RelatedExams.Any())
+        {
+            <div class="content-header tests-header">
+
+                <div>
+
+                    <span class="section-label">
+                        MORE EXAMS
+                    </span>
+
+                    <h2>
+                        Related Exams
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="row g-4">
+
+                @foreach (var exam in Model.RelatedExams)
+                {
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="related-exam-card">
+
+                            <div class="related-icon">
+
+                                <i class="bi bi-mortarboard-fill"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    @exam.ExamName
+                                </h3>
+
+                                <span>
+                                    @exam.TotalQuestions Questions
+                                </span>
+
+                            </div>
+
+
+                            <a asp-controller="Exams"
+                                   asp-action="Details"
+                                   asp-route-id="@exam.ExamId">
+
+                                <i class="bi bi-arrow-up-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+        @if (Model.PYQs != null && Model.PYQs.Any())
+        {
+            <div class="pyq-grid">
+
+                @foreach (var pyq in Model.PYQs)
+                {
+                    <div class="pyq-card">
+
+                        <!-- TOP -->
+                        <div class="pyq-card-top">
+
+                            <div class="pyq-year">
+                                @pyq.Year
+                            </div>
+
+                            <span class="pyq-badge">
+                                <i class="bi bi-patch-check-fill"></i>
+                                PYQ
+                            </span>
+
+                        </div>
+
+                         
+                        <div class="pyq-card-body">
+                             
+                            <h3>
+                                @pyq.PaperName
+                            </h3> 
+                            <div class="pyq-meta">
+
+                                <span>
+                                    <i class="bi bi-calendar3"></i>
+                                    @pyq.Year
+                                </span>
+
+                                <span>
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    Previous Year Paper
+                                </span>
+
+                            </div> 
+                            <div class="pyq-question-count">
+
+                                <div class="pyq-question-count-icon">
+                                    <i class="bi bi-question-circle"></i>
+                                </div>
+
+                                <div class="pyq-question-count-text">
+
+                                    <strong>
+                                        @pyq.TotalQuestions Questions
+                                    </strong>
+
+                                    <span>
+                                        Complete PYQ Paper
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- FOOTER -->
+                        <div class="pyq-card-footer">
+
+                            <a asp-controller="PYQ"
+                                   asp-action="Index"
+                                   asp-route-paperId="@pyq.PaperId"
+                                   class="pyq-read-btn">
+
+                                <i class="bi bi-book"></i>
+
+                                Read PYQ
+
+                            </a>
+
+
+                            <a asp-controller="PYQ"
+                                   asp-action="Practice"
+                                   asp-route-paperId="@pyq.PaperId"
+                                   class="pyq-solve-btn">
+
+                                Start Practice
+
+                                <i class="bi bi-arrow-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="pyq-empty">
+
+                <div class="pyq-empty-icon">
+                    <i class="bi bi-journal-x"></i>
+                </div>
+
+                <h3>
+                    PYQs coming soon
+                </h3>
+
+                <p>
+                    Previous year question papers for this exam
+                    will be available here soon.
+                </p>
+
+            </div>
+        }
+    </div>
+
+</section>
+ 
+
+<section class="exam-final-cta">
+
+    <div class="container">
+
+        <div class="final-cta-card">
+
+            <div class="cta-content">
+
+                <span>
+                    READY TO START?
+                </span>
+
+                <h2>
+                    Start Preparing for
+                    @Model.ExamName Today.
+                </h2>
+
+                <p>
+                    Practice PYQs, attempt mock tests and prepare smarter
+                    with our complete exam preparation platform.
+                </p>
+
+
+                <div class="cta-actions">
+
+                    <a asp-controller="PYQ"
+                           asp-action="Index"
+                           asp-route-examId="@Model.ExamId"
+                           class="btn btn-light">
+
+                        Practice PYQs
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+
+                    <a asp-controller="Tests"
+                           asp-action="Index"
+                           asp-route-examId="@Model.ExamId"
+                           class="btn btn-outline-light">
+
+                        Take Mock Test
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="cta-icon">
+
+                <i class="bi bi-trophy-fill"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<style>
+      
+    .exam-detail-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 45px 0 85px;
+        color: white;
+        background:
+            radial-gradient(circle at 10% 20%, rgba(124,58,237,.35), transparent 35%),
+            radial-gradient(circle at 90% 30%, rgba(6,182,212,.22), transparent 35%),
+            #0f172a;
+    }
+
+    .exam-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 55px;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .exam-breadcrumb a {
+        color: #cbd5e1;
+        text-decoration: none;
+    }
+
+    .exam-breadcrumb a:hover {
+        color: white;
+    }
+
+    .exam-breadcrumb i {
+        font-size: 10px;
+    }
+
+
+    .exam-detail-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 50px;
+        color: #c4b5fd;
+        background: rgba(255,255,255,.07);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .1em;
+    }
+
+
+    .exam-detail-hero h1 {
+        margin: 20px 0 5px;
+        font-size: clamp(42px, 5vw, 65px);
+        font-weight: 850;
+        line-height: 1.05;
+    }
+
+
+    .exam-code {
+        display: inline-block;
+        margin-top: 12px;
+        color: #a5b4fc;
+        font-weight: 700;
+    }
+
+
+    .exam-detail-description {
+        max-width: 720px;
+        margin: 22px 0;
+        color: #cbd5e1;
+        font-size: 17px;
+        line-height: 1.8;
+    }
+
+
+    .hero-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    .hero-buttons .btn {
+        padding: 13px 22px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+
+    .exam-hero-image {
+        width: 270px;
+        height: 270px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        padding: 12px;
+        border-radius: 35px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.15);
+        box-shadow: 0 30px 80px rgba(0,0,0,.3);
+        transform: rotate(3deg);
+    }
+
+
+    .exam-hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 25px;
+    }
+
+
+    .default-exam-icon {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 25px;
+        color: white;
+        font-size: 80px;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    }
+
+
+    /* =========================================================
+       STATS
+    ========================================================= */
+
+    .exam-stats-section {
+        position: relative;
+        margin-top: -45px;
+        z-index: 5;
+    }
+
+
+    .exam-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 15px;
+    }
+
+
+    .exam-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 22px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        box-shadow: 0 15px 40px rgba(15,23,42,.08);
+    }
+
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+        font-size: 20px;
+    }
+
+
+    .stat-icon.purple {
+        color: #6366f1;
+        background: #eef2ff;
+    }
+
+    .stat-icon.blue {
+        color: #0284c7;
+        background: #e0f2fe;
+    }
+
+    .stat-icon.orange {
+        color: #ea580c;
+        background: #fff7ed;
+    }
+
+    .stat-icon.green {
+        color: #059669;
+        background: #ecfdf5;
+    }
+
+
+    .exam-stat-card strong {
+        display: block;
+        color: #0f172a;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+
+    .exam-stat-card span {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       CONTENT
+    ========================================================= */
+
+    .exam-content-section {
+        padding: 90px 0;
+        background: #f8fafc;
+    }
+
+
+    .content-header {
+        margin-bottom: 30px;
+    }
+
+
+    .content-header.tests-header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        margin-top: 85px;
+    }
+
+
+    .section-label {
+        color: #6366f1;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .12em;
+    }
+
+
+    .content-header h2 {
+        margin: 8px 0;
+        color: #0f172a;
+        font-size: 35px;
+        font-weight: 800;
+    }
+
+
+    .content-header p {
+        margin: 0;
+        color: #64748b;
+    }
+
+
+    .view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #4f46e5;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+
+    /* =========================================================
+       SUBJECT
+    ========================================================= */
+
+    .subject-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        height: 100%;
+        padding: 22px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        transition: .25s;
+    }
+
+
+    .subject-card:hover {
+        transform: translateY(-5px);
+        border-color: #c4b5fd;
+        box-shadow: 0 18px 40px rgba(15,23,42,.08);
+    }
+
+
+    .subject-icon {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+        color: #6366f1;
+        background: #eef2ff;
+        font-size: 21px;
+    }
+
+
+    .subject-content {
+        flex: 1;
+    }
+
+
+    .subject-content h3 {
+        margin: 0 0 5px;
+        color: #0f172a;
+        font-size: 17px;
+        font-weight: 750;
+    }
+
+
+    .subject-content p {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+
+    .subject-arrow {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #6366f1;
+        background: #f8fafc;
+    }
+
+
+    /* =========================================================
+       TEST CARD
+    ========================================================= */
+
+    .test-card {
+        height: 100%;
+        padding: 25px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        transition: .25s;
+    }
+
+
+    .test-card:hover {
+        transform: translateY(-6px);
+        border-color: #c4b5fd;
+        box-shadow: 0 20px 45px rgba(15,23,42,.08);
+    }
+
+
+    .test-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .test-badge {
+        padding: 6px 10px;
+        border-radius: 30px;
+        color: #4f46e5;
+        background: #eef2ff;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+
+    .test-time {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+
+    .test-card h3 {
+        margin: 22px 0;
+        color: #0f172a;
+        font-size: 19px;
+        font-weight: 750;
+    }
+
+
+    .test-info {
+        display: flex;
+        gap: 20px;
+        padding: 15px 0;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+
+    .test-info span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+
+    .test-info i {
+        color: #6366f1;
+    }
+
+
+    .test-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 11px;
+        color: white;
+        background: #4f46e5;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .25s;
+    }
+
+
+    .test-button:hover {
+        color: white;
+        background: #3730a3;
+    }
+
+
+    /* =========================================================
+       COURSE
+    ========================================================= */
+
+    .course-card {
+        height: 100%;
+        overflow: hidden;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        transition: .25s;
+    }
+
+
+    .course-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 45px rgba(15,23,42,.08);
+    }
+
+
+    .course-image {
+        height: 190px;
+        overflow: hidden;
+    }
+
+
+    .course-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+
+    .course-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 55px;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    }
+
+
+    .course-body {
+        padding: 22px;
+    }
+
+
+    .course-tag {
+        color: #6366f1;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+
+    .course-body h3 {
+        margin: 9px 0;
+        color: #0f172a;
+        font-size: 19px;
+        font-weight: 750;
+    }
+
+
+    .course-body p {
+        min-height: 45px;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+
+    .course-meta {
+        display: flex;
+        gap: 15px;
+        padding: 15px 0;
+        border-top: 1px solid #f1f5f9;
+    }
+
+
+    .course-meta span {
+        color: #64748b;
+        font-size: 11px;
+    }
+
+
+    .course-meta i {
+        color: #6366f1;
+    }
+
+
+    .course-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .course-footer strong {
+        color: #0f172a;
+        font-size: 20px;
+    }
+
+
+    .course-footer del {
+        margin-left: 5px;
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+
+    .course-button {
+        padding: 9px 13px;
+        border-radius: 9px;
+        color: #4f46e5;
+        background: #eef2ff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       RELATED
+    ========================================================= */
+
+    .related-exam-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+    }
+
+
+    .related-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+        color: white;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    }
+
+
+    .related-exam-card div:nth-child(2) {
+        flex: 1;
+    }
+
+
+    .related-exam-card h3 {
+        margin: 0 0 4px;
+        color: #0f172a;
+        font-size: 16px;
+    }
+
+
+    .related-exam-card span {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+
+    .related-exam-card > a {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #4f46e5;
+        background: #eef2ff;
+    }
+
+
+    /* =========================================================
+       EMPTY
+    ========================================================= */
+
+    .no-data {
+        padding: 50px 20px;
+        text-align: center;
+        background: white;
+        border: 1px dashed #cbd5e1;
+        border-radius: 18px;
+    }
+
+
+    .no-data i {
+        color: #6366f1;
+        font-size: 35px;
+    }
+
+
+    .no-data h4 {
+        margin-top: 12px;
+        color: #0f172a;
+    }
+
+
+    .no-data p {
+        color: #64748b;
+    }
+
+
+    /* =========================================================
+       CTA
+    ========================================================= */
+
+    .exam-final-cta {
+        padding: 0 0 90px;
+        background: #f8fafc;
+    }
+
+
+    .final-cta-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 330px;
+        display: flex;
+        align-items: center;
+        padding: 55px 65px;
+        border-radius: 30px;
+        background: linear-gradient(120deg,#312e81,#4f46e5,#7c3aed);
+    }
+
+
+    .cta-content {
+        position: relative;
+        z-index: 2;
+        max-width: 700px;
+    }
+
+
+    .cta-content > span {
+        color: #c4b5fd;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .12em;
+    }
+
+
+    .cta-content h2 {
+        margin: 12px 0;
+        color: white;
+        font-size: 40px;
+        font-weight: 800;
+    }
+
+
+    .cta-content p {
+        color: #ddd6fe;
+        line-height: 1.7;
+    }
+
+
+    .cta-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+
+    .cta-actions .btn {
+        padding: 12px 20px;
+        border-radius: 11px;
+        font-weight: 700;
+    }
+
+
+    .cta-icon {
+        position: absolute;
+        right: 80px;
+        width: 180px;
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 50%;
+        color: rgba(255,255,255,.9);
+        background: rgba(255,255,255,.08);
+        font-size: 65px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @@media(max-width:991px) {
+
+        .exam-stat-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        .exam-hero-image {
+            width: 210px;
+            height: 210px;
+        }
+
+        .cta-icon {
+            opacity: .2;
+            right: 30px;
+        }
+
+    }
+
+
+    @@media(max-width:767px) {
+
+        .exam-detail-hero {
+            padding: 30px 0 70px;
+        }
+
+        .exam-breadcrumb {
+            margin-bottom: 35px;
+        }
+
+        .exam-detail-hero h1 {
+            font-size: 42px;
+        }
+
+        .exam-detail-description {
+            font-size: 15px;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+        }
+
+        .hero-buttons .btn {
+            width: 100%;
+        }
+
+        .exam-hero-image {
+            width: 180px;
+            height: 180px;
+        }
+
+        .exam-stat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .exam-content-section {
+            padding: 65px 0;
+        }
+
+        .content-header.tests-header {
+            align-items: start;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 60px;
+        }
+
+        .content-header h2 {
+            font-size: 29px;
+        }
+
+        .final-cta-card {
+            padding: 40px 25px;
+        }
+
+        .cta-content h2 {
+            font-size: 30px;
+        }
+
+        .cta-actions {
+            flex-direction: column;
+        }
+
+        .cta-actions .btn {
+            width: 100%;
+        }
+
+        .cta-icon {
+            display: none;
+        }
+
+    }
+
+    /* =========================================================
+       PYQ SECTION
+    ========================================================= */
+
+    .pyq-section {
+        padding: 90px 0;
+        background: #f8fafc;
+    }
+
+    .pyq-section-header {
+        max-width: 750px;
+        margin-bottom: 40px;
+    }
+
+    .pyq-section-label {
+        display: inline-block;
+        margin-bottom: 10px;
+        color: #6366f1;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .pyq-section-title {
+        margin: 0 0 12px;
+        color: #0f172a;
+        font-size: 38px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .pyq-section-description {
+        margin: 0;
+        color: #64748b;
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+
+    /* =========================================================
+       PYQ GRID
+    ========================================================= */
+
+    .pyq-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+
+    /* =========================================================
+       PYQ CARD
+    ========================================================= */
+
+    .pyq-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-width: 0;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 22px;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, .05);
+        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+
+        .pyq-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient( 90deg, #4f46e5, #7c3aed, #06b6d4 );
+        }
+
+        .pyq-card:hover {
+            transform: translateY(-7px);
+            border-color: #c4b5fd;
+            box-shadow: 0 20px 45px rgba(79, 70, 229, .12);
+        }
+
+
+    /* =========================================================
+       CARD TOP
+    ========================================================= */
+
+    .pyq-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 26px 25px 10px;
+    }
+
+    .pyq-year {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 62px;
+        height: 38px;
+        padding: 0 14px;
+        border-radius: 10px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .pyq-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 11px;
+        border-radius: 30px;
+        background: #ecfdf5;
+        color: #059669;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .04em;
+    }
+
+        .pyq-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+
+    /* =========================================================
+       CARD BODY
+    ========================================================= */
+
+    .pyq-card-body {
+        flex: 1;
+        padding: 18px 25px 22px;
+    }
+
+        .pyq-card-body h3 {
+            margin: 0 0 8px;
+            color: #0f172a;
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .pyq-card-body p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+
+    /* =========================================================
+       PAPER / SUBJECT
+    ========================================================= */
+
+    .pyq-paper-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+        .pyq-paper-name i {
+            color: #6366f1;
+            font-size: 16px;
+        }
+
+    .pyq-subject {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding: 7px 10px;
+        border-radius: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       META
+    ========================================================= */
+
+    .pyq-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+        .pyq-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pyq-meta i {
+            color: #6366f1;
+            font-size: 14px;
+        }
+
+
+    /* =========================================================
+       QUESTION COUNT
+    ========================================================= */
+
+    .pyq-question-count {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: linear-gradient( 135deg, #f8faff, #f5f3ff );
+    }
+
+    .pyq-question-count-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 16px;
+    }
+
+    .pyq-question-count-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .pyq-question-count-text strong {
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .pyq-question-count-text span {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+
+    /* =========================================================
+       CARD FOOTER
+    ========================================================= */
+
+    .pyq-card-footer {
+        display: flex;
+        gap: 10px;
+        padding: 0 25px 25px;
+    }
+
+    .pyq-read-btn,
+    .pyq-solve-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 44px;
+        padding: 10px 15px;
+        border-radius: 11px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: all .25s ease;
+    }
+
+    .pyq-read-btn {
+        flex: 1;
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #e0e7ff;
+    }
+
+        .pyq-read-btn:hover {
+            background: #4f46e5;
+            color: #ffffff;
+            border-color: #4f46e5;
+        }
+
+    .pyq-solve-btn {
+        flex: 1;
+        background: linear-gradient( 135deg, #4f46e5, #7c3aed );
+        color: #ffffff;
+        border: 1px solid transparent;
+        box-shadow: 0 7px 18px rgba(79, 70, 229, .18);
+    }
+
+        .pyq-solve-btn:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, .28);
+        }
+
+        .pyq-read-btn i,
+        .pyq-solve-btn i {
+            font-size: 14px;
+        }
+
+
+    /* =========================================================
+       SUBJECT TAGS
+    ========================================================= */
+
+    .pyq-subject-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+    }
+
+    .pyq-subject-tag {
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+        .pyq-subject-tag i {
+            margin-right: 3px;
+            color: #6366f1;
+        }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .pyq-empty {
+        padding: 70px 20px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px dashed #cbd5e1;
+        border-radius: 22px;
+    }
+
+    .pyq-empty-icon {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 25px;
+    }
+
+    .pyq-empty h3 {
+        margin: 0 0 8px;
+        color: #0f172a;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .pyq-empty p {
+        max-width: 450px;
+        margin: auto;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       TABLET
+    ========================================================= */
+
+    @@media (max-width: 1199px) {
+
+        .pyq-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .pyq-section {
+            padding: 75px 0;
+        }
+
+        .pyq-section-title {
+            font-size: 34px;
+        }
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @@media (max-width: 767px) {
+
+        .pyq-section {
+            padding: 60px 0;
+        }
+
+        .pyq-section-title {
+            font-size: 29px;
+        }
+
+        .pyq-section-description {
+            font-size: 14px;
+        }
+
+        .pyq-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .pyq-card {
+            border-radius: 18px;
+        }
+
+        .pyq-card-top {
+            padding: 23px 20px 8px;
+        }
+
+        .pyq-card-body {
+            padding: 16px 20px 20px;
+        }
+
+            .pyq-card-body h3 {
+                font-size: 19px;
+            }
+
+        .pyq-card-footer {
+            padding: 0 20px 20px;
+        }
+
+        .pyq-read-btn,
+        .pyq-solve-btn {
+            min-height: 42px;
+            padding: 9px 10px;
+            font-size: 12px;
+        }
+    }
+
+
+    /* =========================================================
+       SMALL MOBILE
+    ========================================================= */
+
+    @@media (max-width: 400px) {
+
+        .pyq-card-footer {
+            flex-direction: column;
+        }
+
+        .pyq-read-btn,
+        .pyq-solve-btn {
+            width: 100%;
+        }
+
+        .pyq-card-top {
+            align-items: flex-start;
+        }
+
+        .pyq-year {
+            min-width: 56px;
+            height: 35px;
+            font-size: 14px;
+        }
+
+        .pyq-badge {
+            font-size: 10px;
+        }
+
+        .pyq-meta {
+            gap: 8px;
+        }
+    }
+</style>

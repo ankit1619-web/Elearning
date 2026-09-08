@@ -4,6 +4,7 @@ namespace Manikalearning.Application.Interface
 {
     public interface IRepository<T> where T : class
     {
+        IQueryable<T> Entity();
         Task<T?> GetByIdAsync(Guid id); 
         IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null); 
         Task<IEnumerable<T>> GetAllAsync();

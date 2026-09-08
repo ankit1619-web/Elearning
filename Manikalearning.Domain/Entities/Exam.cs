@@ -27,13 +27,12 @@ namespace Manikalearning.Domain.Entities
         public ICollection<Question> Questions { get; set; }
     }
 
-    [Table("ExamCourse")]
+    [Table("ExamCourses")]
     public class ExamCourse
     {
         public Guid ExamId { get; set; }
 
-        public Guid CourseId { get; set; }
-
+        public Guid CourseId { get; set; } 
 
         public Exam Exam { get; set; } = null!;
 
@@ -55,14 +54,13 @@ namespace Manikalearning.Domain.Entities
         public string PaperName { get; set; } // e.g., 'Paper 1 (General Teaching & Research Aptitude)' or 'Paper 2'
 
         [Required, MaxLength(150)]
-        public string Slug { get; set; }     // e.g., 'paper-1'
+        public string PaperCode { get; set; }     // e.g., 'paper-1'
 
         public string Description { get; set; }
 
         public bool IsActive { get; set; } = true;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-         
+          
+        public ICollection<Question> Questions { get; set; }
         public ICollection<Subject> Subjects { get; set; }
     }
 
@@ -78,17 +76,11 @@ namespace Manikalearning.Domain.Entities
         public Paper Paper { get; set; }
 
         [Required, MaxLength(150)]
-        public string SubjectName { get; set; }  
-
-        [Required, MaxLength(150)]
-        public string Slug { get; set; }     
-
+        public string SubjectName { get; set; }   
+        
         public string Description { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-         
+        public bool IsActive { get; set; } = true; 
         public ICollection<Section> Sections { get; set; }
         public ICollection<Question> Questions { get; set; }
     }

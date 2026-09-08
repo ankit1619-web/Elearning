@@ -78,7 +78,7 @@ namespace Manikalearning.Infrastructure.Data
                 });
             modelBuilder.Entity<ExamCourse>(entity =>
             {
-                entity.ToTable("ExamCourse");
+                entity.ToTable("ExamCourses");
 
                 entity.HasKey(x => new
                 {

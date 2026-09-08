@@ -90,15 +90,22 @@
 
     public class ExamPYQDto
     {
-        public Guid Id { get; set; }
+        public Guid PaperId { get; set; }
 
-        public string Title { get; set; } = string.Empty;
+        public string PaperName { get; set; } = string.Empty;
 
-        public int Year { get; set; }
+        public Guid? SubjectId { get; set; }
 
         public string? SubjectName { get; set; }
 
+        public int Year { get; set; }
+
+        public string? Session { get; set; }
+
         public int TotalQuestions { get; set; }
+        public Guid Id { get; set; } 
+        public string Title { get; set; } = string.Empty;
+         
     }
 
 

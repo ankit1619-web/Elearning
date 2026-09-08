@@ -60,37 +60,12 @@ namespace Manikalearning.Infrastructure.Configurations
                 .WithMany(x => x.Questions)
                 .HasForeignKey(x => x.ExamId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Paper
-            builder.HasOne(x => x.Paper)
-                .WithMany()
-                .HasForeignKey(x => x.PaperId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Subject
-            builder.HasOne(x => x.Subject)
-                .WithMany()
-                .HasForeignKey(x => x.SubjectId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+              
             // Section
             builder.HasOne(x => x.Section)
                 .WithMany()
                 .HasForeignKey(x => x.SectionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Topic
-            builder.HasOne(x => x.Topic)
-                .WithMany()
-                .HasForeignKey(x => x.TopicId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // SubTopic
-            builder.HasOne(x => x.SubTopic)
-                .WithMany()
-                .HasForeignKey(x => x.SubTopicId)
-                .OnDelete(DeleteBehavior.Restrict);
-             
+                .OnDelete(DeleteBehavior.Restrict); 
 
             // Passage
             builder.HasOne(x => x.Passage)
@@ -103,6 +78,29 @@ namespace Manikalearning.Infrastructure.Configurations
                 .WithOne(x => x.Question)
                 .HasForeignKey(x => x.QuestionId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // Subject
+            builder.HasOne(x => x.Subject)
+                .WithMany(x => x.Questions) // Link to the collection on Subject, if it exists
+                .HasForeignKey(x => x.SubjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Topic
+            builder.HasOne(x => x.Topic)
+                .WithMany(x => x.Questions) // Link to the collection on Topic, if it exists
+                .HasForeignKey(x => x.TopicId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SubTopic
+            builder.HasOne(x => x.SubTopic)
+                .WithMany(x => x.Questions) // Link to the collection on SubTopic, if it exists
+                .HasForeignKey(x => x.SubTopicId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.Paper)
+    .WithMany(x => x.Questions)
+    .HasForeignKey(x => x.PaperId)
+    .HasPrincipalKey(x => x.PaperId)
+    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

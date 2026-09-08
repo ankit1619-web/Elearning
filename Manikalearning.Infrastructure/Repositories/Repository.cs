@@ -15,7 +15,10 @@ namespace Manikalearning.Infrastructure.Repositories
             _context = context;
             _dbSet = context.Set<T>();
         }
-
+        public IQueryable<T> Entity()
+        {
+            return _context.Set<T>();
+        }
         public async Task<T?> GetByIdAsync(Guid id) => await _dbSet.FindAsync(id);
          
         public IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null)

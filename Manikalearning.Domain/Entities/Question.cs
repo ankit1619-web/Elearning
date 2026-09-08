@@ -23,12 +23,7 @@ namespace Manikalearning.Domain.Entities
 
         public Guid? PassageId { get; set; }
 
-        public Guid? CreatedBy { get; set; }
-
-
-        // =========================
-        // QUESTION DATA
-        // =========================
+        public Guid? CreatedBy { get; set; }  
 
         public string QuestionText { get; set; } = string.Empty;
 
@@ -118,14 +113,14 @@ namespace Manikalearning.Domain.Entities
         public int TotalQuestions { get; set; }
         public int DurationMinutes { get; set; }
         public decimal TotalMarks { get; set; }
-        public decimal NegativeMarking { get; set; }
+        public bool NegativeMarking { get; set; }
 
         public bool IsRandom { get; set; } = false;
         public bool ShowResultImmediately { get; set; } = true;
         public bool IsPublished { get; set; } = false;
 
         [MaxLength(450)]
-        public string CreatedBy { get; set; }
+        public Guid CreatedBy { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
