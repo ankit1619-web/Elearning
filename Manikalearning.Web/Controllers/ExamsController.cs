@@ -88,9 +88,10 @@ namespace Manikalearning.Web.Controllers
                 PYQs = dto.PYQs
                 .Select(x => new ExamPYQDto
                 {
-                    Id = x.Id,
-                    Title = x.Title,
-                    Year = x.Year
+                    PaperId = x.PaperId,
+                    PaperName = x.PaperName,
+                    Year = x.Year,
+                    TotalQuestions=x.TotalQuestions
                 })
                 .ToList(),
                 Courses = dto.Courses

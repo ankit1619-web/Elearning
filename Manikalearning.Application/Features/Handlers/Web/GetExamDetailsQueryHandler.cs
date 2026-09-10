@@ -118,14 +118,11 @@ namespace Manikalearning.Application.Features.Handlers.Web
                         .ToList(),
 
                     PYQs = papers
-                     .Where(x => x.Questions.Any(q => q.IsPYQ)) 
-                     .Take(10)
+                     .Where(x => x.Questions.Any(q => q.IsPYQ))  
                      .Select(x => new ExamPYQDto
                      {
-                         PaperId = x.PaperId,
-                    
-                         PaperName = x.PaperName,
-                     
+                         PaperId = x.PaperId, 
+                         PaperName = x.PaperName, 
                          TotalQuestions = x.Questions
                              .Count(q => q.IsPYQ)
                      })

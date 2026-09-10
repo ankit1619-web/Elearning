@@ -623,95 +623,174 @@
             </div>
         }
 
+        
+         
+    </div>
+
+</section>
+ 
+<section class="section-padding bg-light">
+
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="section-header-row">
+
+            <div>
+                <span class="section-label">
+                    PREVIOUS YEAR QUESTIONS
+                </span>
+
+                <h2>
+                    Practice Real Exam Questions
+                </h2>
+
+                <p>
+                    Solve previous year papers, understand exam patterns
+                    and improve your preparation.
+                </p>
+            </div>
+
+            <div class="exam-count">
+
+                <strong>
+                    @(Model.PYQs?.Count() ?? 0)
+                </strong>
+
+                <span>
+                    Papers Available
+                </span>
+
+            </div>
+
+        </div>
+
+         
         @if (Model.PYQs != null && Model.PYQs.Any())
         {
-            <div class="pyq-grid">
-
+            <div class="row g-4 mt-4"> 
                 @foreach (var pyq in Model.PYQs)
                 {
-                    <div class="pyq-card">
-
-                        <!-- TOP -->
-                        <div class="pyq-card-top">
-
-                            <div class="pyq-year">
-                                @pyq.Year
-                            </div>
-
-                            <span class="pyq-badge">
-                                <i class="bi bi-patch-check-fill"></i>
-                                PYQ
-                            </span>
-
-                        </div>
-
-                         
-                        <div class="pyq-card-body">
-                             
-                            <h3>
-                                @pyq.PaperName
-                            </h3> 
-                            <div class="pyq-meta">
-
-                                <span>
-                                    <i class="bi bi-calendar3"></i>
-                                    @pyq.Year
-                                </span>
-
-                                <span>
+                    <div class="col-xl-4 col-lg-4 col-md-6"> 
+                        <div class="app-card"> 
+                            <div class="app-card-header"> 
+                                <div class="app-card-icon">
                                     <i class="bi bi-file-earmark-text"></i>
-                                    Previous Year Paper
-                                </span>
-
+                                </div> 
+                                <span class="app-card-badge">
+                                    <i class="bi bi-patch-check-fill"></i>
+                                    PYQ
+                                </span> 
                             </div> 
-                            <div class="pyq-question-count">
+                            <div class="app-card-body"> 
+                                <h3 class="app-card-title">
+                                    @pyq.PaperName
+                                </h3> 
+                                @if (!string.IsNullOrWhiteSpace(pyq.Session))
+                                {
+                                    <div class="app-card-meta-item mb-2">
 
-                                <div class="pyq-question-count-icon">
-                                    <i class="bi bi-question-circle"></i>
+                                        <i class="bi bi-clock-history"></i>
+
+                                        <span>
+                                            @pyq.Session
+                                        </span>
+
+                                    </div>
+                                }
+
+
+                                @if (!string.IsNullOrWhiteSpace(pyq.SubjectName))
+                                {
+                                    <div class="app-card-meta-item">
+
+                                        <i class="bi bi-book"></i>
+
+                                        <span>
+                                            @pyq.SubjectName
+                                        </span>
+
+                                    </div>
+                                }
+
+                                 
+                                <div class="app-card-meta">
+
+                                    <div class="app-card-meta-item">
+
+                                        <i class="bi bi-calendar3"></i>
+
+                                        <span>
+                                            @pyq.Year
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="app-card-meta-item">
+
+                                        <i class="bi bi-file-earmark-check"></i>
+
+                                        <span>
+                                            Previous Year Paper
+                                        </span>
+
+                                    </div>
+
                                 </div>
 
-                                <div class="pyq-question-count-text">
+                                 
+                                <div class="app-card-highlight">
 
-                                    <strong>
-                                        @pyq.TotalQuestions Questions
-                                    </strong>
+                                    <div class="app-card-highlight-icon">
 
-                                    <span>
-                                        Complete PYQ Paper
-                                    </span>
+                                        <i class="bi bi-question-circle"></i>
+
+                                    </div>
+
+                                    <div class="app-card-highlight-content">
+
+                                        <strong>
+                                            @pyq.TotalQuestions Questions
+                                        </strong>
+
+                                        <span>
+                                            Complete PYQ Paper
+                                        </span>
+
+                                    </div>
 
                                 </div>
 
                             </div>
 
-                        </div>
+                             
+                            <div class="app-card-footer">
+
+                                <a asp-controller="PYQ"
+                                       asp-action="Index"
+                                       asp-route-paperId="@pyq.PaperId"
+                                       class="app-card-btn secondary">
+
+                                    <i class="bi bi-book"></i>
+
+                                    Read PYQ
+
+                                </a>
 
 
-                        <!-- FOOTER -->
-                        <div class="pyq-card-footer">
+                                <a asp-controller="PYQ"
+                                       asp-action="Practice"
+                                       asp-route-paperId="@pyq.PaperId"
+                                       class="app-card-btn">
 
-                            <a asp-controller="PYQ"
-                                   asp-action="Index"
-                                   asp-route-paperId="@pyq.PaperId"
-                                   class="pyq-read-btn">
+                                    Practice
 
-                                <i class="bi bi-book"></i>
+                                    <i class="bi bi-arrow-right"></i>
 
-                                Read PYQ
+                                </a>
 
-                            </a>
-
-
-                            <a asp-controller="PYQ"
-                                   asp-action="Practice"
-                                   asp-route-paperId="@pyq.PaperId"
-                                   class="pyq-solve-btn">
-
-                                Start Practice
-
-                                <i class="bi bi-arrow-right"></i>
-
-                            </a>
+                            </div>
 
                         </div>
 
@@ -722,10 +801,12 @@
         }
         else
         {
-            <div class="pyq-empty">
+            <div class="app-empty">
 
-                <div class="pyq-empty-icon">
+                <div class="app-empty-icon">
+
                     <i class="bi bi-journal-x"></i>
+
                 </div>
 
                 <h3>
@@ -733,17 +814,16 @@
                 </h3>
 
                 <p>
-                    Previous year question papers for this exam
+                    Previous year papers for this exam
                     will be available here soon.
                 </p>
 
             </div>
         }
+
     </div>
 
 </section>
- 
-
 <section class="exam-final-cta">
 
     <div class="container">
@@ -1017,7 +1097,7 @@
     ========================================================= */
 
     .exam-content-section {
-        padding: 90px 0;
+        padding: 25px 0;
         background: #f8fafc;
     }
 
@@ -1587,7 +1667,7 @@
         }
 
         .exam-content-section {
-            padding: 65px 0;
+            padding: 25px 0;
         }
 
         .content-header.tests-header {
@@ -1628,7 +1708,7 @@
     ========================================================= */
 
     .pyq-section {
-        padding: 90px 0;
+        padding: 25px 0;
         background: #f8fafc;
     }
 
