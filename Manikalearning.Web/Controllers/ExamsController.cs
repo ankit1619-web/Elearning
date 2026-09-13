@@ -63,17 +63,7 @@ namespace Manikalearning.Web.Controllers
 
                 TotalPYQs = dto.TotalPYQs,
 
-                TotalTests = dto.TotalTests,
-
-                TotalSubjects = dto.Subjects.Count, 
-
-                Subjects = dto.Subjects
-                .Select(x => new PublicSubjectVM
-                {
-                    SubjectId = x.SubjectId,
-                    SubjectName = x.SubjectName
-                })
-                .ToList(),
+                TotalTests = dto.TotalTests, 
                  
                 Tests = dto.Tests
                .Select(x => new PublicTestVM

@@ -13,17 +13,78 @@ namespace Manikalearning.Domain.Entities
         public string CourseName { get; set; }
 
         [Required, MaxLength(200)]
-        public string Slug { get; set; }
-
+        public string Slug { get; set; } 
         public string Description { get; set; }
         public decimal Price { get; set; }
         public bool IsPublished { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation Properties
+         
         public ICollection<StudentCourse> StudentCourses { get; set; }
         public ICollection<PlanCourse> PlanCourses { get; set; }
+    }
+
+    [Table("CourseSections")]
+    public class CourseSection
+    {
+        [Key]
+        public Guid CourseSectionId { get; set; }
+
+        [Required]
+        public Guid CourseId { get; set; }
+
+        [Required]
+        [StringLength(250)]
+        public string SectionName { get; set; }
+
+        public string Description { get; set; }
+
+        [Required]
+        public int DisplayOrder { get; set; }
+
+        [Required]
+        public bool IsActive { get; set; }
+
+        [ForeignKey("CourseId")]
+        public virtual Course Course { get; set; }
+    }
+    [Table("CourseLectures")]
+    public class CourseLecture
+    {
+        [Key]
+        public Guid LectureId { get; set; }
+
+        [Required]
+        public Guid CourseSectionId { get; set; }
+
+        [Required]
+        [StringLength(250)]
+        public string LectureTitle { get; set; }
+
+        public string Description { get; set; }
+
+        [StringLength(1000)]
+        public string VideoUrl { get; set; }
+
+        public int? VideoDurationSeconds { get; set; }
+
+        [StringLength(1000)]
+        public string NotesUrl { get; set; }
+
+        [Required]
+        public bool IsFreePreview { get; set; }
+
+        [Required]
+        public int DisplayOrder { get; set; }
+
+        [Required]
+        public bool IsPublished { get; set; }
+
+        [Required]
+        public DateTime CreatedAt { get; set; }
+
+        [ForeignKey("CourseSectionId")]
+        public virtual CourseSection CourseSection { get; set; }
     }
 
     [Table("StudentCourses")]

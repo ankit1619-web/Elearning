@@ -22,6 +22,8 @@ namespace Manikalearning.Infrastructure.Data
          
         public DbSet<ExamCourse> ExamCourse { get; set; }
         public DbSet<Course> Courses { get; set; }
+        public DbSet<CourseSection> CourseSection { get; set; }
+        public DbSet<CourseLecture> CourseLecture { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Plan> Plans { get; set; }
         public DbSet<PlanCourse> PlanCourses { get; set; }

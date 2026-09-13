@@ -86,10 +86,7 @@ namespace Manikalearning.Application.Features.Handlers.Web
                    .Include(x => x.Subjects)
                    .Include(x => x.Questions)
                    .Where(x => x.ExamId == request.ExamId)
-                   .ToListAsync(cancellationToken);
-
-                var subjects = papers.Select(x=>x.Subjects).SelectMany(x => x)
-                    .ToList();
+                   .ToListAsync(cancellationToken); 
 
                 return new ExamDetailsDto
                 {
@@ -109,14 +106,7 @@ namespace Manikalearning.Application.Features.Handlers.Web
 
                     TotalTests = tests.Count, 
 
-                    Subjects = subjects
-                        .Select(x => new ExamSubjectDto
-                        {
-                            SubjectId = x.SubjectId,
-                            SubjectName = x.SubjectName
-                        })
-                        .ToList(),
-
+                    
                     PYQs = papers
                      .Where(x => x.Questions.Any(q => q.IsPYQ))  
                      .Select(x => new ExamPYQDto

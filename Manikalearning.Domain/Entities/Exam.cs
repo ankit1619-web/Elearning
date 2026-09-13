@@ -21,8 +21,7 @@ namespace Manikalearning.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation Properties
+         
         public ICollection<Paper> Papers { get; set; }
         public ICollection<Question> Questions { get; set; }
     }

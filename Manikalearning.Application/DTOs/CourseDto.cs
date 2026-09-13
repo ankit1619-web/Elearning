@@ -1,29 +1,28 @@
-﻿using Manikalearning.Domain.Enums;
-
-namespace Manikalearning.Application.DTOs
+﻿namespace Manikalearning.Application.DTOs
 {
     public class CourseDto
     {
-        public Guid CourseId { get; set; }
-
+        public Guid Id { get; set; }
+         
         public string CourseName { get; set; } = string.Empty;
 
-        public string? CourseCode { get; set; }
+        public string? ShortDescription { get; set; }
 
         public string? Description { get; set; }
 
         public string? ThumbnailUrl { get; set; }
 
-        public decimal Price { get; set; }
+        public string? ExamName { get; set; }
 
-        public decimal? DiscountPrice { get; set; }
+        public string? CategoryName { get; set; }
 
-        public CourseStatus Status { get; set; }
+        public decimal Price { get; set; } 
+        public int TotalLectures { get; set; } 
 
-        public bool IsFeatured { get; set; }
+        public int TotalStudents { get; set; }
 
-        public bool IsActive { get; set; }
-
-        public DateTime CreatedAt { get; set; }
+        public int TotalQuestions { get; set; }
+        public List<CourseSectionDto> Sections { get; set; } = new();
+        public List<CourseLectureDto> Lectures { get; set; } = new();
     }
 }

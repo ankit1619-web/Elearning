@@ -1,0 +1,319 @@
+﻿@model Manikalearning.Web.Models.CourseVM
+@{ 
+    ViewData["Title"] = !string.IsNullOrWhiteSpace(Model.ExamName) ? $"{Model.ExamName} Courses" : "All Courses";
+}
+}
+
+<section class="page-hero">
+    <div class="hero-glow hero-glow-one"></div>
+    <div class="hero-glow hero-glow-two"></div>
+    <div class="container">
+        <div class="page-hero-content"> 
+            <span class="hero-label">
+                <i class="bi bi-mortarboard-fill"></i>
+                EXPERT-LED COURSES
+            </span>
+            <h1>
+               @if (!string.IsNullOrWhiteSpace(Model.ExamName))
+                {
+                    @Model.ExamName <text><span>Courses</span></text>
+                }
+                else
+                {
+                    <text>Learn Smarter. <span>Prepare Better.</span></text>
+                }
+            </h1> 
+            <p>
+                Explore structured courses designed to help you
+                understand concepts, practice PYQs and prepare
+                confidently for your exam.
+            </p>
+
+              
+            <div class="hero-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       id="courseSearch"
+                       autocomplete="off"
+                       placeholder="Search course e.g. SSC CGL, UPSC, Banking..." />
+
+                <span class="search-shortcut">
+                    Ctrl K
+                </span> 
+            </div> 
+        </div> 
+    </div> 
+</section>
+
+<section class="section-padding exams-section"> 
+    <div class="container">  
+        <div class="section-header-row"> 
+            <div> 
+                <span class="section-label">
+                    OUR COURSES
+                </span> 
+                <h2>
+                    Choose Your Learning Path
+                </h2> 
+                <p>
+                    Complete courses, focused preparation and
+                    exam-oriented learning — all in one place.
+                </p> 
+            </div> 
+            <div class="course-count"> 
+                <div class="count-number">
+                    @Model.Items.Count
+                </div> 
+                <div class="count-label">
+                    Courses Available
+                </div> 
+            </div> 
+        </div>    
+        <div class="container">
+            <div class="row g-4 mt-3" id="courseGrid"> 
+                @if (!string.IsNullOrWhiteSpace(@Model.ExamName))
+                {
+                    <div class="app-card-meta-item course-exam">
+
+                        <i class="bi bi-bookmark-fill"></i>
+
+                        <span>
+                            @Model.ExamName
+                        </span>
+
+                    </div>
+                }
+                @foreach (var course in Model.Items)
+                {
+                    <div class="col-xl-4 col-lg-4 col-md-6 course-item"
+                         data-name="@course.CourseName.ToLower()" >
+                        <div class="exam-card">
+                            <div class="exam-card-header">
+                                <div class="exam-card-icon">
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </div>
+                                @* @if (isFree)
+                                {
+                                    <span class="app-card-badge">
+                                        <i class="bi bi-unlock-fill"></i>
+                                        Free
+                                    </span>
+                                }
+                                else
+                                { *@
+                                    <span class="app-card-badge">
+
+                                        <i class="bi bi-patch-check-fill"></i>
+
+                                        Premium
+
+                                    </span>
+                                @* }  *@
+                            </div>
+                            <div class="exam-card-body">
+                                <div class="exam-title-row">
+                                    <h3 class="exam-title">
+                                        @course.CourseName
+                                    </h3>
+                                    <i class="bi bi-arrow-up-right card-arrow"></i>
+                                </div>
+                                <p class="exam-description">
+                                    @(course.Description ?? "Complete preparation material, PYQs and mock tests.")
+                                </p>
+                                <div class="exam-stats">
+                                    <div class="exam-stat">
+                                        <div class="stat-icon">
+                                            <i class="bi bi-patch-question-fill"></i>
+                                        </div> 
+                                        <div class="stat-content">
+                                            <strong>
+                                                @course.TotalLectures  
+                                            </strong>
+                                            <span>
+                                                  Lectures
+                                            </span>
+                                        </div>
+                                    </div> 
+                                </div> 
+                                <div class="exam-meta">
+                                    @* @if (isFree)
+                                {
+                                    <div class="course-free-price">
+                                        FREE
+                                    </div>
+                                }  
+                                else
+                                { *@
+                                    <strong class="course-price">
+                                        ₹@course.Price.ToString("N0")
+                                    </strong>
+                                    @* } *@
+                                </div>
+                            </div> 
+                            <div class="exam-card-footer">
+                                <a asp-controller="Course"
+                                       asp-action="Details"
+                                       asp-route-course="@course.CourseId"
+                                       class="btn-exam">
+                                    <span>
+                                        Explore Course
+                                    </span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div> 
+                } 
+            </div>  
+            <div id="courseEmpty"
+                 class="app-empty"
+                 style="display:none;">
+
+                <div class="app-empty-icon">
+
+                    <i class="bi bi-search"></i>
+
+                </div>
+
+                <h3>
+                    No courses found
+                </h3>
+
+                <p>
+                    Try another course name, exam or category.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+  
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput =
+                document.getElementById("courseSearch");
+
+            const filters =
+                document.querySelectorAll(".course-filter");
+
+            const items =
+                document.querySelectorAll(".course-item");
+
+            const empty =
+                document.getElementById("courseEmpty");
+
+            const count =
+                document.getElementById("courseCount");
+
+            let activeFilter = "all";
+
+
+            function filterCourses() {
+
+                const search =
+                    searchInput.value.toLowerCase().trim();
+
+                let visible = 0;
+
+
+                items.forEach(item => {
+
+                    const name =
+                        item.dataset.name || "";
+
+                    const category =
+                        item.dataset.category || "";
+
+                    const featured =
+                        item.dataset.featured === "true";
+
+                    const type =
+                        item.dataset.type || "";
+
+
+                    const matchesSearch =
+                        name.includes(search) ||
+                        category.includes(search);
+
+
+                    let matchesFilter = true;
+
+
+                    if (activeFilter === "featured") {
+                        matchesFilter = featured;
+                    }
+
+                    if (activeFilter === "free") {
+                        matchesFilter = type === "free";
+                    }
+
+                    if (activeFilter === "paid") {
+                        matchesFilter = type === "paid";
+                    }
+
+
+                    if (matchesSearch && matchesFilter) {
+
+                        item.style.display = "";
+
+                        visible++;
+
+                    }
+                    else {
+
+                        item.style.display = "none";
+
+                    }
+
+                });
+
+
+                count.textContent = visible;
+
+                empty.style.display =
+                    visible === 0 ? "block" : "none";
+
+            }
+
+
+            searchInput.addEventListener(
+                "input",
+                filterCourses
+            );
+
+
+            filters.forEach(button => {
+
+                button.addEventListener("click", function () {
+
+                    filters.forEach(x =>
+                        x.classList.remove("active")
+                    );
+
+                    this.classList.add("active");
+
+                    activeFilter =
+                        this.dataset.filter;
+
+                    filterCourses();
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

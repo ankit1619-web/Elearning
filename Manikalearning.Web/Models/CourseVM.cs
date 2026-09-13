@@ -6,24 +6,18 @@ namespace Manikalearning.Web.Models
     {
         public Guid CourseId { get; set; }
 
+        public string ExamName { get; set; } = string.Empty;
         public string CourseName { get; set; } = string.Empty;
 
         public string? CourseCode { get; set; }
 
         public string? Description { get; set; }
 
-        public string? ThumbnailUrl { get; set; }
-
-
-        // Pricing
+        public string? ThumbnailUrl { get; set; }  
 
         public decimal Price { get; set; }
 
-        public decimal? DiscountPrice { get; set; }
-
-
-        // Course Information
-
+        public decimal? DiscountPrice { get; set; } 
         public int TotalSections { get; set; }
 
         public int TotalLectures { get; set; }
@@ -33,19 +27,11 @@ namespace Manikalearning.Web.Models
         public string? InstructorName { get; set; }
 
         public string? InstructorImage { get; set; }
-
-
-        // Course Content
-
+          
         public List<PublicCourseSectionVM> Sections { get; set; } = new();
-
-
-        // Related Courses
-
+          
         public List<CourseVM> RelatedCourses { get; set; } = new();
-
-
-        // List
+         
 
         public List<CourseVM> Items { get; set; } = new();
 
@@ -71,33 +57,27 @@ namespace Manikalearning.Web.Models
 
     public class PublicLectureVM
     {
-        public Guid CourseLectureId { get; set; }
-
-        public string LectureTitle { get; set; } = string.Empty;
-
-        public string? Description { get; set; }
-
-        public int DurationMinutes { get; set; }
-
+        public Guid LectureId { get; set; }
+        public Guid CourseSectionId { get; set; }
+        public string LectureTitle { get; set; }
+        public string Description { get; set; }
+        public string VideoUrl { get; set; }
+        public int? VideoDurationSeconds { get; set; }
+        public string NotesUrl { get; set; }
         public bool IsFreePreview { get; set; }
+        public int DisplayOrder { get; set; }
+        public bool IsPublished { get; set; }
+        public string CourseName { get; set; }
+        public string NotesHtml { get; set; } 
+        public PYQVM PYQData { get; set; } 
     }
     public class PYQVM
-    {
-        // Filters
-
-        public Guid? ExamId { get; set; }
-
-        public Guid? PaperId { get; set; }
-
-        public Guid? SubjectId { get; set; }
-
-        public Guid? TopicId { get; set; }
-
-        public int? Year { get; set; }
-
-
-        // Dropdowns
-
+    { 
+        public Guid? ExamId { get; set; } 
+        public Guid? PaperId { get; set; } 
+        public Guid? SubjectId { get; set; } 
+        public Guid? TopicId { get; set; } 
+        public int? Year { get; set; } 
         public List<PublicDropdownVM> Exams { get; set; } = new();
 
         public List<PublicDropdownVM> Papers { get; set; } = new();
@@ -106,16 +86,9 @@ namespace Manikalearning.Web.Models
 
         public List<PublicDropdownVM> Topics { get; set; } = new();
 
-        public List<int> Years { get; set; } = new();
-
-
-        // Questions
-
+        public List<int> Years { get; set; } = new(); 
         public List<PublicPYQQuestionVM> Questions { get; set; } = new();
-
-
-        // Pagination
-
+          
         public int Page { get; set; } = 1;
 
         public int PageSize { get; set; } = 20;
@@ -185,5 +158,23 @@ namespace Manikalearning.Web.Models
         public bool IsGuest { get; set; }
 
         public int RemainingFreeQuestions { get; set; }
+    }
+    public class PYQQuestionVM
+    {
+        public long QuestionId { get; set; }
+        public int QuestionNumber { get; set; }
+        public int TotalQuestions { get; set; }
+        public string TopicName { get; set; }
+        public string ExamSourceInfo { get; set; }  
+        public string EnglishText { get; set; }
+        public string HindiText { get; set; } 
+        public List<OptionVM> Options { get; set; }
+        public string ExplanationHtml { get; set; }
+    }
+
+    public class OptionVM
+    {
+        public int OptionId { get; set; } 
+        public string OptionText { get; set; }
     }
 }

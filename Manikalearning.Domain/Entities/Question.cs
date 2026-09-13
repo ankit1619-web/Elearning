@@ -46,6 +46,7 @@ namespace Manikalearning.Domain.Entities
         public string? PYQSession { get; set; }
 
         public string? SourceName { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [ForeignKey("PassageId")]
         public QuestionPassage? Passage { get; set; }
