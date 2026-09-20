@@ -3,7 +3,8 @@
 
 @{
     ViewData["Title"] = "Courses Management";
-    ViewData["HeaderTitle"] = "Courses";
+    ViewData["HeaderTitle"] = "Courses"; 
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; 
 }
  
 @Html.AntiForgeryToken()
@@ -56,18 +57,23 @@
                                 @if (item.Ispublished)
                                 {
                                     <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium">
-                                        <i class="bi bi-dot me-1"></i>Published
+                                         Published
                                     </span>
                                 }
                                 else
                                 {
                                     <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-medium">
-                                        <i class="bi bi-dot me-1"></i>Draft
+                                         Draft
                                     </span>
                                 }
                             </td>
                             <td class="text-end pe-3">
                                 <div class="d-inline-flex gap-1"> 
+                                    <a href="/Admin/CourseSections/@item.Id" 
+                                        class="btn btn-sm btn-light text-info shadow-none rounded-2" 
+                                        title="Manage Sections">
+                                         <i class="bi bi-list-nested"></i>
+                                     </a>
                                     <button type="button"
                                             class="btn btn-sm btn-light text-primary shadow-none rounded-2"
                                             title="Edit Course"

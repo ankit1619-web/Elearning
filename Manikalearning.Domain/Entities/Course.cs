@@ -11,12 +11,10 @@ namespace Manikalearning.Domain.Entities
 
         [Required, MaxLength(200)]
         public string CourseName { get; set; }
-
-        [Required, MaxLength(200)]
-        public string Slug { get; set; } 
+         
         public string Description { get; set; }
         public decimal Price { get; set; }
-        public bool IsPublished { get; set; } = false;
+        public bool IsPublished { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
          

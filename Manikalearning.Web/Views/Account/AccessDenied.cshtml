@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center py-lg-5">
+        <div class="col-md-8 col-lg-6 text-center">
+            
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle" style="width: 90px; height: 90px;">
+                    <i class="bi bi-shield-lock-fill display-4"></i>
+                </div>
+            </div>
+
+            <h1 class="fw-extrabold text-dark mb-2" style="font-weight: 800;">Access Denied 🚫</h1>
+            <p class="text-muted fs-6 mb-4">
+                You do not have the required permissions to view or perform actions on this page. If you believe this is a mistake, please contact your administrator.
+            </p>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 py-2.5 rounded-3 fw-bold">
+                    <i class="bi bi-house-door me-1"></i> Back to Home
+                </a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary px-4 py-2.5 rounded-3 fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Switch Account
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

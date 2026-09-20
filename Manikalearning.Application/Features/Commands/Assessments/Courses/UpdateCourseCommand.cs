@@ -23,7 +23,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Courses
                 .MinimumLength(3).WithMessage("Course Name must be at least 3 characters long.")
                 .MaximumLength(150).WithMessage("Course Name cannot exceed 150 characters.");
 
-            RuleFor(x => x.Description)
+            RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.")
                 .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.");
 
             RuleFor(x => x.Price)
