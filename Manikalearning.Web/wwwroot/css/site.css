@@ -12,6 +12,79 @@
     --orange: #f59e0b;
 }
 
+:root {
+    --brand-primary: #6366F1;
+    --brand-primary-hover: #4F46E5;
+    --brand-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    --brand-bg-subtle: #F5F3FF;
+}
+/* SaaS App Mockup Styles */
+.saas-app-mockup {
+    background: #0f172a;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.app-window-bar {
+    background: #1e293b;
+}
+
+.text-primary-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-brand {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-brand:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: #ffffff;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        transform: translateY(-1px);
+    }
+
+.auth-card {
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+.text-primary-gradient {
+    background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-brand {
+    background: var(--brand-gradient);
+    color: #ffffff;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-brand:hover {
+        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+        color: #ffffff;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        transform: translateY(-1px);
+    }
+
+.auth-card {
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.dark-stat-card {
+    background: #181824;
+    border-radius: 1.25rem;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -4018,3 +4091,4 @@ a {
         gap: 8px;
     }
 }
+

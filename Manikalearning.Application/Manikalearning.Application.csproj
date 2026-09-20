@@ -8,20 +8,22 @@
 
   <ItemGroup>
     <Folder Include="Comman\" />
-    <Folder Include="Features\Commands\Authentication\" />
     <Folder Include="Features\Commands\Curriculum\" />
     <Folder Include="Features\Commands\Subscriptions\" />
     <Folder Include="Features\Commands\Questions\" />
-    <Folder Include="Features\Handlers\Assessments\" />
-    <Folder Include="Features\Handlers\Authentication\" />
     <Folder Include="Features\Handlers\Curriculum\" />
     <Folder Include="Features\Handlers\Questions\" />
     <Folder Include="Features\Handlers\Subscriptions\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="8.0.0" />
     <PackageReference Include="MediatR" Version="14.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

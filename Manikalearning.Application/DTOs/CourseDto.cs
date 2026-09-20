@@ -15,6 +15,7 @@
         public string? ExamName { get; set; }
 
         public string? CategoryName { get; set; }
+        public bool Ispublished { get; set; }
 
         public decimal Price { get; set; } 
         public int TotalLectures { get; set; } 

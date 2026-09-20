@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Manikalearning.Application.Services
+namespace Manikalearning.Domain.Behaviors
 {
-    internal class CourseService
+    internal class ValidationBehavior
     {
     }
 }
