@@ -8,24 +8,11 @@ namespace Manikalearning.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.HasKey(u => u.Id);
-
-            builder.Property(u => u.FullName)
-                .IsRequired()
-                .HasMaxLength(150);
-
-            builder.Property(u => u.Email)
-                .IsRequired()
-                .HasMaxLength(150);
-
-            builder.HasIndex(u => u.Email)
-                .IsUnique();
-
-            builder.Property(u => u.Mobile)
-                .HasMaxLength(20);
-
-            object value = builder.Property(u => u.CreatedAt)
-                .HasDefaultValueSql("GETDATE()");
+            builder.ToTable("Users");
+             
+            builder.Property(u => u.FullName).HasMaxLength(150).IsRequired();
+            builder.Property(u => u.Mobile).HasMaxLength(20);
+            builder.Property(u => u.ProfileImage).HasMaxLength(500); 
         }
     }
 }

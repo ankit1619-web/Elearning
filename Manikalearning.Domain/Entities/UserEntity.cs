@@ -34,17 +34,17 @@ namespace Manikalearning.Domain.Entities
         public ICollection<StudentSubscription> StudentSubscriptions { get; set; } = new List<StudentSubscription>();
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
-
     [Table("Roles")]
     public class Role : IdentityRole<Guid>
     {
-        public Role()
-        {
-            Id = Guid.NewGuid();
-        }
+        public Role() : base() { }
 
-        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public Role(string roleName) : base(roleName) { }
+
+        // Navigation Property
+        public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
+    
 
     [Table("UserRoles")]
     public class UserRole : IdentityUserRole<Guid>
