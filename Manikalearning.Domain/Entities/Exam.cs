@@ -17,6 +17,7 @@ namespace Manikalearning.Domain.Entities
 
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
+        public int DisplayOrder { get; set; }
 
         public bool IsActive { get; set; } = true;
 
@@ -26,18 +27,19 @@ namespace Manikalearning.Domain.Entities
         public ICollection<Question> Questions { get; set; }
     }
 
+     
     [Table("ExamCourses")]
     public class ExamCourse
     {
         public Guid ExamId { get; set; }
+        public Guid CourseId { get; set; }
+         
+        [ForeignKey("ExamId")]
+        public virtual Exam? Exam { get; set; }
 
-        public Guid CourseId { get; set; } 
-
-        public Exam Exam { get; set; } = null!;
-
-        public Course Course { get; set; } = null!;
+        [ForeignKey("CourseId")]
+        public virtual Course? Course { get; set; }
     }
-
     [Table("Papers")]
     public class Paper
     {
@@ -56,6 +58,7 @@ namespace Manikalearning.Domain.Entities
         public string PaperCode { get; set; }     // e.g., 'paper-1'
 
         public string Description { get; set; }
+        public int DisplayOrder { get; set; }
 
         public bool IsActive { get; set; } = true;
           

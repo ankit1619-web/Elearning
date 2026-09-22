@@ -1,0 +1,87 @@
+﻿@model Manikalearning.Web.Areas.Admin.ViewModels.CourseLectureViewModel
+
+@{
+    string title = Model.IsEdit ? "Edit Lecture" : "Add New Lecture";
+    string actionName = Model.IsEdit ? "Edit" : "Create";
+}
+
+<div class="modal-header border-bottom-0 pb-0">
+    <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">@title</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-area="Admin" asp-controller="CourseLectures" asp-action="@actionName" method="post" onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="CourseSectionId" />
+
+    @if (Model.IsEdit)
+    {
+        <input type="hidden" asp-for="LectureId" />
+    }
+
+    <div class="modal-body py-3">
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label text-muted small fw-semibold"></label>
+            <input asp-for="Title" class="form-control rounded-3 shadow-none" placeholder="e.g. 1.1 Overview of C# Syntax" required />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="VideoUrl" class="form-label text-muted small fw-semibold"></label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-link-45deg"></i></span>
+                <input asp-for="VideoUrl" class="form-control rounded-end-3 shadow-none border-start-0" placeholder="e.g. https://youtube.com/watch?v=..." />
+            </div>
+            <span asp-validation-for="VideoUrl" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PdfUrl" class="form-label text-muted small fw-semibold"></label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-file-earmark-pdf"></i></span>
+                <input asp-for="PdfUrl" class="form-control rounded-end-3 shadow-none border-start-0" placeholder="e.g. Attachment / Notes Link" />
+            </div>
+            <span asp-validation-for="PdfUrl" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-3 mb-2">
+            <div class="col-6">
+                <label asp-for="DurationInMinutes" class="form-label text-muted small fw-semibold"></label>
+                <input asp-for="DurationInMinutes" type="number" class="form-control rounded-3 shadow-none" min="0" />
+                <span asp-validation-for="DurationInMinutes" class="text-danger small"></span>
+            </div>
+
+            <div class="col-6">
+                <label asp-for="DisplayOrder" class="form-label text-muted small fw-semibold"></label>
+                <input asp-for="DisplayOrder" type="number" class="form-control rounded-3 shadow-none" min="0" required />
+                <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-6">
+                <div class="form-check form-switch">
+                    <input class="form-check-input shadow-none" type="checkbox" asp-for="IsPreview" id="IsPreviewSwitch" />
+                    <label class="form-check-label fw-medium text-dark small" for="IsPreviewSwitch">Free Preview</label>
+                </div>
+            </div>
+
+            @if (Model.IsEdit)
+            {
+                <div class="col-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input shadow-none" type="checkbox" asp-for="IsActive" id="IsActiveSwitch" />
+                        <label class="form-check-label fw-medium text-dark small" for="IsActiveSwitch">Publish Status</label>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> Save Lecture
+        </button>
+    </div>
+</form>

@@ -32,12 +32,14 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Coursesection
             {
                 var sections = await _sectionRepository.Entity()
                     .AsNoTracking()
+                    .Include(c=>c.Course)
                     .Where(s => s.CourseId == request.CourseId)
                     .OrderBy(s => s.DisplayOrder)
                     .Select(s => new CourseSectionDto
                     {
                         CourseSectionId = s.CourseSectionId,
                         CourseId = s.CourseId,
+                        CourseName = s.Course.CourseName,
                         SectionName = s.SectionName,
                         Description = s.Description,
                         DisplayOrder = s.DisplayOrder,

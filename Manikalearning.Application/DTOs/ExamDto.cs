@@ -124,23 +124,18 @@
         public int TotalAttempts { get; set; }
     }
 
-
     public class ExamCourseDto
     {
+        public Guid ExamId { get; set; }
         public Guid CourseId { get; set; }
-
-        public string CourseName { get; set; } = string.Empty;
-
-        public string? ThumbnailUrl { get; set; }
-
         public decimal Price { get; set; }
-
-        public decimal? DiscountPrice { get; set; }
-
-        public int TotalLectures { get; set; }
-
-        public int TotalHours { get; set; }
-    }
+        public string CourseName { get; set; } = string.Empty;
+        public string ExamName { get; set; } = string.Empty;
+        public string? ExamCode { get; set; }
+        public string? Description { get; set; }
+        public string? ImageUrl { get; set; }
+        public bool IsActive { get; set; }
+    } 
 
 
     public class ExamPatternDto

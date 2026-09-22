@@ -59,7 +59,7 @@ namespace Manikalearning.Domain.Entities
         [StringLength(250)]
         public string LectureTitle { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [StringLength(1000)]
         public string VideoUrl { get; set; }

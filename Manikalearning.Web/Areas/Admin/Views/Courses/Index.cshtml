@@ -68,19 +68,30 @@
                                 }
                             </td>
                             <td class="text-end pe-3">
-                                <div class="d-inline-flex gap-1"> 
-                                    <a href="/Admin/CourseSections/@item.Id" 
-                                        class="btn btn-sm btn-light text-info shadow-none rounded-2" 
-                                        title="Manage Sections">
-                                         <i class="bi bi-list-nested"></i>
-                                     </a>
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Manage Exams -->
+                                    <a href="/Admin/CourseExam/Manage?courseId=@item.Id"
+                                       class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                       title="Manage Exams">
+                                        <i class="bi bi-journal-check me-1"></i> 
+                                    </a>
+
+                                    <!-- Manage Sections -->
+                                    <a href="/Admin/CourseSections/@item.Id"
+                                       class="btn btn-sm btn-light text-info shadow-none rounded-2"
+                                       title="Manage Sections">
+                                        <i class="bi bi-list-nested"></i>
+                                    </a>
+
+                                    <!-- Edit Course -->
                                     <button type="button"
                                             class="btn btn-sm btn-light text-primary shadow-none rounded-2"
                                             title="Edit Course"
                                             onclick="Toast.openModal('/Admin/Courses/EditPartial/@item.Id', 'modal-lg')">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                     
+
+                                    <!-- Delete Course -->
                                     <button type="button"
                                             class="btn btn-sm btn-light text-danger shadow-none rounded-2"
                                             title="Delete Course"

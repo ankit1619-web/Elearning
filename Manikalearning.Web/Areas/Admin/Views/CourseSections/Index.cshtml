@@ -6,15 +6,23 @@
     ViewData["HeaderTitle"] = "Course Sections";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var courseId = (Guid)ViewData["CourseId"]!;
+    var courseName = ViewData["CourseName"]?.ToString() ?? "Selected Course";
 }
 
 @Html.AntiForgeryToken()
 
-<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white"> 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-            <h5 class="fw-bold text-dark mb-1">Course Modules & Sections</h5>
-            <p class="text-muted small mb-0">Organize course content, display order, and active modules.</p>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="/Admin/Courses" class="btn btn-sm btn-light border shadow-none rounded-2 me-1" title="Back to Courses">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h5 class="fw-bold text-dark mb-0">Course Modules & Sections</h5>
+            </div>
+            <p class="text-muted small mb-0 ms-4">
+                Managing sections for: <span class="fw-semibold text-primary">@courseName</span>
+            </p>
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -29,12 +37,13 @@
         </div>
     </div>
 
+    <!-- Table -->
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="sectionsTable">
             <thead class="table-light rounded-3">
                 <tr>
                     <th class="text-muted fw-semibold border-0 py-3 ps-3" style="width: 100px;">Order</th>
-                    <th class="text-muted fw-semibold border-0 py-3">Section Title</th> 
+                    <th class="text-muted fw-semibold border-0 py-3">Section Title</th>
                     <th class="text-muted fw-semibold border-0 py-3">Status</th>
                     <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Actions</th>
                 </tr>
@@ -63,7 +72,7 @@
                                         }
                                     </div>
                                 </div>
-                            </td> 
+                            </td>
                             <td>
                                 @if (item.IsActive)
                                 {
@@ -79,14 +88,20 @@
                                 }
                             </td>
                             <td class="text-end pe-3">
-                                <div class="d-inline-flex gap-1">
+                                <div class="d-inline-flex gap-1"> 
+                                    <a href="/Admin/CourseLectures/@item.CourseSectionId"
+                                       class="btn btn-sm btn-light text-info shadow-none rounded-2"
+                                       title="Manage Lectures">
+                                        <i class="bi bi-play-circle"></i>
+                                    </a>
+ 
                                     <button type="button"
                                             class="btn btn-sm btn-light text-primary shadow-none rounded-2"
                                             title="Edit Section"
                                             onclick="Toast.openModal('/Admin/CourseSections/EditPartial/@item.CourseSectionId', 'modal-md')">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-
+ 
                                     <button type="button"
                                             class="btn btn-sm btn-light text-danger shadow-none rounded-2"
                                             title="Delete Section"
@@ -101,7 +116,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center py-5">
+                        <td colspan="4" class="text-center py-5">
                             <div class="text-muted">
                                 <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                                 <h6 class="fw-semibold mb-1">No Sections Found</h6>
@@ -148,7 +163,7 @@
         deleteModalInstance.show();
     }
 
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (!selectedDeleteId) return;
 
         deleteModalInstance.hide();
@@ -162,7 +177,7 @@
             data: {
                 __RequestVerificationToken: token
             },
-            success: function (response) {
+            success: function(response) {
                 Toast.hideLoader();
 
                 if (typeof response === 'object' && response.isSuccess) {
@@ -173,7 +188,7 @@
                     Toast.error(errorMsg);
                 }
             },
-            error: function () {
+            error: function() {
                 Toast.hideLoader();
                 Toast.error("An error occurred while deleting the section.");
             }
@@ -187,7 +202,7 @@
         const trs = table.getElementsByTagName("tr");
 
         for (let i = 1; i < trs.length; i++) {
-            const td = trs[i].getElementsByTagName("td")[1]; // Search by Section Title column
+            const td = trs[i].getElementsByTagName("td")[1];
             if (td) {
                 const textValue = td.textContent || td.innerText;
                 trs[i].style.display = textValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";

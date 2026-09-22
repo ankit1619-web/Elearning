@@ -1,188 +1,236 @@
-﻿<!DOCTYPE html>
+﻿@using Manikalearning.Web.Helpers
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Manika Learning Admin</title>
-     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-     
-    <link rel="stylesheet"  href="~/css/adminlayout.css"  asp-append-version="true" />
 
-    @await RenderSectionAsync("Styles", required: false) 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/adminlayout.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
      
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+     
     <nav id="sidebar">
         <div class="sidebar-brand">
-            <i class="bi bi-mortarboard-fill fs-4 text-indigo"></i>
-            <span>Manika Admin</span>
+            <div class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div class="brand-text">
+                <span class="fw-bold fs-6">Manika Admin</span>
+                <small class="d-block text-muted" style="font-size: 11px;">LMS Management</small>
+            </div>
+            <button class="btn btn-sm btn-light border-0 d-lg-none ms-auto" id="sidebarCloseBtn">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
-        <div class="py-3 overflow-auto" style="height: calc(100vh - 75px);">
+
+        <div class="sidebar-scroll">
             <ul class="nav flex-column" id="adminSidebarMenu">
-             
+                 
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                    <a class="nav-link @Html.IsActive("Dashboard")" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Dashboard</span>
                     </a>
                 </li>
                  
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuUsers" role="button" aria-expanded="false">
-                        <i class="bi bi-people-fill"></i> User Management <i class="bi bi-chevron-down ms-auto fs-7"></i>
+                    <a class="nav-link @Html.IsMenuCollapsed("Users", "Roles", "UserRoles")"
+                       data-bs-toggle="collapse" href="#menuUsers" role="button">
+                        <i class="bi bi-people-fill"></i>
+                        <span>User Management</span>
+                        <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
                     </a>
-                    <div class="collapse" id="menuUsers" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Roles" asp-action="Index">Roles</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="UserRoles" asp-action="Index">User Roles</a></li>
+                    <div class="collapse @Html.IsMenuShow("Users", "Roles", "UserRoles")" id="menuUsers" data-bs-parent="#adminSidebarMenu">
+                        <ul class="sub-menu">
+                            <li><a class="sub-link @Html.IsActive("Users")" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
+                            <li><a class="sub-link @Html.IsActive("Roles")" asp-area="Admin" asp-controller="Roles" asp-action="Index">Roles</a></li>
+                            <li><a class="sub-link @Html.IsActive("UserRoles")" asp-area="Admin" asp-controller="UserRoles" asp-action="Index">User Roles</a></li>
                         </ul>
                     </div>
                 </li>
-                 
+
+                <!-- CURRICULUM SETUP -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuCurriculum" role="button" aria-expanded="false">
-                        <i class="bi bi-diagram-3-fill"></i> Curriculum Setup <i class="bi bi-chevron-down ms-auto fs-7"></i>
+                    <a class="nav-link @Html.IsMenuCollapsed("Exams", "Subjects", "Sections", "Topics", "SubTopics")"
+                       data-bs-toggle="collapse" href="#menuCurriculum" role="button">
+                        <i class="bi bi-diagram-3-fill"></i>
+                        <span>Curriculum Setup</span>
+                        <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
                     </a>
-                    <div class="collapse" id="menuCurriculum" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Exams" asp-action="Index">Exams & Papers</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Subjects" asp-action="Index">Subjects</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Sections" asp-action="Index">Sections (PYQ Categories)</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Topics" asp-action="Index">Topics</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="SubTopics" asp-action="Index">SubTopics</a></li>
+                    <div class="collapse @Html.IsMenuShow("Exams", "Subjects", "Sections", "Topics", "SubTopics")" id="menuCurriculum" data-bs-parent="#adminSidebarMenu">
+                        <ul class="sub-menu">
+                            <li><a class="sub-link @Html.IsActive("Exams")" asp-area="Admin" asp-controller="Exams" asp-action="Index">Exams & Papers</a></li>
+                            <li><a class="sub-link @Html.IsActive("Subjects")" asp-area="Admin" asp-controller="Subjects" asp-action="Index">Subjects</a></li>
+                            <li><a class="sub-link @Html.IsActive("Sections")" asp-area="Admin" asp-controller="Sections" asp-action="Index">Sections (PYQ Categories)</a></li>
+                            <li><a class="sub-link @Html.IsActive("Topics")" asp-area="Admin" asp-controller="Topics" asp-action="Index">Topics</a></li>
+                            <li><a class="sub-link @Html.IsActive("SubTopics")" asp-area="Admin" asp-controller="SubTopics" asp-action="Index">SubTopics</a></li>
                         </ul>
                     </div>
                 </li>
-                 
+
+                <!-- COURSES -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuCourses" role="button" aria-expanded="false">
-                        <i class="bi bi-camera-video-fill"></i> Course Builder <i class="bi bi-chevron-down ms-auto fs-7"></i>
+                    <a class="nav-link @Html.IsActive("Courses")" asp-area="Admin" asp-controller="Courses" asp-action="Index">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                        <span>Courses</span>
                     </a>
-                    <div class="collapse" id="menuCourses" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Courses" asp-action="Index">All Courses</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="CourseSections" asp-action="Index">Course Sections (Modules)</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="CourseLectures" asp-action="Index">Lectures & Notes</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="ExamCourses" asp-action="Index">Exam-Course Mapping</a></li>
+                </li>
+
+                <!-- QUESTION BANK -->
+                <li class="nav-item">
+                    <a class="nav-link @Html.IsMenuCollapsed("Questions", "QuestionOptions", "QuestionPassages")"
+                       data-bs-toggle="collapse" href="#menuQuestionBank" role="button">
+                        <i class="bi bi-database-fill"></i>
+                        <span>Question Bank</span>
+                        <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
+                    </a>
+                    <div class="collapse @Html.IsMenuShow("Questions", "QuestionOptions", "QuestionPassages")" id="menuQuestionBank" data-bs-parent="#adminSidebarMenu">
+                        <ul class="sub-menu">
+                            <li><a class="sub-link @Html.IsActive("Questions")" asp-area="Admin" asp-controller="Questions" asp-action="Index">Manage Questions</a></li>
+                            <li><a class="sub-link @Html.IsActive("QuestionOptions")" asp-area="Admin" asp-controller="QuestionOptions" asp-action="Index">Question Options</a></li>
+                            <li><a class="sub-link @Html.IsActive("QuestionPassages")" asp-area="Admin" asp-controller="QuestionPassages" asp-action="Index">Passages (Comprehension)</a></li>
                         </ul>
                     </div>
                 </li>
-                 
+
+                <!-- MOCK TESTS -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuQuestionBank" role="button" aria-expanded="false">
-                        <i class="bi bi-database-fill"></i> Question Bank <i class="bi bi-chevron-down ms-auto fs-7"></i>
+                    <a class="nav-link @Html.IsMenuCollapsed("Tests", "TestQuestions", "TestAttempts", "TestAttemptAnswers")"
+                       data-bs-toggle="collapse" href="#menuMockTests" role="button">
+                        <i class="bi bi-ui-checks"></i>
+                        <span>Mock Tests</span>
+                        <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
                     </a>
-                    <div class="collapse" id="menuQuestionBank" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Questions" asp-action="Index">Manage Questions</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="QuestionOptions" asp-action="Index">Question Options</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="QuestionPassages" asp-action="Index">Passages (Comprehension)</a></li>
+                    <div class="collapse @Html.IsMenuShow("Tests", "TestQuestions", "TestAttempts", "TestAttemptAnswers")" id="menuMockTests" data-bs-parent="#adminSidebarMenu">
+                        <ul class="sub-menu">
+                            <li><a class="sub-link @Html.IsActive("Tests")" asp-area="Admin" asp-controller="Tests" asp-action="Index">Test Series Setup</a></li>
+                            <li><a class="sub-link @Html.IsActive("TestQuestions")" asp-area="Admin" asp-controller="TestQuestions" asp-action="Index">Test Questions</a></li>
+                            <li><a class="sub-link @Html.IsActive("TestAttempts")" asp-area="Admin" asp-controller="TestAttempts" asp-action="Index">Student Attempts</a></li>
+                            <li><a class="sub-link @Html.IsActive("TestAttemptAnswers")" asp-area="Admin" asp-controller="TestAttemptAnswers" asp-action="Index">Attempt Answers</a></li>
                         </ul>
                     </div>
                 </li>
-                 
+
+                <!-- SALES & REVENUE -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuMockTests" role="button" aria-expanded="false">
-                        <i class="bi bi-ui-checks"></i> Mock Tests <i class="bi bi-chevron-down ms-auto fs-7"></i>
+                    <a class="nav-link @Html.IsMenuCollapsed("Plans", "PlanCourses", "Coupons", "Payments")"
+                       data-bs-toggle="collapse" href="#menuSales" role="button">
+                        <i class="bi bi-credit-card-fill"></i>
+                        <span>Sales & Revenue</span>
+                        <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
                     </a>
-                    <div class="collapse" id="menuMockTests" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Tests" asp-action="Index">Test Series Setup</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="TestQuestions" asp-action="Index">Test Questions</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="TestAttempts" asp-action="Index">Student Attempts</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="TestAttemptAnswers" asp-action="Index">Attempt Answers</a></li>
+                    <div class="collapse @Html.IsMenuShow("Plans", "PlanCourses", "Coupons", "Payments")" id="menuSales" data-bs-parent="#adminSidebarMenu">
+                        <ul class="sub-menu">
+                            <li><a class="sub-link @Html.IsActive("Plans")" asp-area="Admin" asp-controller="Plans" asp-action="Index">Subscription Plans</a></li>
+                            <li><a class="sub-link @Html.IsActive("PlanCourses")" asp-area="Admin" asp-controller="PlanCourses" asp-action="Index">Plan-Course Access</a></li>
+                            <li><a class="sub-link @Html.IsActive("Coupons")" asp-area="Admin" asp-controller="Coupons" asp-action="Index">Promo Coupons</a></li>
+                            <li><a class="sub-link @Html.IsActive("Payments")" asp-area="Admin" asp-controller="Payments" asp-action="Index">Payment Transactions</a></li>
                         </ul>
                     </div>
                 </li>
-                 
+
+                <!-- STUDENT TRACKING -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuSales" role="button" aria-expanded="false">
-                        <i class="bi bi-credit-card-fill"></i> Sales & Revenue <i class="bi bi-chevron-down ms-auto fs-7"></i>
+                    <a class="nav-link @Html.IsMenuCollapsed("StudentSubscriptions", "StudentCourses", "StudentLectureProgress", "Bookmarks", "QuestionMistakes")"
+                       data-bs-toggle="collapse" href="#menuStudents" role="button">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span>Student Tracking</span>
+                        <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
                     </a>
-                    <div class="collapse" id="menuSales" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Plans" asp-action="Index">Subscription Plans</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="PlanCourses" asp-action="Index">Plan-Course Access</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Coupons" asp-action="Index">Promo Coupons</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Payments" asp-action="Index">Payment Transactions</a></li>
+                    <div class="collapse @Html.IsMenuShow("StudentSubscriptions", "StudentCourses", "StudentLectureProgress", "Bookmarks", "QuestionMistakes")" id="menuStudents" data-bs-parent="#adminSidebarMenu">
+                        <ul class="sub-menu">
+                            <li><a class="sub-link @Html.IsActive("StudentSubscriptions")" asp-area="Admin" asp-controller="StudentSubscriptions" asp-action="Index">Active Subscriptions</a></li>
+                            <li><a class="sub-link @Html.IsActive("StudentCourses")" asp-area="Admin" asp-controller="StudentCourses" asp-action="Index">Enrolled Courses</a></li>
+                            <li><a class="sub-link @Html.IsActive("StudentLectureProgress")" asp-area="Admin" asp-controller="StudentLectureProgress" asp-action="Index">Lecture Progress</a></li>
+                            <li><a class="sub-link @Html.IsActive("Bookmarks")" asp-area="Admin" asp-controller="Bookmarks" asp-action="Index">Saved Bookmarks</a></li>
+                            <li><a class="sub-link @Html.IsActive("QuestionMistakes")" asp-area="Admin" asp-controller="QuestionMistakes" asp-action="Index">Mistake Book</a></li>
                         </ul>
                     </div>
                 </li>
-                 
-                <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuStudents" role="button" aria-expanded="false">
-                        <i class="bi bi-person-lines-fill"></i> Student Tracking <i class="bi bi-chevron-down ms-auto fs-7"></i>
-                    </a>
-                    <div class="collapse" id="menuStudents" data-bs-parent="#adminSidebarMenu">
-                        <ul class="nav flex-column sub-menu ps-3">
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="StudentSubscriptions" asp-action="Index">Active Subscriptions</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="StudentCourses" asp-action="Index">Enrolled Courses</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="StudentLectureProgress" asp-action="Index">Lecture Progress</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="Bookmarks" asp-action="Index">Saved Bookmarks</a></li>
-                            <li><a class="nav-link" asp-area="Admin" asp-controller="QuestionMistakes" asp-action="Index">Mistake Book</a></li>
-                        </ul>
-                    </div>
-                </li> 
+
             </ul>
         </div>
     </nav>
-     
-    <div id="content"> 
+
+    <!-- CONTENT AREA -->
+    <div id="content">
         <header class="admin-navbar">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light border-0 shadow-none d-md-none" id="sidebarToggle">
-                    <i class="bi bi-list fs-5"></i>
+                <button class="btn btn-light border-0 shadow-none d-lg-none" id="sidebarToggle">
+                    <i class="bi bi-list fs-4"></i>
                 </button>
-                <h5 class="fw-bold mb-0 text-dark">@ViewData["HeaderTitle"]</h5>
+                <h5 class="fw-bold mb-0 text-dark">@(ViewData["HeaderTitle"] ?? ViewData["Title"] ?? "Admin Portal")</h5>
             </div>
+
             <div class="d-flex align-items-center gap-3">
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark fw-medium" data-bs-toggle="dropdown">
-                        <div class="bg-indigo-subtle text-indigo rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 38px; height: 38px; background-color: #eef2ff; color: #6366f1;">
+                        <div class="avatar-circle me-2">
                             <i class="bi bi-person-fill"></i>
                         </div>
-                        <span>Administrator</span>
+                        <span class="d-none d-sm-inline">Administrator</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
                         <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="dropdown-item text-danger fw-medium d-flex align-items-center gap-2">
-                                <i class="bi bi-box-arrow-right"></i> Sign Out
-                            </button>
-                        </form>
+                        <li>
+                            <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item text-danger fw-medium d-flex align-items-center gap-2">
+                                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                                </button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
         </header>
-         
-        <main class="p-4">
+
+        <!-- main tag par container-fluid w-100 add kiya body responsiveness ke liye -->
+        <main class="container-fluid p-3 p-md-4 w-100">
+            <!-- Global Loader -->
             <div id="globalLoader" class="d-none">
-                <div class="spinner-border shadow-sm" style="color: #6366f1; width: 3.5rem; height: 3.5rem; border-width: 0.35em;" role="status">
+                <div class="spinner-border text-primary shadow-sm" style="width: 3.5rem; height: 3.5rem; border-width: 0.35em;" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-            </div> 
+            </div>
+
+            <!-- Global Modal -->
             <div class="modal fade" id="globalModal" tabindex="-1" aria-labelledby="globalModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div class="modal-dialog modal-dialog-centered" id="globalModalSize">
-                    <div class="modal-content rounded-4 border-0 shadow-lg" id="globalModalContent">
-                      
-                    </div>
+                <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down" id="globalModalSize">
+                    <div class="modal-content rounded-4 border-0 shadow-lg" id="globalModalContent"></div>
                 </div>
             </div>
-            <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 1055;" id="toastContainer"> 
-            </div>
+
+            <!-- Global Toast Container -->
+            <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 1055;" id="toastContainer"></div>
+
             @RenderBody()
         </main>
     </div>
-    <script src="~/js/admin-ui.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SCRIPTS (jQuery MUST be loaded first) -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/admin-ui.js" asp-append-version="true"></script>
+
+    <script>
+            $(document).ready(function() {
+                $('#sidebarToggle, #sidebarCloseBtn, #sidebarBackdrop').on('click', function() {
+                    $('#sidebar').toggleClass('show');
+                    $('#sidebarBackdrop').toggleClass('show');
+                });
+            });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

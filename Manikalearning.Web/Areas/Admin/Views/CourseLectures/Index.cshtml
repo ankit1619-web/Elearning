@@ -1,0 +1,235 @@
+﻿@using Manikalearning.Application.DTOs
+@model List<CourseLectureDto>
+
+@{
+    ViewData["Title"] = "Course Lectures";
+    ViewData["HeaderTitle"] = "Lectures & Resources";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var sectionId = (Guid)ViewData["SectionId"]!;
+    var courseId = ViewData["CourseId"] != null ? (Guid)ViewData["CourseId"]! : Guid.Empty;
+    var sectionTitle = ViewData["SectionTitle"]?.ToString() ?? "Selected Section";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <!-- Header with Back Navigation -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                @if (courseId != Guid.Empty)
+                {
+                    <a href="/Admin/CourseSections/@courseId" class="btn btn-sm btn-light border shadow-none rounded-2 me-1" title="Back to Sections">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                }
+                <h5 class="fw-bold text-dark mb-0">Section Lectures & Content</h5>
+            </div>
+            <p class="text-muted small mb-0 ms-4">
+                Managing lectures for: <span class="fw-semibold text-primary">@sectionTitle</span>
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <div class="input-group input-group-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-light border-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="tableSearch" class="form-control bg-light border-0 shadow-none" placeholder="Search lectures..." onkeyup="filterTable()">
+            </div>
+
+            <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm" onclick="Toast.openModal('/Admin/CourseLectures/CreatePartial/@sectionId', 'modal-lg')">
+                <i class="bi bi-plus-lg me-1"></i> Add Lecture
+            </button>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="lecturesTable">
+            <thead class="table-light rounded-3">
+                <tr>
+                    <th class="text-muted fw-semibold border-0 py-3 ps-3" style="width: 90px;">Order</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Lecture Title</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Duration</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Preview</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Status</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-3">
+                                <span class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-semibold">
+                                    #@item.DisplayOrder
+                                </span>
+                            </td>
+                            <td class="fw-medium text-dark">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-play-btn fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block fw-semibold text-dark">@item.LectureTitle</span>
+                                        @if (!string.IsNullOrEmpty(item.VideoUrl))
+                                        {
+                                            <a href="@item.VideoUrl" target="_blank" class="text-muted small text-decoration-none">
+                                                <i class="bi bi-link-45deg me-1"></i>Watch Video
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-muted small fw-semibold">
+                                    <i class="bi bi-clock me-1"></i>@item.VideoDurationSeconds seconds
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.IsFreePreview)
+                                {
+                                    <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2 fw-medium">
+                                        Free Preview
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border rounded-pill px-3 py-2 fw-medium">
+                                        Locked
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsPublished)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-medium">
+                                        Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                            title="Edit Lecture"
+                                            onclick="Toast.openModal('/Admin/CourseLectures/EditPartial/@item.LectureId', 'modal-lg')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-danger shadow-none rounded-2"
+                                            title="Delete Lecture"
+                                            onclick="confirmDelete('@item.LectureId', '@item.LectureTitle')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                <h6 class="fw-semibold mb-1">No Lectures Found</h6>
+                                <p class="small mb-0">Click on "Add Lecture" to upload or link your first video.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-exclamation-octagon-fill display-5"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2">Delete Lecture?</h6>
+                <p class="text-muted small mb-4" id="deleteLectureWarningText">Are you sure you want to delete this lecture?</p>
+
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-3 px-3 w-50" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger rounded-3 px-3 w-50">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedDeleteId = null;
+    let deleteModalInstance = null;
+
+    function confirmDelete(id, lectureTitle) {
+        selectedDeleteId = id;
+        document.getElementById('deleteLectureWarningText').innerText = `Are you sure you want to delete "${lectureTitle}"? This action cannot be undone.`;
+
+        const modalEl = document.getElementById('deleteConfirmModal');
+        deleteModalInstance = new bootstrap.Modal(modalEl);
+        deleteModalInstance.show();
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (!selectedDeleteId) return;
+
+        deleteModalInstance.hide();
+        Toast.showLoader();
+
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '/Admin/CourseLectures/Delete/' + selectedDeleteId,
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: token
+            },
+            success: function(response) {
+                Toast.hideLoader();
+
+                if (typeof response === 'object' && response.isSuccess) {
+                    Toast.success(response.message || "Lecture deleted successfully.");
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const errorMsg = (response && response.message) ? response.message : "Unable to delete lecture.";
+                    Toast.error(errorMsg);
+                }
+            },
+            error: function() {
+                Toast.hideLoader();
+                Toast.error("An error occurred while deleting the lecture.");
+            }
+        });
+    });
+
+    function filterTable() {
+        const input = document.getElementById("tableSearch");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("lecturesTable");
+        const trs = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < trs.length; i++) {
+            const td = trs[i].getElementsByTagName("td")[1];
+            if (td) {
+                const textValue = td.textContent || td.innerText;
+                trs[i].style.display = textValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>

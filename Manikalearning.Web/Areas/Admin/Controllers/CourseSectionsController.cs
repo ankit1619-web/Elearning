@@ -38,6 +38,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 TempData["ErrorMessage"] = response.Message;
 
             ViewData["CourseId"] = courseId;
+            ViewData["CourseName"] = response.Data.FirstOrDefault()?.CourseName!;
             ViewData["SearchTerm"] = search;
             return View(sections ?? new());
         }
