@@ -41,7 +41,10 @@ namespace Manikalearning.Infrastructure.Repositories
         public void Update(T entity) => _dbSet.Update(entity);
 
         public void Remove(T entity) => _dbSet.Remove(entity);
-
+        public void RemoveRange(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
+        }
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
     }
 }

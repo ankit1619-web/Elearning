@@ -83,12 +83,7 @@ namespace Manikalearning.Infrastructure.Configurations
                 .WithMany(x => x.Questions) // Link to the collection on Subject, if it exists
                 .HasForeignKey(x => x.SubjectId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Topic
-            builder.HasOne(x => x.Topic)
-                .WithMany(x => x.Questions) // Link to the collection on Topic, if it exists
-                .HasForeignKey(x => x.TopicId)
-                .OnDelete(DeleteBehavior.Restrict);
+             
 
             // SubTopic
             builder.HasOne(x => x.SubTopic)

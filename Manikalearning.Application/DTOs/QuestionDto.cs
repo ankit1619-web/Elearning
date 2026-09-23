@@ -27,8 +27,8 @@ namespace Manikalearning.Application.DTOs
         public string? Explanation { get; set; }
 
         public string? ShortExplanation { get; set; }
-
-        public DifficultyLevel? Difficulty { get; set; }
+         
+        public DifficultyLevel Difficulty { get; set; } 
 
         public decimal Marks { get; set; }
 
@@ -50,5 +50,6 @@ namespace Manikalearning.Application.DTOs
 
         public List<QuestionOptionDto> Options { get; set; }
             = new();
+
     }
 }

@@ -78,8 +78,8 @@ namespace Manikalearning.Domain.Entities
         public Paper Paper { get; set; }
 
         [Required, MaxLength(150)]
-        public string SubjectName { get; set; }   
-        
+        public string SubjectName { get; set; }
+        public int DisplayOrder { get; set; }
         public string Description { get; set; }
 
         public bool IsActive { get; set; } = true; 
@@ -100,19 +100,11 @@ namespace Manikalearning.Domain.Entities
 
         [Required, MaxLength(150)]
         public string SectionName { get; set; } // e.g., 'Data Structures' under Computer Science, or 'Characteristics of Teaching'
-
-        [Required, MaxLength(150)]
-        public string Slug { get; set; }     // e.g., 'data-structures'
-
-        public string Description { get; set; }
-
+           
         public int DisplayOrder { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-         
-        public ICollection<Topic> Topics { get; set; }
+        public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>(); 
     }
 
     [Table("Topics")]
@@ -122,27 +114,18 @@ namespace Manikalearning.Domain.Entities
         public Guid TopicId { get; set; } = Guid.NewGuid();
 
         [Required]
-        public Guid SectionId { get; set; }
-        [ForeignKey("SectionId")]
-        public Section Section { get; set; }
+        public Guid SectionId { get; set; } 
 
         [Required, MaxLength(150)]
-        public string TopicName { get; set; } // e.g., 'Arrays and Linked Lists' or 'Learner Characteristics'
+        public string TopicName { get; set; } 
 
-        [Required, MaxLength(150)]
-        public string Slug { get; set; }     // e.g., 'arrays-and-linked-lists'
-
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public int DisplayOrder { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation Properties
-        public ICollection<SubTopic> SubTopics { get; set; }
-        public ICollection<Question> Questions { get; set; }
+        [ForeignKey("SectionId")]
+        public virtual Section Section { get; set; } = null!;
     }
 
     [Table("SubTopics")]
@@ -157,19 +140,8 @@ namespace Manikalearning.Domain.Entities
         public Topic Topic { get; set; }
 
         [Required, MaxLength(150)]
-        public string SubTopicName { get; set; } // e.g., 'Singly Linked Lists' or 'Adolescent Learners'
-
-        [Required, MaxLength(150)]
-        public string Slug { get; set; }     // e.g., 'singly-linked-lists'
-
-        public string Description { get; set; }
-
-        public int DisplayOrder { get; set; } = 0;
-
-        public bool IsActive { get; set; } = true;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+        public string SubTopicName { get; set; }  
+        public bool IsActive { get; set; } = true; 
         // Navigation Properties
         public ICollection<Question> Questions { get; set; }
     }

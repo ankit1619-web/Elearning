@@ -9,7 +9,7 @@ namespace Manikalearning.Domain.Entities
     {
         public Guid QuestionId { get; set; }
 
-        public Guid ExamId { get; set; }
+        public Guid? ExamId { get; set; }
 
         public Guid? PaperId { get; set; }
 
@@ -67,6 +67,10 @@ namespace Manikalearning.Domain.Entities
            
         public ICollection<QuestionOption> Options { get; set; }
             = new List<QuestionOption>();
+          
+        public bool IsApproved { get; set; } = true;
+        public bool IsActive { get; set; } = true;
+         public DateTime? UpdatedAt { get; set; } 
     }
 
     [Table("QuestionOptions")]

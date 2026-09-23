@@ -13,11 +13,10 @@ namespace Manikalearning.Infrastructure.Configurations
             builder.Property(t => t.TopicName)
                 .IsRequired()
                 .HasMaxLength(150);
-
             builder.HasOne(t => t.Section)
                 .WithMany(sec => sec.Topics)
                 .HasForeignKey(t => t.SectionId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade); 
         }
     }
 }

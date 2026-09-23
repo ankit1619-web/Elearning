@@ -14,10 +14,6 @@ namespace Manikalearning.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(150);
 
-            builder.HasOne(st => st.Topic)
-                .WithMany(t => t.SubTopics)
-                .HasForeignKey(st => st.TopicId)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

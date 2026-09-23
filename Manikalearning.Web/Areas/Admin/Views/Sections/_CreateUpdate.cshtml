@@ -1,0 +1,59 @@
+﻿@model Manikalearning.Web.Areas.Admin.ViewModels.SectionViewModel
+
+@{
+    bool isEdit = Model.SectionId != Guid.Empty;
+    string title = isEdit ? "Edit Section" : "Create New Section";
+    string actionName = isEdit ? "Edit" : "Create";
+}
+
+<div class="modal-header border-bottom-0 pb-0">
+    <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">@title</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-area="Admin" asp-controller="Sections" asp-action="@actionName" method="post" onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="SectionId" />
+    }
+
+    <div class="modal-body py-3">
+        <div class="mb-3">
+            <label asp-for="SubjectId" class="form-label text-muted small fw-semibold">Subject</label>
+            <select asp-for="SubjectId" asp-items="Model.SubjectsList" class="form-select rounded-3 shadow-none" required>
+                <option value="">-- Select Subject --</option>
+            </select>
+            <span asp-validation-for="SubjectId" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SectionName" class="form-label text-muted small fw-semibold">Section Name</label>
+            <input asp-for="SectionName" class="form-control rounded-3 shadow-none" placeholder="e.g. Teaching Aptitude, General Paper-1" required />
+            <span asp-validation-for="SectionName" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6">
+                <label asp-for="DisplayOrder" class="form-label text-muted small fw-semibold">Display Order</label>
+                <input asp-for="DisplayOrder" type="number" class="form-control rounded-3 shadow-none" min="1" required />
+                <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+            </div>
+
+            <div class="col-6 d-flex align-items-end">
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input shadow-none" type="checkbox" asp-for="IsActive" id="IsActiveSwitch" />
+                    <label class="form-check-label fw-medium text-dark small" for="IsActiveSwitch">Active Status</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> Save Changes
+        </button>
+    </div>
+</form>
