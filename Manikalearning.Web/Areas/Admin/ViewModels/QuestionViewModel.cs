@@ -24,11 +24,13 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
         public DifficultyLevel Difficulty { get; set; } 
 
         [Required(ErrorMessage = "Question text is required.")]
-        public string QuestionText { get; set; } = string.Empty;
-
+        public string QuestionText { get; set; } = string.Empty; 
+        public string? QuestionTextHindi { get; set; }
         public string? Explanation { get; set; }
-        public string? ShortExplanation { get; set; } 
-
+        public string? ExplanationHindi { get; set; }
+        public string? ShortExplanation { get; set; }  
+        public string? ShortExplanationHindi { get; set; }
+         
         [Range(0, 100)]
         public decimal Marks { get; set; } = 1.0m;
 
@@ -64,8 +66,11 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
             PassageId = PassageId,
             QuestionType = QuestionType,
             QuestionText = QuestionText,
+            QuestionTextHindi = QuestionTextHindi,
             Explanation = Explanation,
+            ExplanationHindi = ExplanationHindi,
             ShortExplanation = ShortExplanation,
+            ShortExplanationHindi = ShortExplanationHindi,
             Difficulty = Difficulty,
             Marks = Marks,
             NegativeMarks = NegativeMarks,
@@ -80,6 +85,7 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
                 OptionId = o.OptionId,
                 OptionLabel = o.OptionLabel,
                 OptionText = o.OptionText,
+                OptionTextHindi = o.OptionTextHindi,
                 IsCorrect = o.IsCorrect,
                 DisplayOrder = o.DisplayOrder
             }).ToList() 
@@ -97,8 +103,11 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
             PassageId = PassageId,
             QuestionType = QuestionType,
             QuestionText = QuestionText,
+            QuestionTextHindi = QuestionTextHindi,
             Explanation = Explanation,
+            ExplanationHindi = ExplanationHindi,
             ShortExplanation = ShortExplanation,
+            ShortExplanationHindi = ShortExplanationHindi,
             Difficulty = Difficulty,
             Marks = Marks,
             NegativeMarks = NegativeMarks,
@@ -113,6 +122,7 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
                 OptionId = o.OptionId,
                 OptionLabel = o.OptionLabel,
                 OptionText = o.OptionText,
+                OptionTextHindi = o.OptionTextHindi,
                 IsCorrect = o.IsCorrect,
                 DisplayOrder = o.DisplayOrder
             }).ToList()
@@ -125,6 +135,7 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
 
         [Required(ErrorMessage = "Option text is required.")]
         public string OptionText { get; set; } = string.Empty;
+        public string? OptionTextHindi { get; set; }
         public bool IsCorrect { get; set; }
         public int DisplayOrder { get; set; } = 1;
     }

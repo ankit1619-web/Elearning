@@ -13,29 +13,23 @@
 @Html.AntiForgeryToken()
 
 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-    <!-- Header Controls -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <h5 class="fw-bold text-dark mb-0">Question Bank</h5>
-                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.Count Total</span>
-            </div>
-            <p class="text-muted small mb-0">Manage questions, choices, explanations, and PYQs.</p>
-        </div>
-
-        <div class="d-flex flex-wrap align-items-center gap-2">
-            <div class="input-group input-group-sm rounded-3 overflow-hidden border" style="max-width: 240px;">
+            <h5 class="fw-bold text-dark mb-0">Question Bank <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.Count Total</span></h5>
+               <p class="text-muted small mb-0">Manage questions, choices, explanations, and PYQs.</p>
+        </div>   
+        <div class="d-flex align-items-center gap-2">
+            <div class="input-group input-group-sm rounded-3 overflow-hidden border">
                 <span class="input-group-text bg-light border-0 text-muted"><i class="bi bi-search"></i></span>
                 <input type="text" id="tableSearch" class="form-control bg-light border-0 shadow-none" placeholder="Search questions..." onkeyup="filterQuestionsTable()">
             </div>
-
+            
             <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm"
                     onclick="Toast.openModal('/Admin/Questions/CreatePartial?topicId=@(selectedTopicId ?? Guid.Empty)&subTopicId=@(selectedSubTopicId ?? Guid.Empty)', 'modal-xl')">
                 <i class="bi bi-plus-lg me-1"></i> Add Question
             </button>
         </div>
-    </div>
-
+    </div>  
     <!-- Questions Table -->
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="questionsTable">

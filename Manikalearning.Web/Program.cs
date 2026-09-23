@@ -1,3 +1,4 @@
+using GTranslate.Translators;
 using Manikalearning.Application.Behaviors;
 using Manikalearning.Application.Features.Handlers.Web;
 using Manikalearning.Application.Interface;
@@ -5,6 +6,7 @@ using Manikalearning.Application.Services;
 using Manikalearning.Domain.Entities;
 using Manikalearning.Infrastructure.Data;
 using Manikalearning.Infrastructure.Repositories;
+using Manikalearning.Web.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +58,10 @@ builder.Services.AddMediatR(cfg =>
 });
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
+builder.Services.AddSingleton<GoogleTranslator>();
+builder.Services.AddScoped<ITranslationService, TranslationService>();
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

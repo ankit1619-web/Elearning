@@ -26,14 +26,17 @@ namespace Manikalearning.Domain.Entities
         public Guid? CreatedBy { get; set; }  
 
         public string QuestionText { get; set; } = string.Empty;
+        public string? QuestionTextHindi { get; set; } = string.Empty;
 
         public QuestionType QuestionType { get; set; }
 
         public DifficultyLevel Difficulty { get; set; }
 
         public string? Explanation { get; set; }
+        public string? ExplanationHindi { get; set; }
 
         public string? ShortExplanation { get; set; }
+        public string? ShortExplanationHindi { get; set; }
 
         public decimal Marks { get; set; }
 
@@ -89,6 +92,7 @@ namespace Manikalearning.Domain.Entities
 
         [Required]
         public string OptionText { get; set; }
+        public string? OptionTextHindi { get; set; }
 
         public bool IsCorrect { get; set; } = false;
 

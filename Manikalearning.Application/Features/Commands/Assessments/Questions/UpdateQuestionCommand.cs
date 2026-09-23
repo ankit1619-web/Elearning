@@ -16,10 +16,14 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Questions
         public Guid? PassageId { get; set; }
 
         public QuestionType QuestionType { get; set; }
-        public DifficultyLevel Difficulty { get; set; } 
+        public DifficultyLevel Difficulty { get; set; }
+
         public string QuestionText { get; set; } = string.Empty;
+        public string? QuestionTextHindi { get; set; }
         public string? Explanation { get; set; }
-        public string? ShortExplanation { get; set; } 
+        public string? ExplanationHindi { get; set; }
+        public string? ShortExplanation { get; set; }
+        public string? ShortExplanationHindi { get; set; }
         public decimal Marks { get; set; }
         public decimal NegativeMarks { get; set; }
 

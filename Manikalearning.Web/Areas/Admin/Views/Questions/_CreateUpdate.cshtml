@@ -12,14 +12,13 @@
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<form asp-area="Admin" asp-controller="Questions" asp-action="@actionName" method="post" onsubmit="return Toast.submitModalForm(this);">
+<form id="questionForm" asp-area="Admin" asp-controller="Questions" asp-action="@actionName" method="post" onsubmit="return Toast.submitModalForm(this);">
     @Html.AntiForgeryToken()
     @if (isEdit)
     {
         <input type="hidden" asp-for="QuestionId" />
     }
-
-    <!-- Clean Nav Tabs -->
+     
     <ul class="nav nav-tabs px-3 pt-2 bg-light border-bottom" id="questionTabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active py-2 small fw-semibold" id="category-tab" data-bs-toggle="tab" data-bs-target="#tabCategory" type="button">
@@ -40,8 +39,7 @@
 
     <div class="modal-body py-3">
         <div class="tab-content" id="questionTabsContent">
-
-            <!-- TAB 1: CATEGORIZATION -->
+             
             <div class="tab-pane fade show active" id="tabCategory" role="tabpanel">
                 <div class="row g-2 mb-2">
                     <div class="col-md-6">
@@ -56,8 +54,7 @@
                             <option value="">-- Select Section --</option>
                         </select>
                     </div>
-                </div>
-
+                </div> 
                 <div class="row g-2 mb-2">
                     <div class="col-md-6">
                         <label asp-for="TopicId" class="form-label small fw-semibold text-muted">Topic *</label>
@@ -71,14 +68,12 @@
                             <option value="">-- Select SubTopic --</option>
                         </select>
                     </div>
-                </div>
-
-                <hr class="my-2 text-muted" />
-
+                </div> 
+                <hr class="my-2 text-muted" /> 
                 <div class="row g-2">
                     <div class="col-md-6">
                         <label asp-for="QuestionType" class="form-label small fw-semibold text-muted">Question Type *</label>
-                        <select asp-for="QuestionType" asp-items="Html.GetEnumSelectList<QuestionType>()" class="form-select form-select-sm rounded-2 shadow-none" required></select>
+                        <select asp-for="QuestionType" asp-items="Html.GetEnumSelectList<QuestionType>()" class="form-select form-select-sm rounded-2 shadow-none" id="ddlQuestionType" required></select>
                     </div>
                     <div class="col-md-6">
                         <label asp-for="PassageId" class="form-label small fw-semibold text-muted">Passage (Comprehension)</label>
@@ -86,56 +81,88 @@
                             <option value="">-- None --</option>
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label asp-for="ExamId" class="form-label small fw-semibold text-muted">Exam</label>
-                        <select asp-for="ExamId" asp-items="Model.ExamsList" class="form-select form-select-sm rounded-2 shadow-none">
-                            <option value="">-- Select Exam --</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="PaperId" class="form-label small fw-semibold text-muted">Paper</label>
-                        <select asp-for="PaperId" asp-items="Model.PapersList" class="form-select form-select-sm rounded-2 shadow-none">
-                            <option value="">-- Select Paper --</option>
-                        </select>
-                    </div>
                 </div>
             </div>
-
-            <!-- TAB 2: QUESTION & OPTIONS -->
+             
             <div class="tab-pane fade" id="tabQuestion" role="tabpanel">
-                <div class="mb-3">
-                    <label asp-for="QuestionText" class="form-label small fw-semibold text-muted">Question Text *</label>
-                    <textarea asp-for="QuestionText" class="form-control rounded-2 shadow-none" rows="3" placeholder="Enter question text..." required></textarea>
+                <div class="d-flex justify-content-between align-items-center mb-2 bg-light p-2 rounded border">
+                    <ul class="nav nav-pills nav-fill gap-2" id="langTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active btn-sm py-1 px-3 fw-bold" id="btn-lang-en" data-bs-toggle="pill" data-bs-target="#lang-en" type="button">English</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm py-1 px-3 fw-bold" id="btn-lang-hi" data-bs-toggle="pill" data-bs-target="#lang-hi" type="button">हिंदी (Hindi)</button>
+                        </li>
+                    </ul>
+                    <button type="button" class="btn btn-sm btn-outline-success rounded-2 py-1" id="btnAutoTranslate" title="Auto translate English fields to Hindi">
+                        <i class="bi bi-translate me-1"></i> Auto Translate (EN ➔ HI)
+                    </button>
                 </div>
 
-                <div class="mb-2">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label small fw-semibold text-muted mb-0">Question Options</label>
-                        <small class="text-muted fs-7">Select radio button for correct option</small>
+                <div class="tab-content" id="langTabsContent">
+                    <div class="tab-pane fade show active" id="lang-en">
+                        <div class="mb-3">
+                            <label asp-for="QuestionText" class="form-label small fw-semibold text-muted">Question Text (English) *</label>
+                            <textarea asp-for="QuestionText" id="txtQuestionEn" class="form-control rounded-2 shadow-none" rows="3" placeholder="Enter question in English..." required></textarea>
+                            <span asp-validation-for="QuestionText" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="lang-hi">
+                        <div class="mb-3">
+                            <label asp-for="QuestionTextHindi" class="form-label small fw-semibold text-muted">प्रश्न (हिंदी)</label>
+                            <textarea asp-for="QuestionTextHindi" id="txtQuestionHi" class="form-control rounded-2 shadow-none" rows="3" placeholder="हिंदी में प्रश्न दर्ज करें..."></textarea>
+                            <span asp-validation-for="QuestionTextHindi" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="optionsWrapper" class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label small fw-semibold text-muted mb-0">Question Options</label>
+                            <span id="optionTypeHint" class="badge bg-soft-info text-info border ms-1 fs-7">Select correct option</span>
+                        </div>
+                        <button type="button" class="btn btn-xs btn-outline-primary rounded-2 py-0 px-2 fs-7" id="btnAddOption">
+                            <i class="bi bi-plus-lg me-1"></i>Add Option
+                        </button>
                     </div>
 
                     <div id="optionsContainer">
-                        @for (int i = 0; i < Model.Options.Count; i++)
+                        @if (Model.Options != null && Model.Options.Count > 0)
                         {
-                            <div class="input-group input-group-sm mb-2 rounded-2 option-row">
-                                <span class="input-group-text bg-light fw-bold text-dark px-3">@Model.Options[i].OptionLabel</span>
-                                <input type="hidden" name="Options[@i].OptionId" value="@Model.Options[i].OptionId" />
-                                <input type="hidden" name="Options[@i].OptionLabel" value="@Model.Options[i].OptionLabel" />
-                                <input type="hidden" name="Options[@i].DisplayOrder" value="@(i + 1)" />
+                            for (int i = 0; i < Model.Options.Count; i++)
+                            {
+                                <div class="card mb-2 border shadow-none option-row" data-index="@i">
+                                    <div class="card-body p-2">
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text bg-light fw-bold text-dark px-3 option-label-text">@Model.Options[i].OptionLabel</span>
+                                            <input type="hidden" class="option-id" name="Options[@i].OptionId" value="@Model.Options[i].OptionId" />
+                                            <input type="hidden" class="option-label" name="Options[@i].OptionLabel" value="@Model.Options[i].OptionLabel" />
+                                            <input type="hidden" class="option-display-order" name="Options[@i].DisplayOrder" value="@(i + 1)" />
 
-                                <input type="text" name="Options[@i].OptionText" value="@Model.Options[i].OptionText" class="form-control shadow-none" placeholder="Option text" required />
+                                            <input type="text" name="Options[@i].OptionText" value="@Model.Options[i].OptionText" class="form-control shadow-none option-text-input option-text-en" placeholder="Option Text (English)" required />
 
-                                <div class="input-group-text bg-light">
-                                    <input class="form-check-input mt-0" type="radio" name="CorrectOptionIndex" value="@i" @(Model.Options[i].IsCorrect ? "checked" : "") required />
-                                    <span class="ms-1 small text-muted fs-7">Correct</span>
+                                            <div class="input-group-text bg-light option-selector-container">
+                                                <input class="form-check-input mt-0 option-correct-input" type="radio" name="CorrectOptionIndex" value="@i" @(Model.Options[i].IsCorrect ? "checked" : "") required />
+                                                <span class="ms-1 small text-muted fs-7">Correct</span>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-danger btn-remove-option px-2" title="Remove Option">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light text-muted px-2 fs-7">हिंदी</span>
+                                            <input type="text" name="Options[@i].OptionTextHindi" value="@Model.Options[i].OptionTextHindi" class="form-control shadow-none option-text-hi" placeholder="विकल्प पाठ (हिंदी)" />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 3: SETTINGS & SOLUTION -->
+            <!-- TAB 3: SETTINGS -->
             <div class="tab-pane fade" id="tabSettings" role="tabpanel">
                 <div class="row g-2 mb-2">
                     <div class="col-md-4">
@@ -152,12 +179,11 @@
                     </div>
                 </div>
 
-                <!-- PYQ & Source -->
                 <div class="p-2 bg-light rounded-2 mb-2 border">
                     <div class="row align-items-center">
                         <div class="col-md-5">
                             <div class="form-check form-switch">
-                                <input class="form-check-input shadow-none" type="checkbox" asp-for="IsPYQ" id="pyqSwitch" onchange="togglePyqFields(this.checked)" />
+                                <input class="form-check-input shadow-none" type="checkbox" asp-for="IsPYQ" id="pyqSwitch" /> 
                                 <label class="form-check-label fw-semibold text-dark small" for="pyqSwitch">Is PYQ?</label>
                             </div>
                         </div>
@@ -176,7 +202,6 @@
                     </div>
                 </div>
 
-                <!-- Explanations -->
                 <div class="mb-2">
                     <label asp-for="ShortExplanation" class="form-label small fw-semibold text-muted">Short Hint</label>
                     <input asp-for="ShortExplanation" class="form-control form-control-sm rounded-2 shadow-none" placeholder="Brief hint..." />
@@ -208,42 +233,337 @@
             <i class="bi bi-check-lg me-1"></i> Save Question
         </button>
     </div>
-</form>
-@section Scripts {
-
-    <script>
-        function togglePyqFields(isPyq) {
-            if (isPyq) {
-                document.getElementById('pyqFields').classList.remove('d-none');
+</form>  
+<script>
+   const optionLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+     
+    const pyqSwitch = document.getElementById('pyqSwitch');
+    const pyqFields = document.getElementById('pyqFields');
+    if (pyqSwitch && pyqFields) {
+        pyqSwitch.addEventListener('change', function () {
+            console.log("Checked");
+            if (this.checked) {
+                pyqFields.classList.remove('d-none');
             } else {
-                document.getElementById('pyqFields').classList.add('d-none');
+                pyqFields.classList.add('d-none');
             }
+        });
+    }
+     
+    function getSelectedQuestionType() {
+        const select = document.getElementById('ddlQuestionType');
+        if (!select) return "MCQ";
+
+        const selectedOption = select.options[select.selectedIndex];
+        const selectedText = selectedOption ? selectedOption.text.toUpperCase().replace(/\s+/g, '') : '';
+        const selectedVal = select.value;
+
+        if (selectedText.includes("MULTIPLE") || selectedText.includes("MSQ") || selectedVal === "2") {
+            return "MSQ";
+        } else if (selectedText.includes("NUMERICAL") || selectedText.includes("NAT") || selectedText.includes("SUBJECTIVE") || selectedVal === "3" || selectedVal === "5") {
+            return "NUMERICAL";
         }
+        return "MCQ";
+    }
+     
+    function reindexOptions() {
+        const selectedType = getSelectedQuestionType();
+        const rows = document.querySelectorAll('#optionsContainer .option-row');
 
-                $(document).ready(function () {
-                    $('#ddlTopic').change(function () {
-                        var topicId = $(this).val();
+        rows.forEach((row, index) => {
+            const labelText = optionLabels[index] || `Opt ${index + 1}`;
+            row.setAttribute('data-index', index);
 
-                        var $subTopic = $('#ddlSubTopic');
-                        $subTopic.empty().append('<option value="">-- Select SubTopic --</option>');
-                        if (topicId) {
-                            $.getJSON('/Admin/Questions/GetSubTopics', { topicId: topicId }, function (data) {
-                                $.each(data, function (i, item) {
-                                    $subTopic.append($('<option>', { value: item.id, text: item.name }));
-                                });
-                            });
-                        }
+            const labelTextEl = row.querySelector('.option-label-text');
+            if (labelTextEl) labelTextEl.textContent = labelText;
 
-                        var $passage = $('#ddlPassage');
-                        $passage.empty().append('<option value="">-- None --</option>');
-                        if (topicId) {
-                            $.getJSON('/Admin/Questions/GetPassages', { topicId: topicId }, function (data) {
-                                $.each(data, function (i, item) {
-                                    $passage.append($('<option>', { value: item.id, text: item.name }));
-                                });
-                            });
-                        }
-                    });
+            const idEl = row.querySelector('.option-id');
+            if (idEl) idEl.setAttribute('name', `Options[${index}].OptionId`);
+
+            const labelEl = row.querySelector('.option-label');
+            if (labelEl) {
+                labelEl.setAttribute('name', `Options[${index}].OptionLabel`);
+                labelEl.value = labelText;
+            }
+
+            const orderEl = row.querySelector('.option-display-order');
+            if (orderEl) {
+                orderEl.setAttribute('name', `Options[${index}].DisplayOrder`);
+                orderEl.value = index + 1;
+            }
+
+            const textEnEl = row.querySelector('.option-text-input');
+            if (textEnEl) textEnEl.setAttribute('name', `Options[${index}].OptionText`);
+
+            const textHiEl = row.querySelector('.option-text-hi');
+            if (textHiEl) textHiEl.setAttribute('name', `Options[${index}].OptionTextHindi`);
+
+            const selectorDiv = row.querySelector('.option-selector-container');
+            if (selectorDiv) {
+                const existingInput = selectorDiv.querySelector('input');
+                const isChecked = existingInput && existingInput.checked ? 'checked' : '';
+
+                if (selectedType === "MSQ") {
+                    selectorDiv.innerHTML = `
+                        <input class="form-check-input mt-0 option-correct-input" type="checkbox" name="Options[${index}].IsCorrect" value="true" ${isChecked} />
+                        <span class="ms-1 small text-muted fs-7">Correct</span>
+                    `;
+                } else {
+                    selectorDiv.innerHTML = `
+                        <input class="form-check-input mt-0 option-correct-input" type="radio" name="CorrectOptionIndex" value="${index}" ${isChecked} required />
+                        <span class="ms-1 small text-muted fs-7">Correct</span>
+                    `;
+                }
+            }
+        });
+         
+        const removeBtns = document.querySelectorAll('.btn-remove-option');
+        removeBtns.forEach(btn => {
+            btn.disabled = (rows.length <= 2);
+        });
+    } 
+    function handleQuestionTypeChange() {
+        const type = getSelectedQuestionType();
+        const optionsWrapper = document.getElementById('optionsWrapper');
+        const optionInputs = document.querySelectorAll('#optionsContainer .option-text-input');
+        const hintEl = document.getElementById('optionTypeHint');
+
+        if (type === "NUMERICAL") {
+            if (optionsWrapper) optionsWrapper.classList.add('d-none');
+            optionInputs.forEach(input => input.required = false);
+        } else {
+            if (optionsWrapper) optionsWrapper.classList.remove('d-none');
+            optionInputs.forEach(input => input.required = true);
+
+            if (hintEl) {
+                if (type === "MSQ") {
+                    hintEl.textContent = "Select one or more correct options";
+                } else {
+                    hintEl.textContent = "Select radio button for single correct option";
+                }
+            }
+            reindexOptions();
+        }
+    }
+     
+    function addOptionRow() {
+        const container = document.getElementById('optionsContainer');
+        if (!container) return;
+
+        const rows = container.querySelectorAll('.option-row');
+        const index = rows.length;
+        if (index >= 10) return;
+
+        const labelText = optionLabels[index] || `Opt ${index + 1}`;
+        const html = `
+            <div class="card mb-2 border shadow-none option-row" data-index="${index}">
+                <div class="card-body p-2">
+                    <div class="input-group input-group-sm mb-1">
+                        <span class="input-group-text bg-light fw-bold text-dark px-3 option-label-text">${labelText}</span>
+                        <input type="hidden" class="option-id" name="Options[${index}].OptionId" value="00000000-0000-0000-0000-000000000000" />
+                        <input type="hidden" class="option-label" name="Options[${index}].OptionLabel" value="${labelText}" />
+                        <input type="hidden" class="option-display-order" name="Options[${index}].DisplayOrder" value="${index + 1}" />
+
+                        <input type="text" name="Options[${index}].OptionText" value="" class="form-control shadow-none option-text-input option-text-en" placeholder="Option Text (English)" required />
+
+                        <div class="input-group-text bg-light option-selector-container">
+                            <input class="form-check-input mt-0 option-correct-input" type="radio" name="CorrectOptionIndex" value="${index}" required />
+                            <span class="ms-1 small text-muted fs-7">Correct</span>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-remove-option px-2" title="Remove Option">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light text-muted px-2 fs-7">हिंदी</span>
+                        <input type="text" name="Options[${index}].OptionTextHindi" value="" class="form-control shadow-none option-text-hi" placeholder="विकल्प पाठ (हिंदी)" />
+                    </div>
+                </div>
+            </div>`;
+
+        container.insertAdjacentHTML('beforeend', html);
+        reindexOptions();
+    }
+     
+    const container = document.getElementById('optionsContainer');
+    if (container) {
+        if (container.querySelectorAll('.option-row').length === 0) {
+            for (let i = 0; i < 4; i++) {
+                addOptionRow();
+            }
+        } else {
+            reindexOptions();
+        }
+    }
+     
+    const btnAddOption = document.getElementById('btnAddOption');
+    if (btnAddOption) {
+        btnAddOption.addEventListener('click', function (e) {
+            e.preventDefault();
+            addOptionRow();
+        });
+    }
+     
+    if (container) {
+        container.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-remove-option');
+            if (btn) {
+                e.preventDefault();
+                const rows = container.querySelectorAll('.option-row');
+                if (rows.length > 2) {
+                    const row = btn.closest('.option-row');
+                    if (row) {
+                        row.remove();
+                        reindexOptions();
+                    }
+                }
+            }
+        });
+    }
+     
+    function populateDropdown(selectElement, url, defaultText) {
+        if (!selectElement) return;
+        selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.id || item.value;
+                    opt.textContent = item.name || item.text;
+                    selectElement.appendChild(opt);
                 });
-    </script><script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            })
+            .catch(err => console.error("Error loading dropdown data:", err));
+    }
+     
+    const ddlSubject = document.getElementById('ddlSubject');
+    if (ddlSubject) {
+        ddlSubject.addEventListener('change', function () {
+            const subjectId = this.value;
+            const ddlSection = document.getElementById('ddlSection');
+            const ddlTopic = document.getElementById('ddlTopic');
+            const ddlSubTopic = document.getElementById('ddlSubTopic');
+
+            if (ddlSection) ddlSection.innerHTML = '<option value="">-- Select Section --</option>';
+            if (ddlTopic) ddlTopic.innerHTML = '<option value="">-- Select Topic --</option>';
+            if (ddlSubTopic) ddlSubTopic.innerHTML = '<option value="">-- Select SubTopic --</option>';
+
+            if (subjectId) {
+                populateDropdown(ddlSection, '/Admin/Questions/GetSections?subjectId=' + encodeURIComponent(subjectId), '-- Select Section --');
+            }
+        });
+    }
+
+    const ddlSection = document.getElementById('ddlSection');
+    if (ddlSection) {
+        ddlSection.addEventListener('change', function () {
+            const sectionId = this.value;
+            const ddlTopic = document.getElementById('ddlTopic');
+            const ddlSubTopic = document.getElementById('ddlSubTopic');
+
+            if (ddlTopic) ddlTopic.innerHTML = '<option value="">-- Select Topic --</option>';
+            if (ddlSubTopic) ddlSubTopic.innerHTML = '<option value="">-- Select SubTopic --</option>';
+
+            if (sectionId) {
+                populateDropdown(ddlTopic, '/Admin/Questions/GetTopics?sectionId=' + encodeURIComponent(sectionId), '-- Select Topic --');
+            }
+        });
+    }
+
+    const ddlTopic = document.getElementById('ddlTopic');
+    if (ddlTopic) {
+        ddlTopic.addEventListener('change', function () {
+            const topicId = this.value;
+            const ddlSubTopic = document.getElementById('ddlSubTopic');
+            const ddlPassage = document.getElementById('ddlPassage');
+
+            if (ddlSubTopic) ddlSubTopic.innerHTML = '<option value="">-- Select SubTopic --</option>';
+            if (ddlPassage) ddlPassage.innerHTML = '<option value="">-- None --</option>';
+
+            if (topicId) {
+                populateDropdown(ddlSubTopic, '/Admin/Questions/GetSubTopics?topicId=' + encodeURIComponent(topicId), '-- Select SubTopic --');
+                populateDropdown(ddlPassage, '/Admin/Questions/GetPassages?topicId=' + encodeURIComponent(topicId), '-- None --');
+            }
+        });
+    }
+     
+    const ddlQuestionType = document.getElementById('ddlQuestionType');
+    if (ddlQuestionType) {
+        ddlQuestionType.addEventListener('change', handleQuestionTypeChange);
+    }
+     
+    const btnAutoTranslate = document.getElementById('btnAutoTranslate');
+
+if (btnAutoTranslate) {
+    btnAutoTranslate.addEventListener('click', async function () {
+        
+        const originalText = btnAutoTranslate.innerHTML;
+        btnAutoTranslate.disabled = true;
+        btnAutoTranslate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Translating...';
+
+        try {
+            const translationPromises = [];
+             
+            const txtQuestionEn = document.getElementById('txtQuestionEn');
+            const txtQuestionHi = document.getElementById('txtQuestionHi');
+
+            if (txtQuestionEn && txtQuestionEn.value.trim() && txtQuestionHi) {
+                translationPromises.push(
+                    translateApi(txtQuestionEn.value.trim()).then(translated => {
+                        if (translated) txtQuestionHi.value = translated;
+                    })
+                );
+            }
+             
+            const optionEnInputs = document.querySelectorAll('.option-text-en');
+            const optionHiInputs = document.querySelectorAll('.option-text-hi');
+
+            optionEnInputs.forEach((enInput, index) => {
+                const hiInput = optionHiInputs[index];
+                if (enInput && enInput.value.trim() && hiInput) {
+                    translationPromises.push(
+                        translateApi(enInput.value.trim()).then(translated => {
+                            if (translated) hiInput.value = translated;
+                        })
+                    );
+                }
+            });
+             
+            await Promise.all(translationPromises);
+
+            if (typeof Toast !== 'undefined' && Toast.success) {
+                Toast.success("Question and Options translated successfully!");
+            }
+        } catch (err) {
+            console.error("Translation error:", err);
+            if (typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error("Translation failed. Please try again.");
+            }
+        } finally { 
+            btnAutoTranslate.disabled = false;
+            btnAutoTranslate.innerHTML = originalText;
+        }
+    });
 }
+ 
+async function translateApi(text, targetLang = 'hi') {
+    if (!text) return '';
+
+    const formData = new URLSearchParams();
+    formData.append('text', text);
+    formData.append('targetLang', targetLang);
+
+    const response = await fetch('/Admin/Questions/AutoTranslate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+    });
+
+    if (!response.ok) return '';
+
+    const data = await response.json();
+    return data && data.translatedText ? data.translatedText : '';
+}
+</script>

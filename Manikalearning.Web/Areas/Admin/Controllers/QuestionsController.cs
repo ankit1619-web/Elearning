@@ -4,11 +4,13 @@ using Manikalearning.Application.Features.Commands.Assessments.Questions;
 using Manikalearning.Application.Features.Commands.Assessments.Sections;
 using Manikalearning.Application.Features.Commands.Assessments.Subtopics;
 using Manikalearning.Application.Features.Commands.Assessments.Topics;
+using Manikalearning.Application.Interface;
 using Manikalearning.Web.Areas.Admin.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Manikalearning.Web.Areas.Admin.Controllers
 {
@@ -18,10 +20,13 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
     public class QuestionsController : Controller
     {
         private readonly IMediator _mediator;
-
-        public QuestionsController(IMediator mediator)
+        private readonly IViewRenderService _viewRender;
+        private readonly ITranslationService _translationService;
+        public QuestionsController(IMediator mediator, IViewRenderService viewRender, ITranslationService translationService)
         {
-            _mediator = mediator;
+            _mediator = mediator; 
+            _viewRender = viewRender;
+            _translationService = translationService;
         }
 
         [HttpGet]
@@ -54,7 +59,8 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             };
 
             await PopulateDropdowns(viewModel);
-            return PartialView("_CreateUpdate", viewModel);
+            string htmlContent = await _viewRender.RenderToStringAsync("_CreateUpdate", viewModel);
+            return Json(new { success = true, html = htmlContent });
         }
 
         [HttpGet("EditPartial/{id}")]
@@ -76,9 +82,14 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 PaperId = q.PaperId,
                 PassageId = q.PassageId,
                 QuestionType = q.QuestionType,
+                 
                 QuestionText = q.QuestionText,
+                QuestionTextHindi = q.QuestionTextHindi,
                 Explanation = q.Explanation,
+                ExplanationHindi = q.ExplanationHindi,
                 ShortExplanation = q.ShortExplanation,
+                ShortExplanationHindi = q.ShortExplanationHindi,
+
                 Difficulty = q.Difficulty,
                 Marks = q.Marks,
                 NegativeMarks = q.NegativeMarks,
@@ -88,18 +99,21 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 SourceName = q.SourceName,
                 IsApproved = q.IsApproved,
                 IsActive = q.IsActive,
+                 
                 Options = q.Options.Select(o => new QuestionOptionViewModel
                 {
                     OptionId = o.OptionId,
                     OptionLabel = o.OptionLabel,
                     OptionText = o.OptionText,
+                    OptionTextHindi = o.OptionTextHindi,  
                     IsCorrect = o.IsCorrect,
                     DisplayOrder = o.DisplayOrder
                 }).ToList()
             };
 
             await PopulateDropdowns(viewModel);
-            return PartialView("_CreateUpdate", viewModel);
+            string htmlContent = await _viewRender.RenderToStringAsync("_CreateUpdate", viewModel);
+            return Json(new { success = true, html = htmlContent });
         }
 
         [HttpPost("Create")]
@@ -141,7 +155,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         private async Task PopulateDropdowns(QuestionViewModel model)
         {
             var subjects = await _mediator.Send(new GetSubjectsLookupQuery());
-            var sections = await _mediator.Send(new GetSectionsLookupQuery());
+            var sections = await _mediator.Send(new GetSectionsLookupQuery(Guid.Empty));
             var topics = await _mediator.Send(new GetTopicsLookupQuery(Guid.Empty));
             var subtopics = await _mediator.Send(new GetSubTopicsLookupQuery(Guid.Empty));
             var passages = await _mediator.Send(new GetPassagesLookupQuery());
@@ -151,6 +165,74 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             model.TopicsList = topics.Data?.Select(t => new SelectListItem(t.Name, t.Id.ToString())).ToList() ?? new();
             model.SubTopicsList = subtopics.Data?.Select(st => new SelectListItem(st.Name, st.Id.ToString())).ToList() ?? new();
             model.PassagesList = passages.Data?.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList() ?? new();
+        }
+
+        [HttpGet("GetSections")]
+        public async Task<IActionResult> GetSections(Guid subjectId)
+        {
+            if (subjectId == Guid.Empty)
+                return Json(Enumerable.Empty<object>());
+
+            var result = await _mediator.Send(new GetSectionsLookupQuery(subjectId));
+            var sections = result.Data?.Select(s => new { id = s.Id, name = s.Name }) ?? Enumerable.Empty<object>();
+
+            return Json(sections);
+        }
+         
+        [HttpGet("GetTopics")]
+        public async Task<IActionResult> GetTopics(Guid sectionId)
+        {
+            if (sectionId == Guid.Empty)
+                return Json(Enumerable.Empty<object>());
+
+            var result = await _mediator.Send(new GetTopicsLookupQuery(sectionId));
+            var topics = result.Data?.Select(t => new { id = t.Id, name = t.Name }) ?? Enumerable.Empty<object>();
+
+            return Json(topics);
+        }
+         
+        [HttpGet("GetSubTopics")]
+        public async Task<IActionResult> GetSubTopics(Guid topicId)
+        {
+            if (topicId == Guid.Empty)
+                return Json(Enumerable.Empty<object>());
+
+            var result = await _mediator.Send(new GetSubTopicsLookupQuery(topicId));
+            var subTopics = result.Data?.Select(st => new { id = st.Id, name = st.Name }) ?? Enumerable.Empty<object>();
+
+            return Json(subTopics);
+        }
+         
+        [HttpGet("GetPassages")]
+        public async Task<IActionResult> GetPassages(Guid topicId)
+        {
+            if (topicId == Guid.Empty)
+                return Json(Enumerable.Empty<object>());
+
+            var result = await _mediator.Send(new GetPassagesLookupQuery(topicId));
+            var passages = result.Data?.Select(p => new { id = p.Id, name = p.Name }) ?? Enumerable.Empty<object>();
+
+            return Json(passages);
+        }
+         
+        [HttpPost("AutoTranslate")]
+        public async Task<IActionResult> AutoTranslate(string text, string targetLang = "hi")
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return Json(new { translatedText = "" });
+
+            try
+            { 
+                  string translated = await _translationService.TranslateAsync(text, targetLang);
+
+                string translatedText = translated;  
+
+                return Json(new { translatedText });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { translatedText = "", error = ex.Message });
+            }
         }
     }
 }

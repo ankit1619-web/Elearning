@@ -25,7 +25,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Index(Guid? sectionId = null, string search = "")
         {
             var topicsResponse = await _mediator.Send(new GetTopicsBySectionQuery(sectionId, search));
-            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery());
+            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery(Guid.Empty));
 
             var topics = topicsResponse.IsSuccess ? topicsResponse.Data : new List<TopicDto>();
             var sections = sectionsLookup.IsSuccess ? sectionsLookup.Data : new List<LookupDto>();
@@ -40,7 +40,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         [HttpGet("CreatePartial")]
         public async Task<IActionResult> CreatePartial(Guid? sectionId = null)
         {
-            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery());
+            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery(Guid.Empty));
             var sections = sectionsLookup.IsSuccess ? sectionsLookup.Data : new List<LookupDto>();
 
             var viewModel = new TopicViewModel
@@ -63,7 +63,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             if (!response.IsSuccess || response.Data == null)
                 return BadRequest(response.Message);
 
-            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery());
+            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery(Guid.Empty));
             var sections = sectionsLookup.IsSuccess ? sectionsLookup.Data : new List<LookupDto>();
 
             var viewModel = new TopicViewModel
@@ -122,7 +122,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
 
         private async Task PopulateSectionsList(TopicViewModel model)
         {
-            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery());
+            var sectionsLookup = await _mediator.Send(new GetSectionsLookupQuery(Guid.Empty));
             var sections = sectionsLookup.IsSuccess ? sectionsLookup.Data : new List<LookupDto>();
             model.SectionsList = sections.Select(s => new SelectListItem
             {

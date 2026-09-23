@@ -41,8 +41,11 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
             question.PassageId = request.PassageId == Guid.Empty ? null : request.PassageId;
             question.QuestionType = request.QuestionType;
             question.QuestionText = request.QuestionText;
+            question.QuestionTextHindi = request.QuestionTextHindi;
             question.Explanation = request.Explanation;
+            question.ExplanationHindi = request.ExplanationHindi;
             question.ShortExplanation = request.ShortExplanation;
+            question.ShortExplanationHindi = request.ShortExplanationHindi;
             question.Difficulty = request.Difficulty;
             question.Marks = request.Marks;
             question.NegativeMarks = request.NegativeMarks;

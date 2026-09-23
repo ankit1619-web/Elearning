@@ -139,73 +139,77 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
+ @section Scripts {
+     
+    <script>
+        let selectedDeleteId = null;
+        let deleteModalInstance = null;
 
-<script>
-    let selectedDeleteId = null;
-    let deleteModalInstance = null;
+        function confirmDelete(id, examName) {
+            selectedDeleteId = id;
+            document.getElementById('deleteExamWarningText').innerText = `Are you sure you want to delete "${examName}"? This action cannot be undone.`;
 
-    function confirmDelete(id, examName) {
-        selectedDeleteId = id;
-        document.getElementById('deleteExamWarningText').innerText = `Are you sure you want to delete "${examName}"? This action cannot be undone.`;
+            const modalEl = document.getElementById('deleteConfirmModal');
+            deleteModalInstance = new bootstrap.Modal(modalEl);
+            deleteModalInstance.show();
+        }
 
-        const modalEl = document.getElementById('deleteConfirmModal');
-        deleteModalInstance = new bootstrap.Modal(modalEl);
-        deleteModalInstance.show();
-    }
+        $('#confirmDeleteBtn').on('click', function() {
+            if (!selectedDeleteId) return;
 
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        if (!selectedDeleteId) return;
+            deleteModalInstance.hide();
+            if (typeof Toast !== 'undefined' && Toast.showLoader) Toast.showLoader();
 
-        deleteModalInstance.hide();
-        Toast.showLoader();
+            const token = $('input[name="__RequestVerificationToken"]').val();
 
-        const token = $('input[name="__RequestVerificationToken"]').val();
+            $.ajax({
+                url: '/Admin/Exams/Delete/' + selectedDeleteId,
+                type: 'POST',
+                data: { __RequestVerificationToken: token },
+                success: function (response) {
+                    if (typeof Toast !== 'undefined' && Toast.hideLoader) Toast.hideLoader();
 
-        $.ajax({
-            url: '/Admin/Exams/Delete/' + selectedDeleteId,
-            type: 'POST',
-            data: {
-                __RequestVerificationToken: token
-            },
-            success: function(response) {
-                Toast.hideLoader();
-
-                if (typeof response === 'object' && response.isSuccess) {
-                    Toast.success(response.message || "Exam deleted successfully.");
-                    setTimeout(() => location.reload(), 800);
-                } else {
-                    const errorMsg = (response && response.message) ? response.message : "Unable to delete exam.";
-                    Toast.error(errorMsg);
+                    if (response && response.isSuccess) {
+                        if (typeof Toast !== 'undefined' && Toast.success) {
+                            Toast.success(response.message || "Exam deleted successfully.");
+                        }
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        const errorMsg = (response && response.message) ? response.message : "Unable to delete exam.";
+                        if (typeof Toast !== 'undefined' && Toast.error) Toast.error(errorMsg);
+                    }
+                },
+                error: function () {
+                    if (typeof Toast !== 'undefined' && Toast.hideLoader) Toast.hideLoader();
+                    if (typeof Toast !== 'undefined' && Toast.error) {
+                        Toast.error("An error occurred while deleting the exam.");
+                    }
                 }
-            },
-            error: function() {
-                Toast.hideLoader();
-                Toast.error("An error occurred while deleting the exam.");
-            }
+            });
         });
-    });
 
-    function filterTable() {
-        const input = document.getElementById("tableSearch");
-        const filter = input.value.toLowerCase();
-        const table = document.getElementById("examsTable");
-        const trs = table.getElementsByTagName("tr");
+        function filterTable() {
+            const input = document.getElementById("tableSearch");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("examsTable");
+            const trs = table.getElementsByTagName("tr");
 
-        for (let i = 1; i < trs.length; i++) {
-            const nameTd = trs[i].getElementsByTagName("td")[0];
-            const codeTd = trs[i].getElementsByTagName("td")[1];
+            for (let i = 1; i < trs.length; i++) {
+                const nameTd = trs[i].getElementsByTagName("td")[0];
+                const codeTd = trs[i].getElementsByTagName("td")[1];
 
-            if (nameTd || codeTd) {
-                const nameText = nameTd ? (nameTd.textContent || nameTd.innerText) : "";
-                const codeText = codeTd ? (codeTd.textContent || codeTd.innerText) : "";
+                if (nameTd || codeTd) {
+                    const nameText = nameTd ? (nameTd.textContent || nameTd.innerText) : "";
+                    const codeText = codeTd ? (codeTd.textContent || codeTd.innerText) : "";
 
-                if (nameText.toLowerCase().indexOf(filter) > -1 || codeText.toLowerCase().indexOf(filter) > -1) {
-                    trs[i].style.display = "";
-                } else {
-                    trs[i].style.display = "none";
+                    if (nameText.toLowerCase().indexOf(filter) > -1 || codeText.toLowerCase().indexOf(filter) > -1) {
+                        trs[i].style.display = "";
+                    } else {
+                        trs[i].style.display = "none";
+                    }
                 }
             }
         }
-    }
-</script>
+    </script>
+}

@@ -82,26 +82,39 @@
             Toast.hideLoader();
             Toast.error("Global modal container missing in layout.");
             return;
-        }
-         
+        } 
         modalDialog.className = 'modal-dialog modal-dialog-centered ' + sizeClass;
          
         $.ajax({
-            url: url,
-            type: 'GET',
-            success: function (response) {
-                Toast.hideLoader();
-                modalContent.innerHTML = response;
-
-                const modalEl = document.getElementById('globalModal');
-                Toast.bsModalInstance = new bootstrap.Modal(modalEl);
-                Toast.bsModalInstance.show();
-            },
-            error: function (xhr) {
-                Toast.hideLoader();
-                Toast.error("Failed to load request form. Please try again.");
-            }
-        });
+           url: url,
+           type: 'GET',
+           success: function (response) {
+               Toast.hideLoader(); 
+               let htmlContent = "";
+               if (typeof response === 'object' && response.html) {
+                   htmlContent = response.html;  
+               } else {
+                   htmlContent = response;  
+               } 
+               modalContent.innerHTML = '';
+               const range = document.createRange();
+               range.selectNode(modalContent);
+               const fragment = range.createContextualFragment(htmlContent);
+               modalContent.appendChild(fragment);
+        
+               if (typeof window.initQuestionModal === 'function') {
+                   window.initQuestionModal();
+               }
+        
+               const modalEl = document.getElementById('globalModal');
+               Toast.bsModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+               Toast.bsModalInstance.show();
+           },
+           error: function (xhr) {
+               Toast.hideLoader();
+               Toast.error("Failed to load request form. Please try again.");
+           }
+       });
     },
      
     closeModal: function () {

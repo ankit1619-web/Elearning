@@ -9,6 +9,7 @@
         public string OptionLabel { get; set; } = string.Empty;
 
         public string OptionText { get; set; } = string.Empty;
+        public string OptionTextHindi { get; set; } = string.Empty;
 
         public bool IsCorrect { get; set; }
 

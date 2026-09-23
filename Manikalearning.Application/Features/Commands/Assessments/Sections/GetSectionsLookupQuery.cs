@@ -4,5 +4,5 @@ using MediatR;
 namespace Manikalearning.Application.Features.Commands.Assessments.Sections
 {
 
-    public record GetSectionsLookupQuery() : IRequest<ResponseDto<List<LookupDto>>>;
+    public record GetSectionsLookupQuery(Guid? Subjectid) : IRequest<ResponseDto<List<LookupDto>>>;
 }
