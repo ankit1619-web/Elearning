@@ -335,7 +335,7 @@
         });
 
         function loadQuestionBank() {
-            $.get('@Url.Action("GetAvailableQuestions", "TestQuestions")', { subjectId: '@test?.SubjectId' }, function(res) {
+            $.get('@Url.Action("GetAvailableQuestions", "Tests")', { subjectId: '@test?.SubjectId' }, function(res) {
                 if (res.success || res.isSuccess) {
                     availableQuestionsBank = res.data || [];
                     renderQuestionBank(availableQuestionsBank);

@@ -46,6 +46,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<TestAttemptAnswer> TestAttemptAnswers { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<QuestionMistake> QuestionMistakes { get; set; }
+        public DbSet<TopicContent> TopicContents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 
@@ -110,7 +111,13 @@ namespace Manikalearning.Infrastructure.Data
                     .WithMany(u => u.UserRoles)
                     .HasForeignKey(ur => ur.UserId)
                     .IsRequired();
-            });
+            }); 
+            modelBuilder.Entity<TopicContent>()
+                 .HasKey(tc => tc.ContentId);  
+            modelBuilder.Entity<TopicContent>()
+                .HasOne(tc => tc.Topic)
+                .WithOne()
+                .HasForeignKey<TopicContent>(tc => tc.TopicId);
         }
     }
 }

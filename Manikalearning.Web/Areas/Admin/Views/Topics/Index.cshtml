@@ -96,6 +96,11 @@
                             </td>
                             <td class="text-end pe-3">
                                 <div class="d-inline-flex gap-1">
+                                    <button type="button" class="btn btn-sm btn-light text-info shadow-none rounded-2"
+                                            title="Manage Topic Content" 
+                                            onclick="Toast.openModal('/Admin/Topics/ManageContent/@item.TopicId', 'modal-xl')">
+                                        <i class="bi bi-journal-richtext"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-light text-primary shadow-none rounded-2"
                                             title="Edit Topic" onclick="Toast.openModal('/Admin/Topics/EditPartial/@item.TopicId', 'modal-lg')">
                                         <i class="bi bi-pencil-square"></i>

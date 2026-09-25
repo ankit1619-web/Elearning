@@ -124,6 +124,7 @@ namespace Manikalearning.Domain.Entities
         public int DisplayOrder { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
+       
         [ForeignKey("SectionId")]
         public virtual Section Section { get; set; } = null!;
     }
@@ -144,5 +145,16 @@ namespace Manikalearning.Domain.Entities
         public bool IsActive { get; set; } = true; 
         // Navigation Properties
         public ICollection<Question> Questions { get; set; }
+    }
+
+    [Table("TopicContent")]
+    public class TopicContent
+    {
+        public Guid ContentId { get; set; }
+        public Guid TopicId { get; set; } 
+        public string Language { get; set; } = "en"; // "en", "hi"
+        public string ContentText { get; set; } = string.Empty;
+        [ForeignKey("TopicId")]
+        public virtual Topic Topic { get; set; } = null!;
     }
 }

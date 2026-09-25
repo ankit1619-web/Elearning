@@ -1,4 +1,5 @@
-﻿using Manikalearning.Domain.Enums;
+﻿using Manikalearning.Domain.Entities;
+using Manikalearning.Domain.Enums;
 
 namespace Manikalearning.Application.DTOs
 {
@@ -49,8 +50,8 @@ namespace Manikalearning.Application.DTOs
 
         public DateTime CreatedAt { get; set; }
 
-        public List<QuestionOptionDto> Options { get; set; }
-            = new();
+        public List<QuestionOptionDto> Options { get; set; } = new(); 
 
     }
+   
 }

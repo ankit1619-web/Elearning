@@ -19,11 +19,13 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
     [Route("Admin/[controller]")]
     public class QuestionsController : Controller
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMediator _mediator;
         private readonly IViewRenderService _viewRender;
         private readonly ITranslationService _translationService;
-        public QuestionsController(IMediator mediator, IViewRenderService viewRender, ITranslationService translationService)
+        public QuestionsController(IMediator mediator, IWebHostEnvironment webHostEnvironment, IViewRenderService viewRender, ITranslationService translationService)
         {
+            _webHostEnvironment = webHostEnvironment;
             _mediator = mediator; 
             _viewRender = viewRender;
             _translationService = translationService;
@@ -234,5 +236,6 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 return Json(new { translatedText = "", error = ex.Message });
             }
         }
+         
     }
 }

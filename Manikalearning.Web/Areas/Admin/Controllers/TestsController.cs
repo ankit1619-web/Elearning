@@ -155,8 +155,19 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             var response = await _mediator.Send(command);
             return Json(new { success = response.IsSuccess, message = response.Message });
         }
-           
 
+        [HttpGet("GetAvailableQuestions")]
+        public async Task<IActionResult> GetAvailableQuestions([FromQuery] Guid? subjectId)
+        {
+            var query = new GetAvailableQuestionsQuery(subjectId);
+            var result = await _mediator.Send(query);
+
+            return Json(new
+            {
+                success = true,
+                data = result
+            });
+        }
         private async Task PopulateDropdowns(TestViewModel model)
         {
             var subjects = await _mediator.Send(new GetSubjectsLookupQuery());

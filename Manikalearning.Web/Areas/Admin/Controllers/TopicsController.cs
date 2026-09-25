@@ -1,4 +1,5 @@
-﻿using Manikalearning.Application.DTOs;
+﻿using Azure;
+using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.Sections;
 using Manikalearning.Application.Features.Commands.Assessments.Topics;
 using Manikalearning.Web.Areas.Admin.ViewModels;
@@ -6,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Manikalearning.Web.Areas.Admin.Controllers
 {
@@ -54,6 +56,33 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             };
 
             return PartialView("_CreateUpdate", viewModel);
+        }
+        [HttpGet("ManageContent/{id}")]
+        public async Task<IActionResult> ManageContent(Guid id)
+        {
+            var dto = await _mediator.Send(new GetTopicContentQuery(id));
+
+            if (dto == null) return NotFound();
+            var model = new TopicContentViewModel
+            {
+                Id = dto.Id,
+                TopicId = dto.TopicId,
+                TopicName = dto.TopicName,
+                ContentEn = dto.ContentEn,
+            };
+            return PartialView("_TopicContentModalPartial", model);
+        }
+         
+        [HttpPost("SaveContent")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveContent(TopicontentDto model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var command = new SaveTopicContentCommand(model.TopicId,model.ContentEn);
+
+            var result = await _mediator.Send(command);
+            return Json(result); 
         }
 
         [HttpGet("EditPartial/{id}")]
