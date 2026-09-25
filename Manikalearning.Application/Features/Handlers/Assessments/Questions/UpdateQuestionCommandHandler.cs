@@ -72,6 +72,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     QuestionId = question.QuestionId,
                     OptionLabel = opt.OptionLabel,
                     OptionText = opt.OptionText,
+                    OptionTextHindi = opt.OptionTextHindi ?? "",
                     IsCorrect = opt.IsCorrect,
                     DisplayOrder = order++
                 });

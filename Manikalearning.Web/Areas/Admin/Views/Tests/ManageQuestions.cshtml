@@ -1,0 +1,520 @@
+﻿@model List<Manikalearning.Application.DTOs.TestQuestionDto>
+@{
+    var test = ViewBag.Test as Manikalearning.Application.DTOs.TestDto;
+    ViewData["Title"] = $"Manage Questions - {test?.TestName}";
+    Layout = "_AdminLayout";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="container-fluid px-3 py-3">
+    <!-- Header & Action Bar (Compact) -->
+    <div class="card border-0 shadow-sm rounded-3 mb-3 bg-body">
+        <div class="card-body py-2 px-3 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <a asp-action="Index" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0.5 small" style="font-size: 0.75rem;">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                    <h5 class="fw-bold text-dark mb-0 fs-6">@test?.TestName</h5>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-1.5 mt-1">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
+                        <i class="bi bi-tag-fill me-1"></i> @test?.TestType
+                    </span>
+                    <span class="badge bg-body-tertiary text-secondary border rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
+                        <i class="bi bi-clock-history me-1"></i> @test?.DurationMinutes Mins
+                    </span>
+                    <span class="badge bg-body-tertiary text-secondary border rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
+                        <i class="bi bi-dash-circle-dotted me-1"></i> Neg: <strong>@test?.NegativeMarking</strong>
+                    </span>
+                </div>
+            </div>
+            <button type="button" id="btnSaveMapping" class="btn btn-success btn-sm rounded-2 shadow-sm px-3 fw-semibold d-inline-flex align-items-center gap-1 py-1" onclick="saveQuestionsMapping()">
+                <i class="bi bi-check-circle-fill"></i>
+                <span id="btnSaveText">Save Changes</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Stats Bar (Compact) -->
+    <div class="row g-2 mb-3">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 stat-card stat-card-indigo h-100">
+                <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-uppercase fw-bold text-indigo tracking-wide" style="font-size: 0.68rem;">Mapped Questions</span>
+                        <h4 class="fw-bold mb-0 text-indigo fs-4" id="lblTotalQuestions">@Model.Count</h4>
+                    </div>
+                    <div class="stat-icon-wrapper bg-indigo-subtle text-indigo">
+                        <i class="bi bi-patch-question-fill fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 stat-card stat-card-emerald h-100">
+                <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-uppercase fw-bold text-emerald tracking-wide" style="font-size: 0.68rem;">Total Test Marks</span>
+                        <h4 class="fw-bold mb-0 text-emerald fs-4" id="lblTotalMarks">@Model.Sum(x => x.Marks)</h4>
+                    </div>
+                    <div class="stat-icon-wrapper bg-emerald-subtle text-emerald">
+                        <i class="bi bi-trophy-fill fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Left Panel: Question Bank -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden">
+                <div class="card-header bg-body border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2 fs-7">
+                        <i class="bi bi-journal-bookmark-fill text-primary"></i> Question Bank
+                    </h6>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill" id="bankCountBadge" style="font-size: 0.7rem;">Available</span>
+                </div>
+                <div class="card-body p-2">
+                    <!-- Compact Search Input -->
+                    <div class="mb-2">
+                        <div class="input-group input-group-sm search-box-custom">
+                            <span class="input-group-text bg-body border-end-0 text-muted ps-2.5"><i class="bi bi-search"></i></span>
+                            <input type="text" id="bankSearch" class="form-control border-start-0 ps-0 shadow-none form-control-sm" placeholder="Search questions..." onkeyup="filterQuestionBank()" />
+                        </div>
+                    </div>
+
+                    <!-- Available Questions Container -->
+                    <div id="questionBankContainer" class="vstack gap-1.5 overflow-auto pe-1 custom-scrollbar" style="max-height: 520px;">
+                        <div class="text-center py-4 text-muted small" id="bankLoading">
+                            <div class="spinner-border spinner-border-sm text-primary me-1" role="status"></div> Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Mapped Questions -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden">
+                <div class="card-header bg-body border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0 fw-bold text-dark d-flex align-items-center gap-2 fs-7">
+                        <i class="bi bi-list-stars text-success"></i> Selected Test Questions
+                    </h6>
+                    <small class="text-muted bg-body-tertiary px-2 py-0.5 rounded border border-light-subtle" style="font-size: 0.7rem;">
+                        <i class="bi bi-grip-vertical text-primary"></i> Drag to re-order
+                    </small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive custom-scrollbar" style="max-height: 570px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0 dense-table" id="tblMappedQuestions">
+                            <thead class="table-light sticky-top border-bottom">
+                                <tr>
+                                    <th style="width: 36px;" class="text-center">#</th>
+                                    <th>Question Details</th>
+                                    <th style="width: 95px;">Marks</th>
+                                    <th style="width: 50px;" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mappedQuestionsBody">
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var q in Model)
+                                    {
+                                        <tr data-question-id="@q.QuestionId" class="mapped-row">
+                                            <td class="handle cursor-grab text-muted text-center py-2">
+                                                <i class="bi bi-grip-vertical fs-6 grab-icon"></i>
+                                            </td>
+                                            <td class="py-2">
+                                                <div class="fw-semibold text-dark question-text-clamp small">@q.QuestionText</div>
+                                                <small class="text-muted d-block" style="font-size: 0.72rem;">
+                                                    <span class="badge bg-light text-secondary border fw-normal me-1 py-0 px-1">
+                                                        @(string.IsNullOrEmpty(q.SubjectName) ? "General" : q.SubjectName)
+                                                    </span>
+                                                    @if (!string.IsNullOrEmpty(q.TopicName))
+                                                    {
+                                                        <span class="text-secondary"><i class="bi bi-chevron-right" style="font-size:0.65rem;"></i> @q.TopicName</span>
+                                                    }
+                                                </small>
+                                            </td>
+                                            <td class="py-2">
+                                                <input type="number" step="0.5" min="0" class="form-control form-control-sm text-center fw-bold rounded-1 txt-marks py-0" style="height: 28px; font-size: 0.8rem;" value="@q.Marks" onchange="recalculateTotals()" />
+                                            </td>
+                                            <td class="text-center py-2">
+                                                <button class="btn btn-sm btn-action-delete rounded-circle" onclick="removeQuestion(this, '@q.QuestionId')" title="Remove question">
+                                                    <i class="bi bi-trash3-fill" style="font-size:0.75rem;"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr id="emptyRow">
+                                        <td colspan="4" class="text-center py-4">
+                                            <div class="p-3 rounded-2 border border-dashed mx-auto my-2" style="max-width: 320px;">
+                                                <i class="bi bi-inbox fs-3 d-block mb-1 text-primary opacity-50"></i>
+                                                <h6 class="fw-bold text-dark mb-0 fs-7">No Questions Attached</h6>
+                                                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Add questions from the bank on the left.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <style>
+        .fs-7 {
+            font-size: 0.825rem;
+        }
+
+        .tracking-wide {
+            letter-spacing: 0.04em;
+        }
+
+        /* Stat Cards */
+        .stat-card-indigo {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.18) !important;
+        }
+
+        .text-indigo {
+            color: #4f46e5 !important;
+        }
+
+        .bg-indigo-subtle {
+            background-color: rgba(99, 102, 241, 0.12) !important;
+        }
+
+        .stat-card-emerald {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.18) !important;
+        }
+
+        .text-emerald {
+            color: #059669 !important;
+        }
+
+        .bg-emerald-subtle {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+        }
+
+        .stat-icon-wrapper {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bank Item Card */
+        .bank-item-card {
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            transition: all 0.15s ease;
+            background-color: #ffffff;
+        }
+
+            .bank-item-card:hover {
+                border-color: #a5b4fc;
+                box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+            }
+
+        /* Table Specifics */
+        .dense-table th {
+            padding: 0.4rem 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #6c757d;
+        }
+
+        .dense-table td {
+            padding: 0.35rem 0.5rem;
+        }
+
+        .cursor-grab {
+            cursor: grab;
+        }
+
+            .cursor-grab:active {
+                cursor: grabbing;
+            }
+
+        .grab-icon {
+            color: #adb5bd;
+        }
+
+        .mapped-row:hover .grab-icon {
+            color: #4f46e5;
+        }
+
+        .ui-sortable-helper {
+            display: table;
+            background: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12) !important;
+            border-radius: 6px;
+        }
+
+        .ui-sortable-placeholder {
+            background: #e0e7ff !important;
+            visibility: visible !important;
+            height: 42px;
+            border: 1px dashed #6366f1;
+            border-radius: 6px;
+        }
+
+        .btn-action-delete {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+            border: none;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            padding: 0;
+        }
+
+            .btn-action-delete:hover {
+                background: #ef4444;
+                color: #ffffff;
+            }
+
+        /* Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .question-text-clamp {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+    </style>
+
+    <script>
+        const currentTestId = '@test?.TestId';
+        let availableQuestionsBank = [];
+
+        $(document).ready(function() {
+            $("#mappedQuestionsBody").sortable({
+                handle: ".handle",
+                placeholder: "ui-sortable-placeholder",
+                axis: "y",
+                update: function() {
+                    recalculateTotals();
+                }
+            });
+
+            loadQuestionBank();
+        });
+
+        function loadQuestionBank() {
+            $.get('@Url.Action("GetAvailableQuestions", "TestQuestions")', { subjectId: '@test?.SubjectId' }, function(res) {
+                if (res.success || res.isSuccess) {
+                    availableQuestionsBank = res.data || [];
+                    renderQuestionBank(availableQuestionsBank);
+                } else {
+                    $('#questionBankContainer').html('<div class="text-danger p-2 text-center small"><i class="bi bi-exclamation-triangle me-1"></i> Failed to load question bank.</div>');
+                }
+            }).fail(function() {
+                $('#questionBankContainer').html('<div class="text-muted p-3 text-center small"><i class="bi bi-search me-1"></i> Search or select questions to filter bank.</div>');
+            });
+        }
+
+        function renderQuestionBank(items) {
+            const container = $('#questionBankContainer');
+            container.empty();
+
+            const mappedIds = getMappedQuestionIds();
+            const filtered = items.filter(q => !mappedIds.includes(q.questionId));
+
+            $('#bankCountBadge').text(`${filtered.length} Available`);
+
+            if (filtered.length === 0) {
+                container.html(`
+                            <div class="text-center py-4 text-muted small">
+                                <i class="bi bi-check2-circle fs-3 text-success d-block mb-1 opacity-75"></i>
+                                <span>All questions from bank mapped!</span>
+                            </div>`);
+                return;
+            }
+
+            filtered.forEach(q => {
+                const cardHtml = `
+                            <div class="bank-item-card p-2 bank-item" data-id="${q.questionId}">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="pe-1">
+                                        <div class="fw-semibold text-dark small question-text-clamp mb-1">${escapeHtml(q.questionText)}</div>
+                                        <div class="d-flex align-items-center gap-1.5">
+                                            <span class="badge bg-light text-secondary border fw-normal py-0 px-1" style="font-size:0.68rem;">${escapeHtml(q.subjectName || 'General')}</span>
+                                            <small class="text-muted" style="font-size:0.68rem;">Def: <strong>${q.defaultMarks || 1} Mks</strong></small>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-xs btn-primary rounded-2 flex-shrink-0 d-inline-flex align-items-center gap-1 shadow-sm px-2 py-0.5" style="font-size: 0.72rem;"
+                                            onclick="addQuestion('${q.questionId}', '${escapeHtml(q.questionText)}', '${escapeHtml(q.subjectName || '')}', ${q.defaultMarks || 1})">
+                                        <i class="bi bi-plus-lg"></i> Add
+                                    </button>
+                                </div>
+                            </div>`;
+                container.append(cardHtml);
+            });
+        }
+
+        function addQuestion(id, text, subject, defaultMarks) {
+            $('#emptyRow').remove();
+
+            const rowHtml = `
+                        <tr data-question-id="${id}" class="mapped-row">
+                            <td class="handle cursor-grab text-muted text-center py-2">
+                                <i class="bi bi-grip-vertical fs-6 grab-icon"></i>
+                            </td>
+                            <td class="py-2">
+                                <div class="fw-semibold text-dark question-text-clamp small">${text}</div>
+                                <small class="text-muted d-block" style="font-size: 0.72rem;">
+                                    <span class="badge bg-light text-secondary border fw-normal py-0 px-1">${subject || 'General'}</span>
+                                </small>
+                            </td>
+                            <td class="py-2">
+                                <input type="number" step="0.5" min="0" class="form-control form-control-sm text-center fw-bold rounded-1 txt-marks py-0" style="height: 28px; font-size: 0.8rem;" value="${defaultMarks}" onchange="recalculateTotals()" />
+                            </td>
+                            <td class="text-center py-2">
+                                <button class="btn btn-sm btn-action-delete rounded-circle" onclick="removeQuestion(this, '${id}')" title="Remove question">
+                                    <i class="bi bi-trash3-fill" style="font-size:0.75rem;"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+
+            $('#mappedQuestionsBody').append(rowHtml);
+            $(`.bank-item[data-id="${id}"]`).fadeOut(150, function() { $(this).remove(); });
+            recalculateTotals();
+        }
+
+        function removeQuestion(btn, id) {
+            $(btn).closest('tr').fadeOut(150, function() {
+                $(this).remove();
+                if ($('#mappedQuestionsBody tr.mapped-row').length === 0) {
+                    $('#mappedQuestionsBody').html(`
+                                <tr id="emptyRow">
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="p-3 rounded-2 border border-dashed mx-auto my-2" style="max-width: 320px;">
+                                            <i class="bi bi-inbox fs-3 d-block mb-1 text-primary opacity-50"></i>
+                                            <h6 class="fw-bold text-dark mb-0 fs-7">No Questions Attached</h6>
+                                            <p class="text-muted small mb-0" style="font-size: 0.75rem;">Add questions from the bank on the left.</p>
+                                        </div>
+                                    </td>
+                                </tr>`);
+                }
+                renderQuestionBank(availableQuestionsBank);
+                recalculateTotals();
+            });
+        }
+
+        function recalculateTotals() {
+            const rows = $('#mappedQuestionsBody tr.mapped-row');
+            let totalMarks = 0;
+
+            rows.each(function() {
+                const marksVal = parseFloat($(this).find('.txt-marks').val()) || 0;
+                totalMarks += marksVal;
+            });
+
+            $('#lblTotalQuestions').text(rows.length);
+            $('#lblTotalMarks').text(Number.isInteger(totalMarks) ? totalMarks : totalMarks.toFixed(1));
+        }
+
+        function saveQuestionsMapping() {
+            const btn = $('#btnSaveMapping');
+            const btnText = $('#btnSaveText');
+
+            btn.prop('disabled', true);
+            btnText.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...');
+
+            const mappedQuestions = [];
+            let displayOrder = 1;
+
+            $('#mappedQuestionsBody tr.mapped-row').each(function() {
+                const qId = $(this).attr('data-question-id');
+                const marks = parseFloat($(this).find('.txt-marks').val()) || 0;
+
+                mappedQuestions.push({
+                    questionId: qId,
+                    displayOrder: displayOrder++,
+                    marks: marks
+                });
+            });
+
+            const payload = {
+                testId: currentTestId,
+                questions: mappedQuestions
+            };
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '@Url.Action("SaveQuestions", "Tests")',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'RequestVerificationToken': token },
+                data: JSON.stringify(payload),
+                success: function(res) {
+                    if (res.success || res.isSuccess) {
+                        alert(res.message || "Questions mapped successfully!");
+                    } else {
+                        alert(res.message || "Failed to save question mappings.");
+                    }
+                },
+                error: function() {
+                    alert("An error occurred while communicating with the server.");
+                },
+                complete: function() {
+                    btn.prop('disabled', false);
+                    btnText.text('Save Changes');
+                }
+            });
+        }
+
+        function getMappedQuestionIds() {
+            const ids = [];
+            $('#mappedQuestionsBody tr.mapped-row').each(function() {
+                ids.push($(this).attr('data-question-id'));
+            });
+            return ids;
+        }
+
+        function filterQuestionBank() {
+            const query = $('#bankSearch').val().toLowerCase();
+            const filtered = availableQuestionsBank.filter(q => q.questionText.toLowerCase().includes(query));
+            renderQuestionBank(filtered);
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+}

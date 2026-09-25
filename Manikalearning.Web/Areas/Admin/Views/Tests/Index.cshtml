@@ -1,5 +1,237 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Manikalearning.Application.DTOs
+@model List<TestDto>
+
 @{
+    ViewData["Title"] = "Test Series Management";
+    ViewData["HeaderTitle"] = "Test Series";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var selectedSubjectId = ViewData["SubjectId"] as Guid?;
+    var searchTerm = ViewData["SearchTerm"] as string;
 }
+
+@Html.AntiForgeryToken()
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold text-dark mb-0">
+                Test Series <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.Count Total</span>
+            </h5>
+            <p class="text-muted small mb-0">Manage test papers, duration, marks, published state, and question mappings.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="input-group input-group-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-light border-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="tableSearch" class="form-control bg-light border-0 shadow-none" placeholder="Search tests..." value="@searchTerm" onkeyup="filterTestsTable()">
+            </div>
+
+            <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm"
+                    onclick="Toast.openModal('/Admin/Tests/CreatePartial?subjectId=@(selectedSubjectId ?? Guid.Empty)', 'modal-lg')">
+                <i class="bi bi-plus-lg me-1"></i> Add Test
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="testsTable">
+            <thead class="table-light rounded-3">
+                <tr>
+                    <th class="text-muted fw-semibold border-0 py-3 ps-3" style="width: 35%;">Test Details</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Type / Duration</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-center">Questions / Marks</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Config Info</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Status</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-3">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="fw-medium text-dark text-wrap fs-6" style="max-height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                        @item.TestName
+                                    </span>
+                                    <div class="d-flex align-items-center gap-2 small text-muted">
+                                        @if (!string.IsNullOrEmpty(item.SubjectName))
+                                        {
+                                            <span class="badge bg-light text-secondary border fw-normal px-2 py-0.5">
+                                                <i class="bi bi-book me-1"></i>@item.SubjectName
+                                            </span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.SectionName))
+                                        {
+                                            <span class="badge bg-light text-secondary border fw-normal px-2 py-0.5">
+                                                <i class="bi bi-diagram-2 me-1"></i>@item.SectionName
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="badge bg-light text-dark border w-auto align-self-start">
+                                        @item.TestType
+                                    </span>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>@item.DurationMinutes Mins
+                                    </small>
+                                </div>
+                            </td>
+
+                            <td class="text-center">
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="fw-bold text-dark">@item.TotalQuestions Qs</span>
+                                    <small class="text-success fw-semibold">@item.TotalMarks Marks</small>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    @if (item.IsRandom)
+                                    {
+                                        <span class="badge bg-info bg-opacity-10 text-info fw-medium w-auto align-self-start">Randomized</span>
+                                    }
+                                    @if (item.ShowResultImmediately)
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary fw-medium w-auto align-self-start">Instant Result</span>
+                                    }
+                                    @if (item.NegativeMarking > 0)
+                                    {
+                                        <small class="text-danger">Neg: -@item.NegativeMarking</small>
+                                    }
+                                </div>
+                            </td>
+
+                            <td>
+                                @if (item.IsPublished)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2.5 py-1 fw-medium">Published</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2.5 py-1 fw-medium">Draft</span>
+                                }
+                            </td>
+
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="/Admin/Tests/ManageQuestions/@item.TestId"
+                                       class="btn btn-sm btn-light text-primary shadow-none rounded-2" title="Manage Questions">
+                                        <i class="bi bi-list-check"></i>
+                                    </a>
+
+                                    <button type="button" class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                            title="Edit Test" onclick="Toast.openModal('/Admin/Tests/EditPartial/@item.TestId', 'modal-lg')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-sm btn-light text-danger shadow-none rounded-2"
+                                            title="Delete Test" onclick="confirmTestDelete('@item.TestId')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-journal-x fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                <h6 class="fw-semibold mb-1">No Tests Found</h6>
+                                <p class="small mb-0">Click "Add Test" to create your first test series paper.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteTestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-exclamation-octagon-fill display-5"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2">Delete Test?</h6>
+                <p class="text-muted small mb-4">Are you sure you want to delete this test? Mapped questions will also be unlinked.</p>
+
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-3 px-3 w-50" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteTestBtn" class="btn btn-danger rounded-3 px-3 w-50">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeTestDeleteId = null;
+    let testDeleteModal = null;
+
+    function confirmTestDelete(id) {
+        activeTestDeleteId = id;
+        const modalEl = document.getElementById('deleteTestModal');
+        testDeleteModal = new bootstrap.Modal(modalEl);
+        testDeleteModal.show();
+    }
+
+    document.getElementById('confirmDeleteTestBtn').addEventListener('click', function() {
+        if (!activeTestDeleteId) return;
+
+        testDeleteModal.hide();
+        Toast.showLoader();
+
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '/Admin/Tests/Delete/' + activeTestDeleteId,
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: token
+            },
+            success: function(response) {
+                Toast.hideLoader();
+                if (typeof response === 'object' && (response.isSuccess || response.success)) {
+                    Toast.success(response.message || "Test deleted successfully.");
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    Toast.error((response && response.message) ? response.message : "Unable to delete test.");
+                }
+            },
+            error: function() {
+                Toast.hideLoader();
+                Toast.error("An error occurred while deleting the test.");
+            }
+        });
+    });
+
+    function filterTestsTable() {
+        const input = document.getElementById("tableSearch");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("testsTable");
+        const trs = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < trs.length; i++) {
+            const testTd = trs[i].getElementsByTagName("td")[0];
+            if (testTd) {
+                const text = testTd.textContent || testTd.innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    trs[i].style.display = "";
+                } else {
+                    trs[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>

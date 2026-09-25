@@ -118,19 +118,16 @@ namespace Manikalearning.Domain.Entities
 
         [MaxLength(50)]
         public string TestType { get; set; }
-
         public int TotalQuestions { get; set; }
         public int DurationMinutes { get; set; }
         public decimal TotalMarks { get; set; }
-        public bool NegativeMarking { get; set; }
-
+        public decimal NegativeMarking { get; set; }
         public bool IsRandom { get; set; } = false;
         public bool ShowResultImmediately { get; set; } = true;
         public bool IsPublished { get; set; } = false;
 
         [MaxLength(450)]
         public Guid CreatedBy { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation Properties

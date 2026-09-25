@@ -1,0 +1,194 @@
+﻿@model Manikalearning.Web.Areas.Admin.ViewModels.TestViewModel
+
+@{
+    bool isEdit = Model.TestId != Guid.Empty;
+    string title = isEdit ? "Edit Test" : "Create New Test";
+    string actionName = isEdit ? "Edit" : "Create";
+}
+
+<div class="modal-header border-bottom pb-2">
+    <h5 class="modal-title fw-bold text-dark">
+        <i class="bi bi-file-earmark-text text-primary me-2"></i>@title
+    </h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form id="testForm" asp-area="Admin" asp-controller="Tests" asp-action="@actionName" method="post" onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="TestId" />
+    <input type="hidden" asp-for="ExamId" />
+    <input type="hidden" asp-for="PaperId" />
+
+    <div class="modal-body py-3" style="max-height: 75vh; overflow-y: auto;">
+
+        <div class="bg-light p-2 rounded border mb-3">
+            <span class="fw-bold text-dark fs-7 text-uppercase">
+                <i class="bi bi-info-circle text-primary me-1"></i> 1. Basic Information
+            </span>
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col-md-8">
+                <label asp-for="TestName" class="form-label small fw-semibold text-muted">Test Name *</label>
+                <input asp-for="TestName" class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Physics Full Mock Test 1" required />
+                <span asp-validation-for="TestName" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="TestType" class="form-label small fw-semibold text-muted">Test Type *</label>
+                <select asp-for="TestType" class="form-select form-select-sm rounded-2 shadow-none" id="ddlTestType" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="Mock">Mock Test</option>
+                    <option value="Practice">Practice Test</option>
+                    <option value="Sectional">Sectional Test</option>
+                    <option value="Topic">Topic Test</option>
+                    <option value="PYQ">Previous Year</option>
+                </select>
+                <span asp-validation-for="TestType" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="bg-light p-2 rounded border mb-3 mt-3">
+            <span class="fw-bold text-dark fs-7 text-uppercase">
+                <i class="bi bi-diagram-3 text-primary me-1"></i> 2. Categorization
+            </span>
+        </div>
+
+        <div class="row g-2 mb-2">
+            <div class="col-md-4">
+                <label asp-for="SubjectId" class="form-label small fw-semibold text-muted">Subject</label>
+                <select asp-for="SubjectId" asp-items="Model.SubjectsList" class="form-select form-select-sm rounded-2 shadow-none" id="ddlSubject">
+                    <option value="">-- All Subjects --</option>
+                </select>
+                <span asp-validation-for="SubjectId" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="SectionId" class="form-label small fw-semibold text-muted">Section</label>
+                <select asp-for="SectionId" asp-items="Model.SectionsList" class="form-select form-select-sm rounded-2 shadow-none" id="ddlSection">
+                    <option value="">-- Select Section --</option>
+                </select>
+                <span asp-validation-for="SectionId" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="TopicId" class="form-label small fw-semibold text-muted">Topic</label>
+                <select asp-for="TopicId" asp-items="Model.TopicsList" class="form-select form-select-sm rounded-2 shadow-none" id="ddlTopic">
+                    <option value="">-- Select Topic --</option>
+                </select>
+                <span asp-validation-for="TopicId" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="bg-light p-2 rounded border mb-3 mt-3">
+            <span class="fw-bold text-dark fs-7 text-uppercase">
+                <i class="bi bi-clock-history text-primary me-1"></i> 3. Duration & Marking Scheme
+            </span>
+        </div>
+
+        <div class="row g-2 mb-2">
+            <div class="col-md-3 col-6">
+                <label asp-for="DurationMinutes" class="form-label small fw-semibold text-muted">Duration (Mins) *</label>
+                <input asp-for="DurationMinutes" type="number" min="1" max="600" class="form-control form-control-sm rounded-2 shadow-none" required />
+                <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+            </div>
+            <div class="col-md-3 col-6">
+                <label asp-for="TotalQuestions" class="form-label small fw-semibold text-muted">Total Questions *</label>
+                <input asp-for="TotalQuestions" type="number" min="0" max="1000" class="form-control form-control-sm rounded-2 shadow-none" required />
+                <span asp-validation-for="TotalQuestions" class="text-danger small"></span>
+            </div>
+            <div class="col-md-3 col-6">
+                <label asp-for="TotalMarks" class="form-label small fw-semibold text-muted">Total Marks *</label>
+                <input asp-for="TotalMarks" type="number" step="0.5" min="0" max="5000" class="form-control form-control-sm rounded-2 shadow-none" required />
+                <span asp-validation-for="TotalMarks" class="text-danger small"></span>
+            </div>
+            <div class="col-md-3 col-6">
+                <label asp-for="NegativeMarking" class="form-label small fw-semibold text-muted">Negative Marking *</label>
+                <input asp-for="NegativeMarking" type="number" step="0.05" min="0" max="100" class="form-control form-control-sm rounded-2 shadow-none" required />
+                <span asp-validation-for="NegativeMarking" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="bg-light p-2 rounded border mb-3 mt-3">
+            <span class="fw-bold text-dark fs-7 text-uppercase">
+                <i class="bi bi-gear text-primary me-1"></i> 4. Settings & Status
+            </span>
+        </div>
+
+        <div class="row g-2 pt-1">
+            <div class="col-md-4 col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input shadow-none" type="checkbox" asp-for="IsRandom" id="chkIsRandom" />
+                    <label class="form-check-label small fw-semibold text-dark" for="chkIsRandom">Randomize Questions</label>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input shadow-none" type="checkbox" asp-for="ShowResultImmediately" id="chkShowResultImmediately" />
+                    <label class="form-check-label small fw-semibold text-dark" for="chkShowResultImmediately">Show Result Immediately</label>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input shadow-none" type="checkbox" asp-for="IsPublished" id="chkIsPublished" />
+                    <label class="form-check-label small fw-semibold text-dark" for="chkIsPublished">Publish Test</label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer border-top pt-2">
+        <button type="button" class="btn btn-sm btn-light rounded-2 px-3" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> Save Test
+        </button>
+    </div>
+</form>
+
+<script>
+    (function() {
+        'use strict';
+
+        function populateDropdown(selectElement, url, defaultText) {
+            if (!selectElement) return;
+            selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id || item.value;
+                        opt.textContent = item.name || item.text;
+                        selectElement.appendChild(opt);
+                    });
+                })
+                .catch(err => console.error("Error fetching dropdown data:", err));
+        }
+
+        // Cascading Dropdowns: Subject -> Section -> Topic
+        const ddlSubject = document.getElementById('ddlSubject');
+        const ddlSection = document.getElementById('ddlSection');
+        const ddlTopic = document.getElementById('ddlTopic');
+
+        if (ddlSubject) {
+            ddlSubject.addEventListener('change', function() {
+                const subjectId = this.value;
+                if (ddlSection) ddlSection.innerHTML = '<option value="">-- Select Section --</option>';
+                if (ddlTopic) ddlTopic.innerHTML = '<option value="">-- Select Topic --</option>';
+
+                if (subjectId) {
+                    populateDropdown(ddlSection, '/Admin/Tests/GetSections?subjectId=' + encodeURIComponent(subjectId), '-- Select Section --');
+                }
+            });
+        }
+
+        if (ddlSection) {
+            ddlSection.addEventListener('change', function() {
+                const sectionId = this.value;
+                if (ddlTopic) ddlTopic.innerHTML = '<option value="">-- Select Topic --</option>';
+
+                if (sectionId) {
+                    populateDropdown(ddlTopic, '/Admin/Tests/GetTopics?sectionId=' + encodeURIComponent(sectionId), '-- Select Topic --');
+                }
+            });
+        }
+    })();
+</script>

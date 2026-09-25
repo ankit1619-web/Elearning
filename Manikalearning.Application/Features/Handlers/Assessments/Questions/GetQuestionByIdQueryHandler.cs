@@ -24,8 +24,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
         public async Task<ResponseDto<QuestionDto>> Handle(GetQuestionByIdQuery request, CancellationToken cancellationToken)
         {
             try
-            {
-                // 1. Fetch Question with Options from DB
+            { 
                 var q = await _questionRepo.Entity()
                     .AsNoTracking()
                     .Include(x => x.Options)
@@ -36,8 +35,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     _logger.LogWarning("Question with ID: {QuestionId} was not found.", request.QuestionId);
                     return ResponseDto<QuestionDto>.Failure($"Question with ID '{request.QuestionId}' not found.");
                 }
-
-                // 2. Map Entity to DTO
+                 
                 var dto = new QuestionDto
                 {
                     QuestionId = q.QuestionId,
@@ -49,8 +47,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     PaperId = q.PaperId,
                     PassageId = q.PassageId,
                     QuestionType = q.QuestionType,
-
-                    // English & Hindi Fields
+                     
                     QuestionText = q.QuestionText,
                     QuestionTextHindi = q.QuestionTextHindi,
                     Explanation = q.Explanation,
@@ -68,8 +65,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     IsApproved = q.IsApproved,
                     IsActive = q.IsActive,
                     CreatedAt = q.CreatedAt,
-
-                    // Options Mapping with Null check safety
+                     
                     Options = q.Options != null
                         ? q.Options.OrderBy(o => o.DisplayOrder).Select(o => new QuestionOptionDto
                         {
@@ -77,7 +73,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                             QuestionId = o.QuestionId,
                             OptionLabel = o.OptionLabel,
                             OptionText = o.OptionText,
-                            OptionTextHindi = o.OptionTextHindi,
+                            OptionTextHindi = o.OptionTextHindi ?? "",
                             IsCorrect = o.IsCorrect,
                             DisplayOrder = o.DisplayOrder
                         }).ToList()

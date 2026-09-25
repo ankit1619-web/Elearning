@@ -233,10 +233,13 @@
             <i class="bi bi-check-lg me-1"></i> Save Question
         </button>
     </div>
-</form>  
+</form> 
 <script>
-   const optionLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-     
+(function () {
+    'use strict';
+
+    const optionLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+      
     const pyqSwitch = document.getElementById('pyqSwitch');
     const pyqFields = document.getElementById('pyqFields');
     if (pyqSwitch && pyqFields) {
@@ -249,7 +252,7 @@
             }
         });
     }
-     
+      
     function getSelectedQuestionType() {
         const select = document.getElementById('ddlQuestionType');
         if (!select) return "MCQ";
@@ -265,7 +268,7 @@
         }
         return "MCQ";
     }
-     
+      
     function reindexOptions() {
         const selectedType = getSelectedQuestionType();
         const rows = document.querySelectorAll('#optionsContainer .option-row');
@@ -316,12 +319,13 @@
                 }
             }
         });
-         
+          
         const removeBtns = document.querySelectorAll('.btn-remove-option');
         removeBtns.forEach(btn => {
             btn.disabled = (rows.length <= 2);
         });
-    } 
+    }
+
     function handleQuestionTypeChange() {
         const type = getSelectedQuestionType();
         const optionsWrapper = document.getElementById('optionsWrapper');
@@ -345,7 +349,7 @@
             reindexOptions();
         }
     }
-     
+      
     function addOptionRow() {
         const container = document.getElementById('optionsContainer');
         if (!container) return;
@@ -384,7 +388,7 @@
         container.insertAdjacentHTML('beforeend', html);
         reindexOptions();
     }
-     
+      
     const container = document.getElementById('optionsContainer');
     if (container) {
         if (container.querySelectorAll('.option-row').length === 0) {
@@ -395,7 +399,7 @@
             reindexOptions();
         }
     }
-     
+      
     const btnAddOption = document.getElementById('btnAddOption');
     if (btnAddOption) {
         btnAddOption.addEventListener('click', function (e) {
@@ -403,7 +407,7 @@
             addOptionRow();
         });
     }
-     
+      
     if (container) {
         container.addEventListener('click', function (e) {
             const btn = e.target.closest('.btn-remove-option');
@@ -420,7 +424,7 @@
             }
         });
     }
-     
+      
     function populateDropdown(selectElement, url, defaultText) {
         if (!selectElement) return;
         selectElement.innerHTML = `<option value="">${defaultText}</option>`;
@@ -432,12 +436,13 @@
                     const opt = document.createElement('option');
                     opt.value = item.id || item.value;
                     opt.textContent = item.name || item.text;
+                    console.log(opt.value, opt.textContent);
                     selectElement.appendChild(opt);
                 });
             })
             .catch(err => console.error("Error loading dropdown data:", err));
     }
-     
+      
     const ddlSubject = document.getElementById('ddlSubject');
     if (ddlSubject) {
         ddlSubject.addEventListener('change', function () {
@@ -488,82 +493,84 @@
             }
         });
     }
-     
+      
     const ddlQuestionType = document.getElementById('ddlQuestionType');
     if (ddlQuestionType) {
         ddlQuestionType.addEventListener('change', handleQuestionTypeChange);
     }
-     
+      
     const btnAutoTranslate = document.getElementById('btnAutoTranslate');
 
-if (btnAutoTranslate) {
-    btnAutoTranslate.addEventListener('click', async function () {
-        
-        const originalText = btnAutoTranslate.innerHTML;
-        btnAutoTranslate.disabled = true;
-        btnAutoTranslate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Translating...';
+    if (btnAutoTranslate) {
+        btnAutoTranslate.addEventListener('click', async function () {
+            
+            const originalText = btnAutoTranslate.innerHTML;
+            btnAutoTranslate.disabled = true;
+            btnAutoTranslate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Translating...';
 
-        try {
-            const translationPromises = [];
-             
-            const txtQuestionEn = document.getElementById('txtQuestionEn');
-            const txtQuestionHi = document.getElementById('txtQuestionHi');
+            try {
+                const translationPromises = [];
+                
+                const txtQuestionEn = document.getElementById('txtQuestionEn');
+                const txtQuestionHi = document.getElementById('txtQuestionHi');
 
-            if (txtQuestionEn && txtQuestionEn.value.trim() && txtQuestionHi) {
-                translationPromises.push(
-                    translateApi(txtQuestionEn.value.trim()).then(translated => {
-                        if (translated) txtQuestionHi.value = translated;
-                    })
-                );
-            }
-             
-            const optionEnInputs = document.querySelectorAll('.option-text-en');
-            const optionHiInputs = document.querySelectorAll('.option-text-hi');
-
-            optionEnInputs.forEach((enInput, index) => {
-                const hiInput = optionHiInputs[index];
-                if (enInput && enInput.value.trim() && hiInput) {
+                if (txtQuestionEn && txtQuestionEn.value.trim() && txtQuestionHi) {
                     translationPromises.push(
-                        translateApi(enInput.value.trim()).then(translated => {
-                            if (translated) hiInput.value = translated;
+                        translateApi(txtQuestionEn.value.trim()).then(translated => {
+                            if (translated) txtQuestionHi.value = translated;
                         })
                     );
                 }
-            });
-             
-            await Promise.all(translationPromises);
+                
+                const optionEnInputs = document.querySelectorAll('.option-text-en');
+                const optionHiInputs = document.querySelectorAll('.option-text-hi');
 
-            if (typeof Toast !== 'undefined' && Toast.success) {
-                Toast.success("Question and Options translated successfully!");
+                optionEnInputs.forEach((enInput, index) => {
+                    const hiInput = optionHiInputs[index];
+                    if (enInput && enInput.value.trim() && hiInput) {
+                        translationPromises.push(
+                            translateApi(enInput.value.trim()).then(translated => {
+                                if (translated) hiInput.value = translated;
+                            })
+                        );
+                    }
+                });
+                
+                await Promise.all(translationPromises);
+
+                if (typeof Toast !== 'undefined' && Toast.success) {
+                    Toast.success("Question and Options translated successfully!");
+                }
+            } catch (err) {
+                console.error("Translation error:", err);
+                if (typeof Toast !== 'undefined' && Toast.error) {
+                    Toast.error("Translation failed. Please try again.");
+                }
+            } finally { 
+                btnAutoTranslate.disabled = false;
+                btnAutoTranslate.innerHTML = originalText;
             }
-        } catch (err) {
-            console.error("Translation error:", err);
-            if (typeof Toast !== 'undefined' && Toast.error) {
-                Toast.error("Translation failed. Please try again.");
-            }
-        } finally { 
-            btnAutoTranslate.disabled = false;
-            btnAutoTranslate.innerHTML = originalText;
-        }
-    });
-}
- 
-async function translateApi(text, targetLang = 'hi') {
-    if (!text) return '';
+        });
+    }
 
-    const formData = new URLSearchParams();
-    formData.append('text', text);
-    formData.append('targetLang', targetLang);
+    async function translateApi(text, targetLang = 'hi') {
+        if (!text) return '';
 
-    const response = await fetch('/Admin/Questions/AutoTranslate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString()
-    });
+        const formData = new URLSearchParams();
+        formData.append('text', text);
+        formData.append('targetLang', targetLang);
 
-    if (!response.ok) return '';
+        const response = await fetch('/Admin/Questions/AutoTranslate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        });
 
-    const data = await response.json();
-    return data && data.translatedText ? data.translatedText : '';
-}
+        if (!response.ok) return '';
+
+        const data = await response.json();
+        return data && data.translatedText ? data.translatedText : '';
+    }
+
+})();
 </script>
