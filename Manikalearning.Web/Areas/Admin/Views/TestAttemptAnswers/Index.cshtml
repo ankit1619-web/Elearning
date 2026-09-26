@@ -1,0 +1,106 @@
+﻿@model  Manikalearning.Application.DTOs.TestAttemptDetailDto
+@{
+    ViewData["Title"] = "Student Attempt Answer Sheet";
+}
+
+<div class="container-fluid py-3">
+    <!-- Top Back Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a asp-controller="TestAttempts" asp-action="Index" class="btn btn-outline-secondary rounded-2">
+            <i class="bi bi-arrow-left me-1"></i> Back to Attempts
+        </a>
+        <h5 class="fw-bold mb-0 text-dark">Answer Sheet Analysis</h5>
+    </div>
+
+    <!-- Student & Test Performance Card -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4 bg-light-subtle">
+            <div class="row g-3">
+                <div class="col-md-4 border-end">
+                    <small class="text-muted d-block">Student</small>
+                    <h5 class="fw-bold text-dark mb-0">@Model.UserName</h5>
+                    <small class="text-muted">@Model.UserEmail</small>
+                </div>
+                <div class="col-md-4 border-end">
+                    <small class="text-muted d-block">Test Title</small>
+                    <h5 class="fw-bold text-primary mb-0">@Model.TestTitle</h5>
+                    <small class="text-muted">Status: <span class="badge bg-success-subtle text-success">@Model.Status</span></small>
+                </div>
+                <div class="col-md-4">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <small class="text-muted d-block">Score</small>
+                            <span class="fs-5 fw-bold text-dark">@Model.Score/@Model.TotalMarks</span>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Accuracy</small>
+                            <span class="fs-5 fw-bold text-info">@Model.Accuracy%</span>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Time Spent</small>
+                            <span class="fs-5 fw-bold text-secondary">@(Model.TimeTakenSeconds / 60)m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Answers Breakdown -->
+    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-list-check me-2"></i>Question Details (@Model.Answers.Count Questions)</h6>
+
+    @if (!Model.Answers.Any())
+    {
+        <div class="alert alert-info rounded-3">No attempt answer records found for this student test.</div>
+    }
+
+    @for (int i = 0; i < Model.Answers.Count; i++)
+    {
+        var item = Model.Answers[i];
+        string borderClass = item.IsCorrect == true ? "border-success" : (item.IsAnswered ? "border-danger" : "border-secondary");
+        string badgeClass = item.IsCorrect == true ? "bg-success" : (item.IsAnswered ? "bg-danger" : "bg-secondary");
+        string resultText = item.IsCorrect == true ? "Correct" : (item.IsAnswered ? "Incorrect" : "Unattempted / Skipped");
+
+        <div class="card border-1 @borderClass shadow-sm rounded-3 mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                <span class="fw-bold text-dark">Question @(i + 1)</span>
+                <div>
+                    <span class="badge @badgeClass me-2">@resultText</span>
+                    <span class="small text-muted fw-semibold">Marks: @item.MarksObtained</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Question Text -->
+                <div class="fw-semibold text-dark mb-3 fs-6">@Html.Raw(item.QuestionText)</div>
+
+                <!-- Selected vs Correct Option -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <div class="p-2 border rounded-2 bg-light">
+                            <small class="text-muted d-block">Student's Selected Option:</small>
+                            <span class="fw-bold @(item.IsCorrect == true ? "text-success" : "text-danger")">
+                                @Html.Raw(item.SelectedOptionText)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-2 border rounded-2 bg-success-subtle">
+                            <small class="text-success-emphasis d-block fw-semibold">Correct Option:</small>
+                            <span class="fw-bold text-success">
+                                @Html.Raw(item.CorrectOptionText)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Explanation -->
+                @if (!string.IsNullOrWhiteSpace(item.Explanation))
+                {
+                    <div class="alert alert-secondary border-0 mb-0 p-2 small rounded-2">
+                        <i class="bi bi-lightbulb-fill text-warning me-1"></i> <strong>Explanation:</strong> @Html.Raw(item.Explanation)
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

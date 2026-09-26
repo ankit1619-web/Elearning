@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Manikalearning.Application.Features.Handlers.Assessments.Courses
 {
-    public class DeleteCourseCommandHandler : IRequestHandler<DeleteCourseCommand, ResponseDto<bool>>
+    public class DeleteCourseCommandHandler : IRequestHandler<DeletePlanCommand, ResponseDto<bool>>
     {
         private readonly IRepository<Course> _courseRepository;
         private readonly ILogger<DeleteCourseCommandHandler> _logger;
@@ -26,7 +26,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Courses
             _logger = logger;
         }
 
-        public async Task<ResponseDto<bool>> Handle(DeleteCourseCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<bool>> Handle(DeletePlanCommand request, CancellationToken cancellationToken)
         {
             try
             { 

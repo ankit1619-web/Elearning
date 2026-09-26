@@ -4,8 +4,8 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Assessments.Courses
 {
-    public record DeleteCourseCommand(Guid CourseId) : IRequest<ResponseDto<bool>>;
-    public class DeleteCourseCommandValidator : AbstractValidator<DeleteCourseCommand>
+    public record DeletePlanCommand(Guid CourseId) : IRequest<ResponseDto<bool>>;
+    public class DeleteCourseCommandValidator : AbstractValidator<DeletePlanCommand>
     {
         public DeleteCourseCommandValidator()
         {

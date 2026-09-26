@@ -1,0 +1,207 @@
+﻿@using Manikalearning.Application.DTOs
+@model List<PlanDto>
+
+@{
+    ViewData["Title"] = "Subscription Plans";
+    ViewData["HeaderTitle"] = "Subscription Plans"; 
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; 
+}
+
+@Html.AntiForgeryToken()
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white"> 
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold text-dark mb-1">All Subscription Plans</h5>
+            <p class="text-muted small mb-0">Manage plan pricing, duration, and student access packages.</p>
+        </div>
+        
+        <div class="d-flex align-items-center gap-2"> 
+            <div class="input-group input-group-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-light border-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="tableSearch" class="form-control bg-light border-0 shadow-none" placeholder="Search plans..." onkeyup="filterTable()">
+            </div>
+             
+            <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm" onclick="Toast.openModal('/Admin/Plans/CreatePartial', 'modal-lg')">
+                <i class="bi bi-plus-lg me-1"></i> Add Plan
+            </button>
+        </div>
+    </div>
+     
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="plansTable">
+            <thead class="table-light rounded-3">
+                <tr>
+                    <th class="text-muted fw-semibold border-0 py-3 ps-3">Plan Name</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Price</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Duration</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Status</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-medium text-dark ps-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-card-checklist fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block text-dark fw-semibold">@item.PlanName</span>
+                                        @if (!string.IsNullOrEmpty(item.Description))
+                                        {
+                                            <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">@item.Description</small>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="fw-semibold text-dark">₹@item.Price.ToString("N2")</td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-2 py-1 fw-medium">
+                                    <i class="bi bi-calendar3 me-1 text-primary"></i>@item.DurationDays Days
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium">
+                                         Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-medium">
+                                         Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Manage Plan Courses Mapping -->
+                                    <a href="/Admin/PlanCourses/Manage?planId=@item.PlanId"
+                                       class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                       title="Manage Plan Courses">
+                                        <i class="bi bi-journal-plus me-1"></i>
+                                    </a>
+
+                                    <!-- Edit Plan -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                            title="Edit Plan"
+                                            onclick="Toast.openModal('/Admin/Plans/EditPartial/@item.PlanId', 'modal-lg')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <!-- Delete Plan -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-danger shadow-none rounded-2"
+                                            title="Delete Plan"
+                                            onclick="confirmDelete('@item.PlanId', '@item.PlanName')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                { 
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-credit-card-2-front fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                <h6 class="fw-semibold mb-1">No Subscription Plans Found</h6>
+                                <p class="small mb-0">Click on "Add Plan" to create your first package.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-exclamation-octagon-fill display-5"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2">Delete Subscription Plan?</h6>
+                <p class="text-muted small mb-4" id="deletePlanWarningText">Are you sure you want to delete this plan?</p>
+                
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-3 px-3 w-50" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger rounded-3 px-3 w-50">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedDeleteId = null;
+    let deleteModalInstance = null;
+     
+    function confirmDelete(id, planName) {
+        selectedDeleteId = id;
+        document.getElementById('deletePlanWarningText').innerText = `Are you sure you want to delete "${planName}"? This action cannot be undone.`;
+        
+        const modalEl = document.getElementById('deleteConfirmModal');
+        deleteModalInstance = new bootstrap.Modal(modalEl);
+        deleteModalInstance.show();
+    }
+     
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        if (!selectedDeleteId) return;
+
+        deleteModalInstance.hide();
+        Toast.showLoader();
+
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '/Admin/Plans/Delete/' + selectedDeleteId,
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: token
+            },
+            success: function (response) {
+                Toast.hideLoader();
+
+                if (typeof response === 'object' && response.isSuccess) {
+                    Toast.success(response.message || "Plan deleted successfully.");
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const errorMsg = (response && response.message) ? response.message : "Unable to delete plan.";
+                    Toast.error(errorMsg);
+                }
+            },
+            error: function () {
+                Toast.hideLoader();
+                Toast.error("An error occurred while deleting the subscription plan.");
+            }
+        });
+    });
+     
+    function filterTable() {
+        const input = document.getElementById("tableSearch");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("plansTable");
+        const trs = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < trs.length; i++) {
+            const td = trs[i].getElementsByTagName("td")[0];
+            if (td) {
+                const textValue = td.textContent || td.innerText;
+                trs[i].style.display = textValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>

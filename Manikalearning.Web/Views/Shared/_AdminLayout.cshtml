@@ -115,9 +115,7 @@
                     <div class="collapse @Html.IsMenuShow("Tests", "TestQuestions", "TestAttempts", "TestAttemptAnswers")" id="menuMockTests" data-bs-parent="#adminSidebarMenu">
                         <ul class="sub-menu">
                             <li><a class="sub-link @Html.IsActive("Tests")" asp-area="Admin" asp-controller="Tests" asp-action="Index">Test Series Setup</a></li>
-                            <li><a class="sub-link @Html.IsActive("TestQuestions")" asp-area="Admin" asp-controller="TestQuestions" asp-action="Index">Test Questions</a></li>
-                            <li><a class="sub-link @Html.IsActive("TestAttempts")" asp-area="Admin" asp-controller="TestAttempts" asp-action="Index">Student Attempts</a></li>
-                            <li><a class="sub-link @Html.IsActive("TestAttemptAnswers")" asp-area="Admin" asp-controller="TestAttemptAnswers" asp-action="Index">Attempt Answers</a></li>
+                            <li><a class="sub-link @Html.IsActive("TestAttempts")" asp-area="Admin" asp-controller="TestAttempts" asp-action="Index">Student Attempts</a></li>                            
                         </ul>
                     </div>
                 </li>
@@ -133,7 +131,6 @@
                     <div class="collapse @Html.IsMenuShow("Plans", "PlanCourses", "Coupons", "Payments")" id="menuSales" data-bs-parent="#adminSidebarMenu">
                         <ul class="sub-menu">
                             <li><a class="sub-link @Html.IsActive("Plans")" asp-area="Admin" asp-controller="Plans" asp-action="Index">Subscription Plans</a></li>
-                            <li><a class="sub-link @Html.IsActive("PlanCourses")" asp-area="Admin" asp-controller="PlanCourses" asp-action="Index">Plan-Course Access</a></li>
                             <li><a class="sub-link @Html.IsActive("Coupons")" asp-area="Admin" asp-controller="Coupons" asp-action="Index">Promo Coupons</a></li>
                             <li><a class="sub-link @Html.IsActive("Payments")" asp-area="Admin" asp-controller="Payments" asp-action="Index">Payment Transactions</a></li>
                         </ul>

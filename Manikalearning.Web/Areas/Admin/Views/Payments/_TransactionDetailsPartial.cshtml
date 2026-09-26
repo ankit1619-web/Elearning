@@ -1,0 +1,101 @@
+﻿@using Manikalearning.Application.DTOs
+@model  PaymentTransactionDto
+
+<div class="modal-header border-bottom-0 pb-0">
+    <div>
+        <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">Transaction Details</h5>
+        <small class="text-muted font-monospace">Ref ID: @Model.TransactionId</small>
+    </div>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body py-3">
+    <!-- Status Banner -->
+    <div class="p-3 rounded-3 mb-4 d-flex align-items-center justify-content-between @(Model.PaymentStatus == "Success" ? "bg-success bg-opacity-10 text-success" : Model.PaymentStatus == "Failed" ? "bg-danger bg-opacity-10 text-danger" : "bg-warning bg-opacity-10 text-warning")">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi @(Model.PaymentStatus == "Success" ? "bi-check-circle-fill" : Model.PaymentStatus == "Failed" ? "bi-x-circle-fill" : "bi-clock-history") fs-4"></i>
+            <div>
+                <h6 class="fw-bold mb-0">Payment Status: @Model.PaymentStatus</h6>
+                <small class="opacity-75">Processed on @Model.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</small>
+            </div>
+        </div>
+        <h4 class="fw-bold mb-0">₹@Model.FinalAmount.ToString("N2")</h4>
+    </div>
+
+    <!-- Customer Information -->
+    <div class="mb-4">
+        <h6 class="text-uppercase text-muted fs-7 fw-bold mb-2">Customer Details</h6>
+        <div class="bg-light p-3 rounded-3">
+            <div class="row g-2 text-sm">
+                <div class="col-6">
+                    <span class="text-muted d-block small">Name:</span>
+                    <strong class="text-dark">@Model.UserName</strong>
+                </div>
+                <div class="col-6">
+                    <span class="text-muted d-block small">Email:</span>
+                    <strong class="text-dark">@Model.UserEmail</strong>
+                </div>
+                <div class="col-6 mt-2">
+                    <span class="text-muted d-block small">Phone:</span>
+                    <strong class="text-dark">@(string.IsNullOrEmpty(Model.UserPhone) ? "N/A" : Model.UserPhone)</strong>
+                </div>
+                <div class="col-6 mt-2">
+                    <span class="text-muted d-block small">User ID:</span>
+                    <small class="text-dark font-monospace">@Model.UserId</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Gateway Breakdown -->
+    <div class="mb-4">
+        <h6 class="text-uppercase text-muted fs-7 fw-bold mb-2">Razorpay Gateway Information</h6>
+        <div class="border rounded-3 p-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <span class="text-muted d-block small">Payment ID:</span>
+                    <span class="font-monospace fw-semibold text-primary">@(string.IsNullOrEmpty(Model.RazorpayPaymentId) ? "N/A" : Model.RazorpayPaymentId)</span>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block small">Order ID:</span>
+                    <span class="font-monospace fw-semibold text-secondary">@(string.IsNullOrEmpty(Model.RazorpayOrderId) ? "N/A" : Model.RazorpayOrderId)</span>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block small">Payment Method:</span>
+                    <span class="fw-semibold text-dark">@Model.PaymentMethod</span>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block small">Applied Coupon:</span>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold">@(string.IsNullOrEmpty(Model.AppliedCouponCode) ? "None" : Model.AppliedCouponCode)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Calculation -->
+    <div>
+        <h6 class="text-uppercase text-muted fs-7 fw-bold mb-2">Order Summary</h6>
+        <ul class="list-group list-group-flush rounded-3 border">
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Item Purchased (@Model.ItemType):</span>
+                <strong class="text-dark">@Model.ItemName</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Base Amount:</span>
+                <span>₹@Model.Amount.ToString("N2")</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted">Discount Deducted:</span>
+                <span class="text-danger">- ₹@Model.DiscountAmount.ToString("N2")</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-light fw-bold">
+                <span class="text-dark">Total Paid Amount:</span>
+                <span class="text-success fs-6">₹@Model.FinalAmount.ToString("N2")</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="modal-footer border-top-0 pt-0">
+    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Close</button>
+</div>

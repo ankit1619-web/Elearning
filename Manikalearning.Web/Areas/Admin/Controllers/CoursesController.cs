@@ -84,7 +84,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var response = await _mediator.Send(new DeleteCourseCommand(id));
+            var response = await _mediator.Send(new DeletePlanCommand(id));
 
             if (response.IsSuccess)
             {

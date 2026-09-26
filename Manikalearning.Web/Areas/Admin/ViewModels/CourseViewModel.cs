@@ -28,12 +28,12 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
          
         public CreateCourseCommand ToCreateCommand()
         {
-            return new CreateCourseCommand(CourseName, Description, Price);
+            return new CreateCourseCommand(CourseName, Description ??"", Price);
         }
 
         public UpdateCourseCommand ToUpdateCommand()
         {
-            return new UpdateCourseCommand(CourseId, CourseName, Description, Price, Ispublished);
+            return new UpdateCourseCommand(CourseId, CourseName, Description ?? "", Price, Ispublished);
         }
     }
 }
