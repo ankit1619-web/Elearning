@@ -1,0 +1,211 @@
+﻿@model Manikalearning.Web.Areas.Admin.ViewModels.StudentLectureProgressListViewModel
+
+@{
+    ViewData["Title"] = "Lecture Progress";
+    ViewData["HeaderTitle"] = "Student Engagement & Telemetry";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <!-- Header Summary Stats -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold text-dark mb-1">Student Lecture Progress</h5>
+            <p class="text-muted small mb-0">Monitor student watch hours, completion rates, and active progress.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <div class="badge bg-primary bg-opacity-10 text-primary p-2 px-3 rounded-3 text-start border border-primary border-opacity-25">
+                <small class="d-block text-muted fs-8">Avg Completion</small>
+                <span class="fw-bold fs-6">@Model.AverageCompletionRate%</span>
+            </div>
+            <div class="badge bg-success bg-opacity-10 text-success p-2 px-3 rounded-3 text-start border border-success border-opacity-25">
+                <small class="d-block text-muted fs-8">Completed</small>
+                <span class="fw-bold fs-6">@Model.CompletedCount</span>
+            </div>
+            <div class="badge bg-warning bg-opacity-10 text-dark p-2 px-3 rounded-3 text-start border border-warning border-opacity-25">
+                <small class="d-block text-muted fs-8">In Progress</small>
+                <span class="fw-bold fs-6">@Model.InProgressCount</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <form method="get" asp-area="Admin" asp-controller="StudentLectureProgress" asp-action="Index" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <div class="input-group input-group-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-light border-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control bg-light border-0 shadow-none" placeholder="Search Student name, email, or lecture title...">
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <select name="courseId" asp-items="Model.CourseOptions" class="form-select form-select-sm rounded-3 shadow-none border">
+                <option value="">All Courses</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select name="isCompleted" class="form-select form-select-sm rounded-3 shadow-none border">
+                <option value="">All Statuses</option>
+                <option value="true" selected="@(Model.IsCompletedFilter == true)">Completed Only</option>
+                <option value="false" selected="@(Model.IsCompletedFilter == false)">In Progress Only</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-primary-custom btn-sm w-100 rounded-3 shadow-sm">
+                <i class="bi bi-filter me-1"></i> Filter
+            </button>
+            <a href="/Admin/StudentLectureProgress" class="btn btn-light btn-sm text-secondary rounded-3" title="Reset Filters">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+
+    <!-- Progress Table -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light rounded-3">
+                <tr>
+                    <th class="text-muted fw-semibold border-0 py-3 ps-3">Student</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Course & Lecture</th>
+                    <th class="text-muted fw-semibold border-0 py-3" style="width: 220px;">Progress</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Watched Time</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Status</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Last Watched</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ProgressRecords != null && Model.ProgressRecords.Any())
+                {
+                    @foreach (var item in Model.ProgressRecords)
+                    {
+                        <tr>
+                            <td class="ps-3">
+                                <div class="fw-semibold text-dark">@item.StudentName</div>
+                                <small class="text-muted">@item.StudentEmail</small>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-primary">@item.CourseTitle</div>
+                                <small class="text-dark d-block text-truncate" style="max-width: 250px;"><i class="bi bi-play-circle text-muted me-1"></i> @item.LectureTitle</small>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1 rounded-pill" style="height: 6px;">
+                                        <div class="progress-bar @(item.IsCompleted ? "bg-success" : "bg-primary")"
+                                             role="progressbar"
+                                             style="width: @item.CompletionPercentage%"></div>
+                                    </div>
+                                    <span class="fs-8 fw-bold text-dark" style="min-width: 38px;">@item.CompletionPercentage%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="small font-monospace text-dark fw-medium">@item.FormattedWatchedTime</span>
+                                <small class="text-muted fs-8 d-block">/ @item.FormattedTotalTime</small>
+                            </td>
+                            <td>
+                                @if (item.IsCompleted)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-25 px-2 py-1">In Progress</span>
+                                }
+                            </td>
+                            <td>
+                                <small class="text-dark fw-medium">@item.LastWatchedAt.ToString("dd MMM yyyy, hh:mm tt")</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                            title="View Telemetry Details"
+                                            onclick="Toast.openModal('/Admin/StudentLectureProgress/DetailsPartial/@item.ProgressId', 'modal-md')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-danger shadow-none rounded-2"
+                                            title="Reset Student Progress"
+                                            onclick="resetProgressConfirm('@item.ProgressId', '@item.StudentName')">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-play-btn fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                <h6 class="fw-semibold mb-1">No Progress Records Found</h6>
+                                <p class="small mb-0">No student watching telemetry matches your filters.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-between align-items-center pt-4 border-top mt-3">
+            <small class="text-muted">Showing @(((Model.PageIndex - 1) * Model.PageSize) + 1) to @Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount) of @Model.TotalCount records</small>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link shadow-none" href="/Admin/StudentLectureProgress?search=@Model.SearchTerm&courseId=@Model.CourseIdFilter&isCompleted=@Model.IsCompletedFilter&pageIndex=@(Model.PageIndex - 1)">Previous</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link shadow-none" href="/Admin/StudentLectureProgress?search=@Model.SearchTerm&courseId=@Model.CourseIdFilter&isCompleted=@Model.IsCompletedFilter&pageIndex=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                    <a class="page-link shadow-none" href="/Admin/StudentLectureProgress?search=@Model.SearchTerm&courseId=@Model.CourseIdFilter&isCompleted=@Model.IsCompletedFilter&pageIndex=@(Model.PageIndex + 1)">Next</a>
+                </li>
+            </ul>
+        </div>
+    }
+</div>
+
+<script>
+    function resetProgressConfirm(id, studentName) {
+        if (!confirm(`Are you sure you want to reset lecture watching progress for ${studentName}? This will reset watch time to 0.`))
+            return;
+
+        Toast.showLoader();
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: `/Admin/StudentLectureProgress/ResetProgress/${id}`,
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: token
+            },
+            success: function(response) {
+                Toast.hideLoader();
+                if (typeof response === 'object' && response.isSuccess) {
+                    Toast.success(response.message || "Progress reset successfully.");
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    Toast.error((response && response.message) ? response.message : "Failed to reset progress.");
+                }
+            },
+            error: function() {
+                Toast.hideLoader();
+                Toast.error("An error occurred while resetting progress.");
+            }
+        });
+    }
+</script>

@@ -19,26 +19,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         connectionString,
         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
- 
 builder.Services.AddIdentity<User, Role>(options =>
 {
-    // Password rules
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 8;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
 
-    // Lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     options.Lockout.MaxFailedAccessAttempts = 5;
 
-    // User settings
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
- 
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";

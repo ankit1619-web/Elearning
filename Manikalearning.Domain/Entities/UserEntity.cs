@@ -22,6 +22,7 @@ namespace Manikalearning.Domain.Entities
 
         public bool IsActive { get; set; } = true;
         public bool IsMobileVerified { get; set; } = false;
+        public bool IsEmailVerified { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

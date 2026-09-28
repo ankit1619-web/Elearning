@@ -1,0 +1,215 @@
+﻿@model Manikalearning.Web.Areas.Admin.ViewModels.StudentSubscriptionListViewModel
+
+@{
+    ViewData["Title"] = "Active Subscriptions";
+    ViewData["HeaderTitle"] = "Student Subscriptions";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <!-- Header Title & Quick Metrics -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold text-dark mb-1">Active Subscriptions</h5>
+            <p class="text-muted small mb-0">Monitor student plan access, renewal dates, and manual extensions.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <div class="badge bg-success bg-opacity-10 text-success p-2 px-3 rounded-3 text-start border border-success border-opacity-25">
+                <small class="d-block text-muted fs-8">Active Users</small>
+                <span class="fw-bold fs-6">@Model.ActiveCount</span>
+            </div>
+            <div class="badge bg-danger bg-opacity-10 text-danger p-2 px-3 rounded-3 text-start border border-danger border-opacity-25">
+                <small class="d-block text-muted fs-8">Expired Users</small>
+                <span class="fw-bold fs-6">@Model.ExpiredCount</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Search Form -->
+    <form method="get" asp-area="Admin" asp-controller="StudentSubscriptions" asp-action="Index" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <div class="input-group input-group-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-light border-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control bg-light border-0 shadow-none" placeholder="Search by student name, email, or plan name...">
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <select name="status" class="form-select form-select-sm rounded-3 shadow-none border">
+                <option value="All" selected="@(Model.StatusFilter == "All")">All Statuses</option>
+                <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
+                <option value="Expired" selected="@(Model.StatusFilter == "Expired")">Expired</option>
+                <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex gap-1">
+            <button type="submit" class="btn btn-primary-custom btn-sm w-100 rounded-3 shadow-sm">
+                <i class="bi bi-filter me-1"></i> Filter
+            </button>
+            <a href="/Admin/StudentSubscriptions" class="btn btn-light btn-sm text-secondary rounded-3" title="Reset Filters">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light rounded-3">
+                <tr>
+                    <th class="text-muted fw-semibold border-0 py-3 ps-3">Student Details</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Plan Name</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Start Date</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Expiry Date</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Status</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Subscriptions != null && Model.Subscriptions.Any())
+                {
+                    @foreach (var item in Model.Subscriptions)
+                    {
+                        <tr>
+                            <td class="ps-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
+                                        @(string.IsNullOrEmpty(item.UserName) ? "S" : item.UserName[0].ToString().ToUpper())
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold text-dark">@item.UserName</div>
+                                        <small class="text-muted">@item.UserEmail</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-primary">@item.PlanName</span>
+                                <small class="d-block text-muted">₹@item.PlanPrice.ToString("N0")</small>
+                            </td>
+                            <td>
+                                <small class="text-dark fw-medium">@item.StartDate.ToString("dd MMM yyyy")</small>
+                            </td>
+                            <td>
+                                <small class="text-dark fw-medium">@item.EndDate.ToString("dd MMM yyyy")</small>
+                                @if (item.Status == "Active")
+                                {
+                                    <small class="d-block text-success fs-8">@item.DaysRemaining days left</small>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Status == "Active")
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium">Active</span>
+                                }
+                                else if (item.Status == "Expired")
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-medium">Expired</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-medium">Cancelled</span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- View Details -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-secondary shadow-none rounded-2"
+                                            title="View Details"
+                                            onclick="Toast.openModal('/Admin/StudentSubscriptions/DetailsPartial/@item.SubscriptionId', 'modal-md')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+
+                                    <!-- Extend Subscription -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                            title="Extend Days"
+                                            onclick="Toast.openModal('/Admin/StudentSubscriptions/ExtendPartial/@item.SubscriptionId', 'modal-md')">
+                                        <i class="bi bi-clock-history"></i>
+                                    </button>
+
+                                    <!-- Cancel Subscription -->
+                                    @if (item.Status == "Active")
+                                    {
+                                        <button type="button"
+                                                class="btn btn-sm btn-light text-danger shadow-none rounded-2"
+                                                title="Cancel Subscription"
+                                                onclick="cancelSubscription('@item.SubscriptionId', '@item.UserName')">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-person-badge fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                <h6 class="fw-semibold mb-1">No Subscriptions Found</h6>
+                                <p class="small mb-0">No active or past subscription records match your search criteria.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-between align-items-center pt-4 border-top mt-3">
+            <small class="text-muted">Showing @(((Model.PageIndex - 1) * Model.PageSize) + 1) to @Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount) of @Model.TotalCount entries</small>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link shadow-none" href="/Admin/StudentSubscriptions?search=@Model.SearchTerm&status=@Model.StatusFilter&pageIndex=@(Model.PageIndex - 1)">Previous</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link shadow-none" href="/Admin/StudentSubscriptions?search=@Model.SearchTerm&status=@Model.StatusFilter&pageIndex=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                    <a class="page-link shadow-none" href="/Admin/StudentSubscriptions?search=@Model.SearchTerm&status=@Model.StatusFilter&pageIndex=@(Model.PageIndex + 1)">Next</a>
+                </li>
+            </ul>
+        </div>
+    }
+</div>
+
+<script>
+    function cancelSubscription(id, userName) {
+        if (!confirm(`Are you sure you want to cancel subscription for "${userName}"?`)) return;
+
+        Toast.showLoader();
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '/Admin/StudentSubscriptions/Cancel/' + id,
+            type: 'POST',
+            data: { __RequestVerificationToken: token },
+            success: function(response) {
+                Toast.hideLoader();
+                if (typeof response === 'object' && response.isSuccess) {
+                    Toast.success(response.message || "Subscription cancelled successfully.");
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    Toast.error((response && response.message) ? response.message : "Failed to cancel subscription.");
+                }
+            },
+            error: function() {
+                Toast.hideLoader();
+                Toast.error("An error occurred while processing cancellation.");
+            }
+        });
+    }
+</script>

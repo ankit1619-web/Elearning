@@ -71,20 +71,22 @@ namespace Manikalearning.Domain.Entities
     [Table("Bookmarks")]
     public class Bookmark
     {
+        
         [Key]
-        public Guid BookmarkId { get; set; } = Guid.NewGuid();
+        public Guid BookmarkId { get; set; }
 
-        [Required]
         public Guid UserId { get; set; }
-        [ForeignKey("UserId")]
-        public User User { get; set; }
 
-        [Required]
         public Guid QuestionId { get; set; }
-        [ForeignKey("QuestionId")]
-        public Question Question { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation Properties
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; } = null!;
+
+        [ForeignKey(nameof(QuestionId))]
+        public virtual Question Question { get; set; } = null!;
     }
 
     [Table("QuestionMistakes")]

@@ -1,0 +1,39 @@
+﻿@using Manikalearning.Application.DTOs
+@model  BookmarkDto
+
+<div class="modal-header border-bottom-0 pb-0">
+    <div>
+        <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">Bookmarked Question Details</h5>
+        <p class="text-muted small mb-0">Student saved question item.</p>
+    </div>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body py-3">
+    <!-- Student Header -->
+    <div class="p-3 bg-light rounded-3 mb-3 border">
+        <small class="text-muted text-uppercase fw-bold fs-8 d-block">Saved By</small>
+        <span class="fw-bold text-dark">@Model.StudentName</span>
+        <small class="text-muted d-block">@Model.StudentEmail</small>
+    </div>
+
+    <!-- Question Content -->
+    <div class="border rounded-3 p-3 mb-3">
+        <small class="text-muted text-uppercase fw-bold fs-8 d-block mb-1">Question</small>
+        <div class="text-dark fw-medium fs-7">
+            <i class="bi bi-bookmark-star-fill text-warning me-1"></i> @Html.Raw(Model.QuestionTitle)
+        </div>
+    </div>
+
+    <!-- Metadata -->
+    <ul class="list-group list-group-flush border rounded-3 fs-7">
+        <li class="list-group-item d-flex justify-content-between py-2">
+            <span class="text-muted">Bookmarked On:</span>
+            <strong class="text-dark">@Model.CreatedAt.ToString("dd MMMM yyyy, hh:mm tt")</strong>
+        </li>
+    </ul>
+</div>
+
+<div class="modal-footer border-top-0 pt-0">
+    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Close</button>
+</div>

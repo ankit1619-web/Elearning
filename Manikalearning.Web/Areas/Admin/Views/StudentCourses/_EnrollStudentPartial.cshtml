@@ -1,0 +1,53 @@
+﻿@model Manikalearning.Web.Areas.Admin.ViewModels.EnrollStudentViewModel
+
+<div class="modal-header border-bottom-0 pb-0">
+    <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">Enroll Student in Course</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-area="Admin" asp-controller="StudentCourses" asp-action="Enroll" method="post" onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body py-3">
+        <div class="mb-3">
+            <label asp-for="UserId" class="form-label text-muted small fw-semibold">Select Student *</label>
+            <select asp-for="UserId" asp-items="Model.UserOptions" class="form-select rounded-3 shadow-none">
+                <option value="">-- Choose Student --</option>
+            </select>
+            <span asp-validation-for="UserId" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CourseId" class="form-label text-muted small fw-semibold">Select Course *</label>
+            <select asp-for="CourseId" asp-items="Model.CourseOptions" class="form-select rounded-3 shadow-none">
+                <option value="">-- Choose Course --</option>
+            </select>
+            <span asp-validation-for="CourseId" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-2 mb-3">
+            <div class="col-md-6">
+                <label asp-for="StartDate" class="form-label text-muted small fw-semibold">Start Date</label>
+                <input asp-for="StartDate" type="datetime-local" class="form-control rounded-3 shadow-none" />
+                <span asp-validation-for="StartDate" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ExpiryDate" class="form-label text-muted small fw-semibold">Expiry Date (Optional)</label>
+                <input asp-for="ExpiryDate" type="datetime-local" class="form-control rounded-3 shadow-none" />
+                <span asp-validation-for="ExpiryDate" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="form-check form-switch mt-2">
+            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="enrollIsActive">
+            <label class="form-check-label small fw-semibold text-dark" for="enrollIsActive">Set Active Immediately</label>
+        </div>
+    </div>
+
+    <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+            <i class="bi bi-person-plus me-1"></i> Confirm Enrollment
+        </button>
+    </div>
+</form>

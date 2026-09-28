@@ -61,6 +61,7 @@ namespace Manikalearning.Domain.Entities
 
         [MaxLength(20)]
         public string Status { get; set; } = "Active";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
 
@@ -121,4 +122,6 @@ namespace Manikalearning.Domain.Entities
         public DateTime ExpiryDate { get; set; }
         public bool IsActive { get; set; } = true;
     }
+
+     
 }

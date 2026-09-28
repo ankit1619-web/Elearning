@@ -1,5 +1,112 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Manikalearning.Application.DTOs
+@model IEnumerable<UserDto>
 @{
+    ViewData["Title"] = "User Management";
 }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">User Management</h3>
+        <p class="text-muted mb-0">Manage registered learners, instructors, and system access</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-10">
+                <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control" placeholder="Search by Name, Email, Username, or Mobile..." />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">User Details</th>
+                        <th>Mobile</th>
+                        <th>Roles</th>
+                        <th>Verifications</th>
+                        <th>Status</th>
+                        <th>Joined On</th>
+                        <th class="text-end pe-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <img src="@(string.IsNullOrEmpty(user.ProfileImage) ? "/images/default-avatar.png" : user.ProfileImage)"
+                                         class="rounded-circle me-3" width="40" height="40" style="object-fit:cover;" alt="Avatar" />
+                                    <div>
+                                        <div class="fw-bold text-dark">@(string.IsNullOrEmpty(user.FullName) ? user.UserName : user.FullName)</div>
+                                        <div class="small text-muted">@user.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@(string.IsNullOrEmpty(user.Mobile) ? "—" : user.Mobile)</td>
+                            <td>
+                                @if (user.Roles.Any())
+                                {
+                                    @foreach (var r in user.Roles)
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary me-1">@r</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted">No Role</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    @if (user.IsEmailVerified)
+                                    {
+                                        <span class="badge bg-success-subtle text-success small"><i class="bi bi-check-circle me-1"></i> Email Verified</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning small"><i class="bi bi-exclamation-circle me-1"></i> Email Pending</span>
+                                    }
+
+                                    @if (user.IsMobileVerified)
+                                    {
+                                        <span class="badge bg-success-subtle text-success small"><i class="bi bi-check-circle me-1"></i> Mobile Verified</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (user.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-end pe-4">
+                                <form asp-action="ToggleStatus" method="post" class="d-inline">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="btn btn-sm @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                        @(user.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

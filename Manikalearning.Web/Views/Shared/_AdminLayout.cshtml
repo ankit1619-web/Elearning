@@ -15,11 +15,9 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-
-    <!-- Sidebar Mobile Overlay -->
+     
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
-    <!-- Sidebar Navigation -->
+     
     <nav id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-icon">
@@ -36,16 +34,14 @@
 
         <div class="sidebar-scroll">
             <ul class="nav flex-column" id="adminSidebarMenu">
-
-                <!-- DASHBOARD -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsActive("Dashboard")" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
                         <i class="bi bi-grid-1x2-fill"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
-
-                <!-- USER MANAGEMENT -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsMenuCollapsed("Users", "Roles", "UserRoles")"
                        data-bs-toggle="collapse" href="#menuUsers" role="button" aria-expanded="false" aria-controls="menuUsers">
@@ -61,8 +57,7 @@
                         </ul>
                     </div>
                 </li>
-
-                <!-- CURRICULUM SETUP -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsMenuCollapsed("Exams", "Subjects", "Sections", "Topics", "SubTopics")"
                        data-bs-toggle="collapse" href="#menuCurriculum" role="button" aria-expanded="false" aria-controls="menuCurriculum">
@@ -80,16 +75,14 @@
                         </ul>
                     </div>
                 </li>
-
-                <!-- COURSES -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsActive("Courses")" asp-area="Admin" asp-controller="Courses" asp-action="Index">
                         <i class="bi bi-journal-bookmark-fill"></i>
                         <span>Courses</span>
                     </a>
                 </li>
-
-                <!-- QUESTION BANK -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsMenuCollapsed("Questions", "QuestionOptions", "QuestionPassages")"
                        data-bs-toggle="collapse" href="#menuQuestionBank" role="button" aria-expanded="false" aria-controls="menuQuestionBank">
@@ -103,8 +96,7 @@
                         </ul>
                     </div>
                 </li>
-
-                <!-- MOCK TESTS -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsMenuCollapsed("Tests", "TestQuestions", "TestAttempts", "TestAttemptAnswers")"
                        data-bs-toggle="collapse" href="#menuMockTests" role="button" aria-expanded="false" aria-controls="menuMockTests">
@@ -119,8 +111,7 @@
                         </ul>
                     </div>
                 </li>
-
-                <!-- SALES & REVENUE -->
+                 
                 <li class="nav-item">
                     <a class="nav-link @Html.IsMenuCollapsed("Plans", "PlanCourses", "Coupons", "Payments")"
                        data-bs-toggle="collapse" href="#menuSales" role="button" aria-expanded="false" aria-controls="menuSales">
@@ -136,22 +127,21 @@
                         </ul>
                     </div>
                 </li>
-
-                <!-- STUDENT TRACKING -->
+                 
                 <li class="nav-item">
-                    <a class="nav-link @Html.IsMenuCollapsed("StudentSubscriptions", "StudentCourses", "StudentLectureProgress", "Bookmarks", "QuestionMistakes")"
+                    <a class="nav-link @Html.IsMenuCollapsed("StudentSubscriptions", "StudentCourses", "StudentLectureProgress", "Bookmarks")"
                        data-bs-toggle="collapse" href="#menuStudents" role="button" aria-expanded="false" aria-controls="menuStudents">
                         <i class="bi bi-person-lines-fill"></i>
                         <span>Student Tracking</span>
                         <i class="bi bi-chevron-down ms-auto arrow-icon"></i>
                     </a>
-                    <div class="collapse @Html.IsMenuShow("StudentSubscriptions", "StudentCourses", "StudentLectureProgress", "Bookmarks", "QuestionMistakes")" id="menuStudents" data-bs-parent="#adminSidebarMenu">
+                    <div class="collapse @Html.IsMenuShow("StudentSubscriptions", "StudentCourses", "StudentLectureProgress", "Bookmarks")" id="menuStudents" data-bs-parent="#adminSidebarMenu">
                         <ul class="sub-menu">
                             <li><a class="sub-link @Html.IsActive("StudentSubscriptions")" asp-area="Admin" asp-controller="StudentSubscriptions" asp-action="Index">Active Subscriptions</a></li>
                             <li><a class="sub-link @Html.IsActive("StudentCourses")" asp-area="Admin" asp-controller="StudentCourses" asp-action="Index">Enrolled Courses</a></li>
                             <li><a class="sub-link @Html.IsActive("StudentLectureProgress")" asp-area="Admin" asp-controller="StudentLectureProgress" asp-action="Index">Lecture Progress</a></li>
                             <li><a class="sub-link @Html.IsActive("Bookmarks")" asp-area="Admin" asp-controller="Bookmarks" asp-action="Index">Saved Bookmarks</a></li>
-                            <li><a class="sub-link @Html.IsActive("QuestionMistakes")" asp-area="Admin" asp-controller="QuestionMistakes" asp-action="Index">Mistake Book</a></li>
+                           
                         </ul>
                     </div>
                 </li>

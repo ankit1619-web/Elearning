@@ -85,23 +85,55 @@ namespace Manikalearning.Domain.Entities
         public virtual CourseSection CourseSection { get; set; }
     }
 
+    [Table("StudentLectureProgress")]
+    public class StudentLectureProgress
+    {
+        [Key]
+        public Guid ProgressId { get; set; }
+
+        public Guid UserId { get; set; }
+
+        public Guid LectureId { get; set; }
+
+        public int WatchedSeconds { get; set; }
+
+        public int TotalSeconds { get; set; }
+
+        public bool IsCompleted { get; set; }
+
+        public DateTime LastWatchedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation Properties
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; } = null!;
+
+        [ForeignKey(nameof(LectureId))]
+        public virtual CourseLecture Lecture { get; set; } = null!;
+    }
+
     [Table("StudentCourses")]
     public class StudentCourse
     {
         [Key]
-        public Guid StudentCourseId { get; set; } = Guid.NewGuid();
+        public Guid StudentCourseId { get; set; }
 
-        [Required]
         public Guid UserId { get; set; }
-        [ForeignKey("UserId")]
-        public User User { get; set; }
 
-        [Required]
         public Guid CourseId { get; set; }
-        [ForeignKey("CourseId")]
-        public Course Course { get; set; }
 
         public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime? StartDate { get; set; }
+
+        public DateTime? ExpiryDate { get; set; }
+
         public bool IsActive { get; set; } = true;
+
+        // Navigation Properties
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; } = null!;
+
+        [ForeignKey(nameof(CourseId))]
+        public virtual Course Course { get; set; } = null!;
     }
 }
