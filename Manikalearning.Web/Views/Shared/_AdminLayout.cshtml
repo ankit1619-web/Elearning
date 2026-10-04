@@ -51,9 +51,7 @@
                     </a>
                     <div class="collapse @Html.IsMenuShow("Users", "Roles", "UserRoles")" id="menuUsers" data-bs-parent="#adminSidebarMenu">
                         <ul class="sub-menu">
-                            <li><a class="sub-link @Html.IsActive("Users")" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
-                            <li><a class="sub-link @Html.IsActive("Roles")" asp-area="Admin" asp-controller="Roles" asp-action="Index">Roles</a></li>
-                            <li><a class="sub-link @Html.IsActive("UserRoles")" asp-area="Admin" asp-controller="UserRoles" asp-action="Index">User Roles</a></li>
+                            <li><a class="sub-link @Html.IsActive("Users")" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li> 
                         </ul>
                     </div>
                 </li>

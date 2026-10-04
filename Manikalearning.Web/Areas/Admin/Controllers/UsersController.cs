@@ -1,4 +1,7 @@
-﻿using Manikalearning.Application.Features.Commands.Assessments.Users;
+﻿using Azure;
+using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Assessments.Users;
+using Manikalearning.Application.Features.Handlers.Assessments.Users;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +50,23 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("ManageRole/{userId}")]
+        public async Task<IActionResult> ManageRole(Guid userId)
+        {
+            var model = await _mediator.Send(new GetManageUserRoleQuery(userId));
+            if (model == null) return BadRequest("User not found.");
+
+            return PartialView("_ManageUserRolesPartial", model);
+        }
+
+        [HttpPost("ManageRoles")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ManageRoles(ManageUserRoleViewModel model)
+        {
+            var response = await _mediator.Send(new UpdateUserRoleCommand(model.UserId, model.SelectedRoleId));
+            return Json(response); 
         }
     }
 }

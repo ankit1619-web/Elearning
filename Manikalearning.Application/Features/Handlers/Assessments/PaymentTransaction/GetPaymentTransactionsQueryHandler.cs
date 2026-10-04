@@ -71,9 +71,10 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.PaymentTransa
                         UserPhone = t.User.Mobile,
                         RazorpayOrderId = t.GatewayOrderId,
                         RazorpayPaymentId = t.GatewayPaymentId,  
-                        Amount = t.Amount, 
+                        FinalAmount = t.Amount, 
                         Currency = t.Currency,
-                        PaymentStatus = t.Status 
+                        PaymentStatus = t.Status ,
+                        PaidAt = t.PaidAt
                     }).ToListAsync(cancellationToken);
 
                 var result = new PaymentTransactionPagedResultDto

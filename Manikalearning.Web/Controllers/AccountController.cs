@@ -80,7 +80,21 @@ namespace Manikalearning.Web.Controllers
             if (response.IsSuccess)
             {
                 TempData["SuccessMessage"] = response.Message ?? "Welcome back!";
-                return RedirectToLocal(command.ReturnUrl);
+                 
+                if (string.IsNullOrEmpty(command.ReturnUrl) || !Url.IsLocalUrl(command.ReturnUrl))
+                {
+                    if (User.IsInRole("Admin"))
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                    }
+                    if (User.IsInRole("Student"))
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Student" });
+                    }
+                    return RedirectToAction("Index", "Home");
+                }
+
+                return Redirect(command.ReturnUrl);
             }
 
             TempData["ErrorMessage"] = response.Errors.Count > 0
@@ -90,7 +104,7 @@ namespace Manikalearning.Web.Controllers
             ViewData["ReturnUrl"] = command.ReturnUrl;
             return View(command);
         }
-         
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()

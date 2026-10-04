@@ -16,23 +16,16 @@
     }
     public class RoleDto
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; } 
         public string Name { get; set; } = string.Empty;
         public int UsersCount { get; set; }
-    }
-
-    public class UserRoleSelectionDto
-    {
-        public Guid RoleId { get; set; } = Guid.Empty;
-        public string RoleName { get; set; } = string.Empty;
-        public bool IsSelected { get; set; }
-    }
-
-    public class ManageUserRolesViewModel
+    }  
+    public class ManageUserRoleViewModel
     {
         public Guid UserId { get; set; } = Guid.Empty;
         public string? FullName { get; set; }
         public string Email { get; set; } = string.Empty;
-        public List<UserRoleSelectionDto> UserRoles { get; set; } = new();
+        public Guid? SelectedRoleId { get; set; }
+        public List<RoleDto> AvailableRoles { get; set; } = new();
     }
 }

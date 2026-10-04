@@ -13,6 +13,7 @@
     <Folder Include="Features\Commands\Questions\" />
     <Folder Include="Features\Handlers\Curriculum\" />
     <Folder Include="Features\Handlers\Questions\" />
+    <Folder Include="Features\Handlers\Students\" />
     <Folder Include="Features\Handlers\Subscriptions\" />
   </ItemGroup>
 

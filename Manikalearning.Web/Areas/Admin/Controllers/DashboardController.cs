@@ -1,13 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Manikalearning.Application.Features.Commands.Assessments.AdminDashboard; 
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "SuperAdmin, Admin")]
+    [Route("Admin/[controller]")]
     public class DashboardController : Controller
     {
-        public IActionResult Index()
+        private readonly IMediator _mediator;
+
+        public DashboardController(IMediator mediator)
         {
-            return View();
+            _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var model = await _mediator.Send(new GetAdminDashboardQuery());
+            return View(model);
         }
     }
 }

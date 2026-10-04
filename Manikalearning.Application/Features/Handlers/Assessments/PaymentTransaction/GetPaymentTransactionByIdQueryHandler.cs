@@ -34,14 +34,14 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.PaymentTransa
 
                 var dto = new PaymentTransactionDto
                 {
-                    TransactionId = t.PaymentId,
-                    UserId = t.UserId,
+                    TransactionId = t.PaymentId, 
                     UserName = t.User.UserName,
                     UserEmail = t.User.Email,
                     UserPhone = t.User.Mobile,
                     RazorpayOrderId = t.GatewayOrderId,
                     RazorpayPaymentId = t.GatewayPaymentId,
                     Amount = t.Amount,
+                    FinalAmount = t.Amount,
                     Currency = t.Currency,
                     PaymentStatus = t.Status 
                 };

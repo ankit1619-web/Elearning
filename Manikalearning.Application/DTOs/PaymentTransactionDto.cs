@@ -29,7 +29,7 @@ namespace Manikalearning.Application.DTOs
         public string ItemName { get; set; } = string.Empty;
         public string? AppliedCouponCode { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime? PaidAt { get; set; }
     }
     public class PaymentTransactionPagedResultDto
     {

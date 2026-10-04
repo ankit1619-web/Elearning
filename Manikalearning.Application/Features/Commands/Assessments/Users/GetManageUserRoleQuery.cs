@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Assessments.Users
 {
-    public record GetManageUserRolesQuery(string UserId) : IRequest<ManageUserRolesViewModel?>;
+    public record GetManageUserRoleQuery(Guid UserId) : IRequest<ManageUserRoleViewModel?>;
 }

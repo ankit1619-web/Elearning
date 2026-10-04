@@ -25,13 +25,12 @@
                 <small class="d-block text-muted fs-8">Inactive</small>
                 <span class="fw-bold fs-6">@Model.InactiveCount</span>
             </div>
-            <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm" onclick="Toast.openModal('/Admin/StudentCourses/EnrollPartial', 'modal-md')">
+            @* <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm" onclick="Toast.openModal('/Admin/StudentCourses/EnrollPartial', 'modal-md')">
                 <i class="bi bi-person-plus me-1"></i> Enroll Student
-            </button>
+            </button> *@
         </div>
     </div>
-
-    <!-- Filter Form -->
+     
     <form method="get" asp-area="Admin" asp-controller="StudentCourses" asp-action="Index" class="row g-2 mb-4">
         <div class="col-md-5">
             <div class="input-group input-group-sm rounded-3 overflow-hidden border">
