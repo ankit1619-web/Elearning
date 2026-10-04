@@ -2,7 +2,7 @@
 
 namespace Manikalearning.Web.Areas.Student.Controllers
 {
-    public class CoursesController : Controller
+    public class MyCoursesController : Controller
     {
         public IActionResult Index()
         {

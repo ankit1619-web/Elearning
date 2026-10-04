@@ -13,7 +13,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ManikaLearning Student Portal</title>
-     
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,379 +21,243 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
     <style>
-        :root {
-            --saas-primary: #6366f1;
-            --saas-primary-hover: #4f46e5;
-            --saas-primary-light: #eef2ff;
-            --saas-sidebar-width: 260px;
-            --saas-header-height: 70px;
-            --saas-bg: #f8fafc;
-            --saas-surface: #ffffff;
-            --saas-border: #e2e8f0;
-            --saas-text-main: #0f172a;
-            --saas-text-muted: #64748b;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--saas-bg);
-            color: var(--saas-text-main);
-            overflow-x: hidden;
-            letter-spacing: -0.01em;
-        }
-
-        /* --- Sidebar Styling --- */
-        #studentSidebar {
-            width: var(--saas-sidebar-width);
-            background: var(--saas-surface);
-            border-right: 1px solid var(--saas-border);
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            z-index: 1040;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-brand {
-            height: var(--saas-header-height);
-            padding: 0 1.5rem;
-            font-weight: 800;
-            font-size: 1.15rem;
-            color: var(--saas-text-main);
-            border-bottom: 1px solid var(--saas-border);
-        }
-
-        .brand-icon-box {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            color: #ffffff;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-        }
-
-        .nav-section-title {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #94a3b8;
-            font-weight: 700;
-            padding: 1.25rem 1.5rem 0.5rem;
-        }
-
-        .sidebar-nav .nav-link {
-            color: var(--saas-text-muted);
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 0.65rem 1rem;
-            margin: 0.15rem 1rem;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .sidebar-nav .nav-link:hover {
-            color: var(--saas-primary);
-            background-color: var(--saas-primary-light);
-            transform: translateX(3px);
-        }
-
-        .sidebar-nav .nav-link.active {
-            color: var(--saas-primary);
-            background-color: var(--saas-primary-light);
-            font-weight: 700;
-        }
-
-        .sidebar-nav .nav-link i {
-            font-size: 1.1rem;
-            margin-right: 0.75rem;
-            transition: color 0.2s;
-        }
-
-        /* --- Header Topbar --- */
-        #mainWrapper {
-            margin-left: var(--saas-sidebar-width);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .student-navbar {
-            height: var(--saas-header-height);
-            background: var(--saas-surface);
-            border-bottom: 1px solid var(--saas-border);
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        .search-input-group {
-            background-color: #f1f5f9;
-            border-radius: 10px;
-            padding: 0.4rem 0.8rem;
-            width: 280px;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .search-input-group:focus-within {
-            background-color: #ffffff;
-            border-color: var(--saas-primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-        }
-
-        .streak-badge {
-            background: #fff7ed;
-            color: #c2410c;
-            border: 1px solid #ffedd5;
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-
-        .avatar-circle {
-            width: 38px;
-            height: 38px;
-            background: #eef2ff;
-            color: var(--saas-primary);
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #ffffff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        /* --- Responsive Drawer --- */
-        @@media (max-width: 991.98px) {
-            #studentSidebar {
-                transform: translateX(-100%);
+            :root {
+                --saas-primary: #4f46e5;
+                --saas-primary-hover: #4338ca;
+                --saas-primary-light: #eef2ff;
+                --saas-bg: #f8fafc;
+                --saas-surface: #ffffff;
+                --saas-border: #e2e8f0;
+                --saas-text-main: #0f172a;
+                --saas-text-muted: #64748b;
             }
-            #studentSidebar.show {
-                transform: translateX(0);
-                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                background-color: var(--saas-bg);
+                color: var(--saas-text-main);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
             }
-            #mainWrapper {
-                margin-left: 0 !important;
+
+            /* Top Nav Styling */
+            .student-topnav {
+                background: var(--saas-surface);
+                border-bottom: 1px solid var(--saas-border);
+                position: sticky;
+                top: 0;
+                z-index: 1020;
             }
-        }
+
+            .brand-icon-box {
+                width: 38px;
+                height: 38px;
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+                color: #ffffff;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Clean Link Style */
+            .top-nav-link {
+                color: var(--saas-text-muted) !important;
+                font-weight: 600;
+                font-size: 0.875rem;
+                padding: 0.6rem 0.9rem !important;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                transition: all 0.15s ease-in-out;
+                position: relative;
+            }
+
+                .top-nav-link:hover {
+                    color: var(--saas-primary) !important;
+                    background-color: rgba(99, 102, 241, 0.05);
+                }
+
+                .top-nav-link.active {
+                    color: var(--saas-primary) !important;
+                    background-color: var(--saas-primary-light);
+                    font-weight: 700;
+                }
+
+            /* Search Input */
+            .search-box {
+                background-color: #f1f5f9;
+                border: 1px solid transparent;
+                border-radius: 8px;
+                padding: 0.4rem 0.8rem;
+                width: 220px;
+                transition: all 0.2s;
+            }
+
+                .search-box:focus-within {
+                    background-color: #ffffff;
+                    border-color: var(--saas-primary);
+                    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+                }
+
+            .streak-pill {
+                background: #fff7ed;
+                color: #c2410c;
+                border: 1px solid #ffedd5;
+                padding: 0.35rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 700;
+            }
+
+            .avatar-circle {
+                width: 36px;
+                height: 36px;
+                background: var(--saas-primary-light);
+                color: var(--saas-primary);
+                border-radius: 50%;
+                font-weight: 700;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid #ffffff;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-     
-    <div class="offcanvas-backdrop fade" id="sidebarBackdrop" style="display:none;" onclick="toggleMobileSidebar()"></div>
-     
-    <aside id="studentSidebar">
-        <div class="sidebar-brand d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2.5">
-                <div class="brand-icon-box">
-                    <i class="bi bi-mortarboard-fill"></i>
-                </div>
-                <span>Manika<span class="text-primary">Learning</span></span>
-            </div>
-            <button class="btn btn-sm btn-icon d-lg-none text-muted" onclick="toggleMobileSidebar()">
-                <i class="bi bi-x-lg fs-5"></i>
-            </button>
-        </div>
 
-        <div class="flex-grow-1 overflow-y-auto py-2">
-            <ul class="nav flex-column sidebar-nav">
-                <li class="nav-section-title">Core Workspace</li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "Dashboard" ? "active" : "")" 
-                       asp-area="Student" asp-controller="Dashboard" asp-action="Index">
-                        <i class="bi bi-grid-1x2-fill"></i> Overview
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "MyCourses" ? "active" : "")" 
-                       asp-area="Student" asp-controller="MyCourses" asp-action="Index">
-                        <i class="bi bi-play-circle-fill"></i> My Enrolled Courses
-                    </a>
-                </li>
+    <!-- Header Navigation -->
+    <header class="student-topnav">
+        <nav class="navbar navbar-expand-lg py-2">
+            <div class="container-fluid px-3 px-lg-4">
 
-                <li class="nav-section-title">Practice & Preparation</li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "MockTests" ? "active" : "")" 
-                       asp-area="Student" asp-controller="MockTests" asp-action="Index">
-                        <i class="bi bi-lightning-charge-fill"></i> Mock Tests
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "PYQPractice" ? "active" : "")" 
-                       asp-area="Student" asp-controller="PYQPractice" asp-action="Index">
-                        <i class="bi bi-file-earmark-text-fill"></i> PYQ Practice
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "MistakeBook" ? "active" : "")" 
-                       asp-area="Student" asp-controller="MistakeBook" asp-action="Index">
-                        <i class="bi bi-exclamation-triangle-fill text-warning"></i> Smart Mistake Book
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "Bookmarks" ? "active" : "")" 
-                       asp-area="Student" asp-controller="Bookmarks" asp-action="Index">
-                        <i class="bi bi-bookmark-star-fill"></i> Saved Bookmarks
-                    </a>
-                </li>
-
-                <li class="nav-section-title">Account Settings</li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentController == "Profile" ? "active" : "")" 
-                       asp-area="Student" asp-controller="Profile" asp-action="Index">
-                        <i class="bi bi-sliders"></i> Profile & Billing
-                    </a>
-                </li>
-            </ul>
-        </div>
-         
-        <div class="p-3 border-top bg-light-subtle">
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="avatar-circle">
-                        @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "S")
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center gap-2.5 me-4" asp-area="Student" asp-controller="Dashboard" asp-action="Index">
+                    <div class="brand-icon-box">
+                        <i class="bi bi-mortarboard-fill fs-5"></i>
                     </div>
-                    <div class="lh-1 overflow-hidden" style="max-width: 120px;">
-                        <span class="d-block fw-bold text-truncate text-dark small">@(User.Identity?.Name ?? "Student")</span>
-                        <span class="text-muted extra-small" style="font-size: 0.72rem;">Student Account</span>
-                    </div>
-                </div>
-                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-2" title="Logout">
-                        <i class="bi bi-box-arrow-right fs-6"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </aside>
-     
-    <div id="mainWrapper"> 
-        <header class="student-navbar d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light btn-sm d-lg-none rounded-3 border" onclick="toggleMobileSidebar()">
-                    <i class="bi bi-list fs-5"></i>
+                    <span class="fw-bold fs-5 text-dark">Manika<span class="text-primary">Learning</span></span>
+                </a>
+
+                <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#topnavMenu">
+                    <i class="bi bi-list fs-3"></i>
                 </button>
-                <h5 class="fw-bold mb-0 text-dark d-none d-sm-block">@ViewData["Title"]</h5>
-            </div>
-             
-            <div class="d-none d-md-flex align-items-center search-input-group">
-                <i class="bi bi-search text-muted me-2"></i>
-                <input type="text" class="form-control form-control-sm border-0 bg-transparent p-0 shadow-none" placeholder="Search courses, tests, topics... (Ctrl+K)">
-            </div>
-             
-            <div class="d-flex align-items-center gap-3">
-                <!-- Daily Streak Widget -->
-                <div class="streak-badge d-flex align-items-center gap-1.5" title="Daily Learning Streak">
-                    <i class="bi bi-fire text-danger"></i>
-                    <span>5 Day Streak</span>
-                </div>
 
-                <!-- Notifications Dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-light rounded-circle border-0 position-relative p-2" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-bell fs-5 text-secondary"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-3" style="width: 320px;">
-                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                            <h6 class="fw-bold mb-0">Notifications</h6>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill">2 New</span>
-                        </div>
-                        <div class="d-flex flex-column gap-2 py-1">
-                            <a href="#" class="text-decoration-none text-dark p-2 rounded-3 bg-light-subtle d-flex gap-2">
-                                <i class="bi bi-journal-check text-primary fs-5"></i>
-                                <div>
-                                    <div class="small fw-semibold">New Mock Test Live!</div>
-                                    <div class="text-muted extra-small" style="font-size:0.75rem;">UGC NET Paper 1 - Full Mock #4</div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <div class="collapse navbar-collapse" id="topnavMenu">
 
-                <!-- Profile Dropdown -->
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none gap-2" data-bs-toggle="dropdown">
-                        <div class="avatar-circle">
-                            @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "S")
-                        </div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-2" style="min-width: 200px;">
-                        <li class="px-3 py-2 border-bottom mb-1">
-                            <div class="fw-bold text-dark small">@(User.Identity?.Name ?? "Student User")</div>
-                            <div class="text-muted extra-small" style="font-size: 0.75rem;">Active Learner</div>
-                        </li>
-                        <li>
-                            <a class="dropdown-item rounded-2 py-1.5" asp-area="Student" asp-controller="Profile" asp-action="Index">
-                                <i class="bi bi-person me-2"></i> Profile & Settings
+                    <!-- Clean Center Nav Links -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
+                        <li class="nav-item">
+                            <a class="nav-link top-nav-link @(currentController == "Dashboard" ? "active" : "")"
+                               asp-area="Student" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-grid-1x2 me-1"></i> Overview
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="dropdown-item rounded-2 py-1.5 text-danger">
-                                    <i class="bi bi-box-arrow-right me-2"></i> Log Out
-                                </button>
-                            </form>
+                        <li class="nav-item">
+                            <a class="nav-link top-nav-link @(currentController == "MyCourses" ? "active" : "")"
+                               asp-area="Student" asp-controller="MyCourses" asp-action="Index">
+                                <i class="bi bi-play-circle me-1"></i> My Courses
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link top-nav-link @(currentController == "MockTests" ? "active" : "")"
+                               asp-area="Student" asp-controller="MockTests" asp-action="Index">
+                                <i class="bi bi-lightning-charge me-1"></i> Mock Tests
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link top-nav-link @(currentController == "PYQPractice" ? "active" : "")"
+                               asp-area="Student" asp-controller="PYQPractice" asp-action="Index">
+                                <i class="bi bi-file-earmark-text me-1"></i> PYQ Bank
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link top-nav-link @(currentController == "MistakeBook" ? "active" : "")"
+                               asp-area="Student" asp-controller="MistakeBook" asp-action="Index">
+                                <i class="bi bi-exclamation-circle me-1"></i> Mistake Book
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link top-nav-link @(currentController == "Bookmarks" ? "active" : "")"
+                               asp-area="Student" asp-controller="Bookmarks" asp-action="Index">
+                                <i class="bi bi-bookmark me-1"></i> Saved
+                            </a>
                         </li>
                     </ul>
+
+                    <!-- Right Controls -->
+                    <div class="d-flex align-items-center gap-3">
+
+                        <!-- Search Box -->
+                        <div class="search-box d-flex align-items-center">
+                            <i class="bi bi-search text-muted me-2 small"></i>
+                            <input type="text" class="form-control form-control-sm border-0 bg-transparent p-0 shadow-none" placeholder="Search tests, courses...">
+                        </div>
+
+                        <!-- Streak -->
+                        <div class="streak-pill d-flex align-items-center gap-1" title="Practice Streak">
+                            <i class="bi bi-fire text-danger"></i>
+                            <span>5 Days</span>
+                        </div>
+
+                        <!-- User Profile Dropdown -->
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+                                <div class="avatar-circle">
+                                    @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "S")
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-2" style="min-width: 200px;">
+                                <li class="px-3 py-2 border-bottom mb-1">
+                                    <div class="fw-bold text-dark small">@(User.Identity?.Name ?? "Student User")</div>
+                                    <div class="text-muted extra-small" style="font-size: 0.75rem;">Active Learner</div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-1.5" asp-area="Student" asp-controller="Profile" asp-action="Index">
+                                        <i class="bi bi-person me-2"></i> Profile & Settings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item rounded-2 py-1.5 text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
-        </header>
+        </nav>
+    </header>
 
-        <!-- Dynamic Body Page Content -->
-        <main class="p-4 flex-grow-1">
-            <!-- Global Flash Toast Notification Container -->
+    <!-- Page Content -->
+    <main class="py-4 flex-grow-1">
+        <div class="container-fluid px-3 px-lg-4">
+
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }
 
             @RenderBody()
-        </main>
-    </div>
-     
+        </div>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('studentSidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            sidebar.classList.toggle('show');
-            if(sidebar.classList.contains('show')) {
-                backdrop.style.display = 'block';
-                backdrop.classList.add('show');
-            } else {
-                backdrop.classList.remove('show');
-                backdrop.style.display = 'none';
-            }
-        }
-    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

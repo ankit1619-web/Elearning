@@ -17,12 +17,16 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         {
             _mediator = mediator;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            
-            return View( );
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+            var query = new GetStudentDashboardQuery { UserId = Guid.Parse(userId) };
+            var viewModel = await _mediator.Send(query);
+
+            return View(viewModel);
         }
     }
 }
