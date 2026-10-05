@@ -126,6 +126,48 @@
                 border: 2px solid #ffffff;
                 box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
+
+            .btn-saas-primary {
+                background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+                color: #ffffff;
+                border: none;
+                border-radius: 12px;
+                font-weight: 700;
+                padding: 10px 18px;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+                transition: all 0.2s ease;
+                display: block;
+                text-align: center;
+                text-decoration: none;
+                font-size: 0.875rem;
+            }
+
+                .btn-saas-primary:hover {
+                    background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+                    color: #ffffff;
+                    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+                    transform: translateY(-1px);
+                }
+
+            .btn-saas-secondary {
+                background: #ffffff;
+                border: 1px solid #cbd5e1;
+                color: #334155;
+                border-radius: 12px;
+                font-weight: 600;
+                padding: 10px 18px;
+                transition: all 0.2s ease;
+                display: block;
+                text-align: center;
+                text-decoration: none;
+                font-size: 0.875rem;
+            }
+
+                .btn-saas-secondary:hover {
+                    background: #f8fafc;
+                    color: #0f172a;
+                    border-color: #94a3b8;
+                }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -159,7 +201,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "MyCourses" ? "active" : "")"
+                            <a class="nav-link top-nav-link @(currentController == "MyCourses" || currentController == "Watch" ? "active" : "")"
                                asp-area="Student" asp-controller="MyCourses" asp-action="Index">
                                 <i class="bi bi-play-circle me-1"></i> My Courses
                             </a>
@@ -256,8 +298,9 @@
             @RenderBody()
         </div>
     </main>
-
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/admin-ui.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -10,8 +10,7 @@ namespace Manikalearning.Domain.Entities
         public Guid CourseId { get; set; } = Guid.NewGuid();
 
         [Required, MaxLength(200)]
-        public string CourseName { get; set; }
-         
+        public string CourseName { get; set; } 
         public string Description { get; set; }
         public decimal Price { get; set; }
         public bool IsPublished { get; set; } = true;
@@ -19,7 +18,8 @@ namespace Manikalearning.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
          
         public ICollection<StudentCourse> StudentCourses { get; set; }
-        public ICollection<PlanCourse> PlanCourses { get; set; }
+        public ICollection<PlanCourse> PlanCourses { get; set; } 
+        public virtual ICollection<CourseSection> CourseSections { get; set; } = new List<CourseSection>(); 
     }
 
     [Table("CourseSections")]
@@ -45,6 +45,7 @@ namespace Manikalearning.Domain.Entities
 
         [ForeignKey("CourseId")]
         public virtual Course Course { get; set; }
+        public virtual ICollection<CourseLecture> CourseLectures { get; set; } = new List<CourseLecture>();
     }
     [Table("CourseLectures")]
     public class CourseLecture
@@ -83,6 +84,7 @@ namespace Manikalearning.Domain.Entities
 
         [ForeignKey("CourseSectionId")]
         public virtual CourseSection CourseSection { get; set; }
+        public virtual ICollection<StudentLectureProgress> StudentLectureProgresses { get; set; } = new List<StudentLectureProgress>();
     }
 
     [Table("StudentLectureProgress")]
@@ -128,8 +130,7 @@ namespace Manikalearning.Domain.Entities
         public DateTime? ExpiryDate { get; set; }
 
         public bool IsActive { get; set; } = true;
-
-        // Navigation Properties
+         
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
 

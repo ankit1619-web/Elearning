@@ -8,5 +8,6 @@
         public string SectionName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public int DisplayOrder { get; set; }
+        public int TotalQuestions { get; set; }
     }
 }

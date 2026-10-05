@@ -83,8 +83,9 @@ namespace Manikalearning.Domain.Entities
         public string Description { get; set; }
 
         public bool IsActive { get; set; } = true; 
-        public ICollection<Section> Sections { get; set; }
-        public ICollection<Question> Questions { get; set; }
+        public ICollection<Section> Sections { get; set; } 
+
+        public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
     }
 
     [Table("Sections")]
@@ -104,7 +105,8 @@ namespace Manikalearning.Domain.Entities
         public int DisplayOrder { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
-        public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>(); 
+        public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>();
+
     }
 
     [Table("Topics")]
@@ -126,7 +128,8 @@ namespace Manikalearning.Domain.Entities
         public bool IsActive { get; set; } = true;
        
         [ForeignKey("SectionId")]
-        public virtual Section Section { get; set; } = null!;
+        public virtual Section Section { get; set; } = null!; 
+        public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
     }
 
     [Table("SubTopics")]

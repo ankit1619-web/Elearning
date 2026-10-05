@@ -23,7 +23,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(Guid? subjectId = null, string search = "")
         {
-            var sectionsResponse = await _mediator.Send(new GetSectionsBySubjectQuery(subjectId, search));
+            var sectionsResponse = await _mediator.Send(new GetSectionsBySubjectQuery(subjectId, null, search));
             var subjectsLookup = await _mediator.Send(new GetSubjectsLookupQuery());
 
             var sections = sectionsResponse.IsSuccess ? sectionsResponse.Data : new List<SectionDto>();

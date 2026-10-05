@@ -1,0 +1,57 @@
+﻿@using Manikalearning.Web.Areas.Student.ViewModels
+@model PYQPracticeViewModel
+@{
+    ViewData["Title"] = "PYQ Bank";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-file-earmark-text text-primary me-2"></i>PYQ Practice Bank</h3>
+            <p class="text-muted small mb-0">Select a subject and section to practice previous year questions topic-wise.</p>
+        </div>
+    </div>
+
+    <!-- Subject Tabs -->
+    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+        @foreach (var sub in Model.Subjects)
+        {
+            <a href="@Url.Action("Index", "PYQPractice", new { area = "Student", subjectId = sub.SubjectId })"
+               class="btn @(Model.SelectedSubjectId == sub.SubjectId ? "btn-primary" : "btn-outline-secondary") rounded-pill px-4">
+                @sub.SubjectName
+            </a>
+        }
+    </div>
+
+    <!-- Sections Grid (Using 'Sections' Master Table) -->
+    <div class="row g-3">
+        @if (Model.Sections.Any())
+        {
+            @foreach (var sec in Model.Sections)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">@sec.SectionName</h6>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                    <i class="bi bi-question-circle me-1"></i>@sec.TotalQuestions Questions
+                                </span>
+                            </div>
+                            <a href="@Url.Action("Practice", "PYQPractice", new { area = "Student", sectionId = sec.SectionId })"
+                               class="btn btn-sm btn-primary rounded-3 px-3">
+                                Start <i class="bi bg-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Is subject ke liye koi sections abhi available nahi hain.</p>
+            </div>
+        }
+    </div>
+</div>

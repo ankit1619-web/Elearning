@@ -3,6 +3,6 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Assessments.Sections
 {
-    public record GetSectionsBySubjectQuery(Guid? SubjectId = null, string SearchTerm = "") : IRequest<ResponseDto<List<SectionDto>>>;
+    public record GetSectionsBySubjectQuery(Guid? SubjectId,string? SectionName,string? SearchTerm) : IRequest<ResponseDto<List<SectionDto>>>; 
     
 }

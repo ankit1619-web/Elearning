@@ -16,8 +16,7 @@ namespace Manikalearning.Domain.Entities
         public int DurationDays { get; set; }
         public string Description { get; set; }
         public bool IsActive { get; set; } = true;
-
-        // Navigation Properties
+         
         public ICollection<PlanCourse> PlanCourses { get; set; }
         public ICollection<StudentSubscription> StudentSubscriptions { get; set; }
     }

@@ -129,8 +129,7 @@ namespace Manikalearning.Domain.Entities
         [MaxLength(450)]
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation Properties
+         
         public ICollection<TestQuestion> TestQuestions { get; set; }
         public ICollection<TestAttempt> TestAttempts { get; set; }
     }

@@ -30,8 +30,8 @@ namespace Manikalearning.Application.DTOs
         public string? ShortExplanation { get; set; }
         public string? ShortExplanationHindi { get; set; }
 
-        public DifficultyLevel Difficulty { get; set; } 
-
+        public DifficultyLevel Difficulty { get; set; }
+        public int QuestionOrder { get; set; }
         public decimal Marks { get; set; }
 
         public decimal NegativeMarks { get; set; }

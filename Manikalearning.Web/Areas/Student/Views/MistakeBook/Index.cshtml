@@ -1,0 +1,62 @@
+﻿@using Manikalearning.Application.DTOs
+
+@model List<MistakeDto>
+@{
+    ViewData["Title"] = "Mistake Book";
+}
+
+<div class="container-fluid py-3">
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1"><i class="bi bi-exclamation-circle text-danger me-2"></i>Mistake Book</h3>
+        <p class="text-muted small mb-0">Tests aur PYQs me galat hue questions yahan automatic save hote hain revision ke liye.</p>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var m in Model)
+        {
+            <div class="col-12" id="mistake-card-@m.MistakeId">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1">Galat Answered</span>
+                        <button class="btn btn-sm btn-outline-success rounded-pill" onclick="removeMistake('@m.MistakeId')">
+                            <i class="bi bi-check2-circle me-1"></i> Mark as Mastered
+                        </button>
+                    </div>
+
+                    <h6 class="fw-bold text-dark mb-3">@m.QuestionText</h6>
+
+                    <div class="p-3 bg-light rounded-3 mb-2">
+                        <span class="text-danger fw-semibold">Aapka Jawab:</span> @m.SelectedAnswer
+                    </div>
+                    <div class="p-3 bg-success-subtle text-success rounded-3 mb-3">
+                        <span class="fw-semibold">Sahi Jawab:</span> @m.CorrectAnswer
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(m.Explanation))
+                    {
+                        <div class="small text-muted border-top pt-2">
+                            <strong>Explanation:</strong> @m.Explanation
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function removeMistake(mistakeId) {
+            fetch(`@Url.Action("Remove", "MistakeBook", new { area = "Student" })/${mistakeId}`, {
+                method: 'POST'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const card = document.getElementById(`mistake-card-${mistakeId}`);
+                        card.remove();
+                    }
+                });
+        }
+    </script>
+}

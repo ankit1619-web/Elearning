@@ -1,0 +1,205 @@
+﻿@using Manikalearning.Application.Features.Commands.Students
+@model  MockTestDetailDto
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = null;  
+}
+
+<div class="vh-100 d-flex flex-column bg-light"> 
+    <header class="bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-0 text-dark">@Model.Title</h5>
+            <small class="text-muted">Total Questions: <span id="total-q-count">@Model.Questions.Count</span></small>
+        </div>
+         
+        <div class="d-flex align-items-center bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold">
+            <i class="bi bi-clock me-2 fs-5"></i>
+            <span id="timer-display">00:00</span>
+        </div>
+
+        <div>
+            <button class="btn btn-success fw-bold px-4 rounded-3" onclick="submitTest()">
+                <i class="bi bi-send me-1"></i> Submit Test
+            </button>
+        </div>
+    </header>
+     
+    <div class="flex-grow-1 container-fluid py-4 overflow-hidden">
+        <div class="row h-100 g-3"> 
+            <div class="col-md-8 col-lg-9 h-100">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-1" id="q-number-badge">Question 1</span>
+                        </div>
+                        <h5 class="fw-semibold text-dark mb-4" id="q-text">Loading question...</h5>
+                         
+                        <div class="d-flex flex-column gap-2" id="options-container">
+                            
+                        </div>
+                    </div> 
+                    <div class="d-flex justify-content-between border-top pt-3 mt-3">
+                        <button class="btn btn-outline-secondary rounded-3" id="btn-prev" onclick="navigate(-1)">
+                            <i class="bi bi-chevron-left me-1"></i> Previous
+                        </button>
+                        <button class="btn btn-primary rounded-3 px-4" id="btn-next" onclick="navigate(1)">
+                            Next <i class="bi bi-chevron-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+             
+            <div class="col-md-4 col-lg-3 h-100">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-3 overflow-auto">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Question Palette</h6>
+                    <div class="d-flex flex-wrap gap-2" id="question-palette">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const questionsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Questions));
+        const testId = "@Model.TestId";
+        let durationSeconds = @(Model.DurationMinutes * 60);
+        let currentIndex = 0;
+        let selectedAnswers = {};
+        let timeTaken = 0;
+        let timerInterval;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initTimer();
+            renderQuestion(0);
+            renderPalette();
+        });
+
+        function initTimer() {
+            timerInterval = setInterval(() => {
+                durationSeconds--;
+                timeTaken++;
+
+                let mins = Math.floor(durationSeconds / 60);
+                let secs = durationSeconds % 60;
+                document.getElementById("timer-display").innerText =
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                if (durationSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time's up! Submitting your test automatically.");
+                    submitTest();
+                }
+            }, 1000);
+        }
+
+        function renderQuestion(index) {
+            currentIndex = index;
+            const q = questionsData[index];
+
+            document.getElementById("q-number-badge").innerText = `Question ${index + 1} of ${questionsData.length}`;
+            document.getElementById("q-text").innerText = q.questionText;
+
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+
+            const options = [
+                { key: "OptionA", text: q.optionA },
+                { key: "OptionB", text: q.optionB },
+                { key: "OptionC", text: q.optionC },
+                { key: "OptionD", text: q.optionD }
+            ];
+
+            options.forEach(opt => {
+                if (opt.text) {
+                    const isChecked = selectedAnswers[q.questionId] === opt.key;
+                    const optBtn = document.createElement("div");
+                    optBtn.className = `p-3 rounded-3 border cursor-pointer option-item ${isChecked ? 'bg-primary-subtle border-primary' : 'bg-white'}`;
+                    optBtn.onclick = () => selectOption(q.questionId, opt.key);
+                    optBtn.innerHTML = `
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="opt" ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label fw-medium text-dark">${opt.text}</label>
+                        </div>
+                    `;
+                    container.appendChild(optBtn);
+                }
+            });
+
+            document.getElementById("btn-prev").disabled = index === 0;
+            document.getElementById("btn-next").innerText = (index === questionsData.length - 1) ? "Finish" : "Next";
+            updatePaletteUI();
+        }
+
+        function selectOption(qId, selectedOpt) {
+            selectedAnswers[qId] = selectedOpt;
+            renderQuestion(currentIndex);
+        }
+
+        function navigate(step) {
+            let target = currentIndex + step;
+            if (target >= 0 && target < questionsData.length) {
+                renderQuestion(target);
+            }
+        }
+
+        function renderPalette() {
+            const palette = document.getElementById("question-palette");
+            palette.innerHTML = "";
+
+            questionsData.forEach((q, idx) => {
+                const btn = document.createElement("button");
+                btn.id = `palette-btn-${idx}`;
+                btn.className = "btn btn-outline-secondary btn-sm rounded-circle fw-bold p-0";
+                btn.style.width = "38px";
+                btn.style.height = "38px";
+                btn.innerText = idx + 1;
+                btn.onclick = () => renderQuestion(idx);
+                palette.appendChild(btn);
+            });
+            updatePaletteUI();
+        }
+
+        function updatePaletteUI() {
+            questionsData.forEach((q, idx) => {
+                const btn = document.getElementById(`palette-btn-${idx}`);
+                if (btn) {
+                    if (idx === currentIndex) {
+                        btn.className = "btn btn-primary btn-sm rounded-circle fw-bold p-0";
+                    } else if (selectedAnswers[q.questionId]) {
+                        btn.className = "btn btn-success btn-sm rounded-circle fw-bold p-0";
+                    } else {
+                        btn.className = "btn btn-outline-secondary btn-sm rounded-circle fw-bold p-0";
+                    }
+                }
+            });
+        }
+
+        function submitTest() {
+            if (!confirm("Are you sure you want to submit the test?")) return;
+
+            clearInterval(timerInterval);
+
+            const payload = {
+                testId: testId,
+                selectedAnswers: selectedAnswers,
+                timeTakenSeconds: timeTaken
+            };
+
+            fetch('@Url.Action("Submit", "MockTests", new { area = "Student" })', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    alert(`Test Submitted Successfully!\nScore: ${res.data.score}/${res.data.totalQuestions}`);
+                    window.location.href = '@Url.Action("Index", "MockTests", new { area = "Student" })';
+                }
+            });
+        }
+    </script>
+}

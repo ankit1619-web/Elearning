@@ -30,6 +30,10 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Sections
                     query = query.Where(s => s.SubjectId == request.SubjectId.Value);
                 }
 
+                if (!string.IsNullOrWhiteSpace(request.SectionName))
+                {
+                    query = query.Where(s => s.SectionName == request.SectionName);
+                }
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
                     string search = request.SearchTerm.Trim().ToLower();

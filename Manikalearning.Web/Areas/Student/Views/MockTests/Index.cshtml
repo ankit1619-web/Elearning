@@ -1,0 +1,79 @@
+﻿@using Manikalearning.Application.Features.Commands.Students
+@model List<MockTestDto>
+@{
+    ViewData["Title"] = "Mock Tests";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<div class="container-fluid py-3"> 
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-clock-history text-primary me-2"></i>Mock Test Series</h3>
+            <p class="text-muted small mb-0">Test your exam readiness with real-time timed mock tests and instant analysis.</p>
+        </div>
+    </div>
+     
+    <div class="row g-3">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var test in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-card p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">
+                                    <i class="bi bi-journal-text me-1"></i>Full Test
+                                </span>
+                                @if (test.IsAttempted)
+                                {
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
+                                        <i class="bi bi-check-circle me-1"></i>Attempted
+                                    </span>
+                                }
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-3">@test.Title</h5>
+                             
+                            <div class="row g-2 mb-3 text-muted small">
+                                <div class="col-6">
+                                    <i class="bi bi-question-circle me-1 text-primary"></i>
+                                    <strong>@test.TotalQuestions</strong> Questions
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-stopwatch me-1 text-primary"></i>
+                                    <strong>@test.DurationMinutes</strong> Mins
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-trophy me-1 text-primary"></i>
+                                    <strong>@test.TotalMarks</strong> Marks
+                                </div>
+                                @if (test.IsAttempted && test.LastScore.HasValue)
+                                {
+                                    <div class="col-6 text-success fw-semibold">
+                                        <i class="bi bi-award me-1"></i>
+                                        Score: @test.LastScore / @test.TotalMarks
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3 mt-2">
+                            <a href="@Url.Action("Attempt", "MockTests", new { area = "Student", testId = test.TestId })"
+                               class="btn @(test.IsAttempted ? "btn-outline-primary" : "btn-saas-primary") w-100 rounded-3 fw-bold">
+                                @(test.IsAttempted ? "Re-attempt Test" : "Start Test Now") <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox text-muted display-4 mb-3 d-block"></i>
+                <h5 class="text-muted">Abhi koi mock tests available nahi hain.</h5>
+            </div>
+        }
+    </div>
+</div>

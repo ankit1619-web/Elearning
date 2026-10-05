@@ -1,0 +1,211 @@
+﻿@model Manikalearning.Application.DTOs.LessonPlayerViewModel
+
+<style>
+    .player-container {
+        background-color: #0b0f19;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .btn-action-pill {
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 6px 16px;
+        border-radius: 999px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-action-pill:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+        }
+
+    .notes-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .notes-dark-header {
+        background-color: #18181b;
+        color: #ffffff;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .btn-pyq-blue {
+        background-color: #2563eb;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.825rem;
+        padding: 6px 16px;
+        border-radius: 8px;
+        border: none;
+    }
+
+        .btn-pyq-blue:hover {
+            background-color: #1d4ed8;
+            color: #ffffff;
+        }
+
+    .btn-bookmark {
+        background: rgba(255,255,255,0.15);
+        color: #ffffff;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-bookmark:hover {
+            background: rgba(255,255,255,0.25);
+        }
+</style>
+
+<!-- VIDEO PLAYER SCREEN -->
+<div class="player-container ratio ratio-16x9 mb-4">
+    @if (!string.IsNullOrEmpty(Model.VideoUrl))
+    {
+        <iframe src="@Model.VideoUrl"
+                title="@Model.LessonTitle"
+                allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+    }
+    else
+    {
+        <div class="d-flex flex-column justify-content-center align-items-center text-white p-4">
+            <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h4 class="fw-bold mb-1">We're getting things ready</h4>
+            <p class="text-muted small">Loading your experience... This won't take long.</p>
+        </div>
+    }
+</div>
+ 
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 px-1">
+    <h2 class="fw-bold text-dark mb-0 fs-3">@Model.LessonTitle</h2>
+
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-action-pill">
+            <i class="bi bi-question-circle me-1 text-primary"></i> Ask Doubt
+        </button>
+        <button type="button" class="btn btn-action-pill">
+            <i class="bi bi-star-fill me-1 text-warning"></i> Reviews
+        </button>
+    </div>
+</div>
+ 
+<div class="notes-card shadow-sm"> 
+    <div class="notes-dark-header">
+        <h5 class="fw-bold mb-0 fs-6 text-truncate pe-2">@Model.LessonTitle</h5>
+
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <button type="button" class="btn btn-pyq-blue">
+                Topic-wise PYQs
+            </button>
+            <button type="button" class="btn btn-bookmark" title="Save Bookmark">
+                <i class="bi bi-bookmark"></i>
+            </button>
+        </div>
+    </div>
+     
+    <div class="p-4 bg-white">
+        @if (string.IsNullOrWhiteSpace(Model.Notes))
+        {
+            <div class="lecture-notes-html">
+                @Html.Raw(Model.Notes)
+            </div>
+        }
+        else
+        {
+            <div class="lecture-content">
+                <!-- Main Heading -->
+                <h3 class="fw-bold text-primary mb-3">Levels of Teaching (शिक्षण के स्तर)</h3>
+                <p class="text-muted">
+                    Teaching process is structured across three distinct levels of learning based on cognitive development:
+                    <br>
+                    <em>(शिक्षण प्रक्रिया को संज्ञानात्मक विकास के आधार पर तीन अलग-अलग स्तरों में विभाजित किया गया है:)</em>
+                </p>
+
+                <hr class="my-4">
+
+                <!-- 1. MEMORY LEVEL -->
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark">1. Memory Level of Teaching (MLT) - स्मृति स्तर</h4>
+                    <ul class="list-unstyled ms-2">
+                        <li><strong>Proponent (प्रतिपादक):</strong> Johann Friedrich Herbart (हर्बर्ट)</li>
+                        <li><strong>Nature (प्रकृति):</strong> Thoughtless Teaching (विचारहीन शिक्षण)</li>
+                        <li><strong>Level:</strong> Initial / Lowest level of teaching</li>
+                    </ul>
+                    <p><strong>Key Points (मुख्य बिंदु):</strong></p>
+                    <ul>
+                        <li>Focuses on rote learning, memorization, recalling facts, and figures. <em>(तथ्यों को रटने, याद करने और पुन: स्मरण करने पर जोर देता है।)</em></li>
+                        <li>Teacher plays a dominant and active role, while students are passive listeners. <em>(शिक्षक मुख्य भूमिका में होता है और छात्र निष्क्रिय श्रोता होते हैं।)</em></li>
+                        <li>Instructional material includes definitions, formulas, and tables. <em>(सूत्र, परिभाषाएं और पहाड़े याद कराना इसका हिस्सा है।)</em></li>
+                        <li><strong>Evaluation Method:</strong> Oral, Written, and Short-type tests.</li>
+                    </ul>
+                </div>
+
+                <!-- 2. UNDERSTANDING LEVEL -->
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark">2. Understanding Level of Teaching (ULT) - बोध / समझ का स्तर</h4>
+                    <ul class="list-unstyled ms-2">
+                        <li><strong>Proponent (प्रतिपादक):</strong> H. C. Morrison (मॉरिसन)</li>
+                        <li><strong>Nature (प्रकृति):</strong> Thoughtful Teaching (विचारशील शिक्षण)</li>
+                        <li><strong>Level:</strong> Middle level of teaching</li>
+                    </ul>
+                    <p><strong>Key Points (मुख्य बिंदु):</strong></p>
+                    <ul>
+                        <li>Focuses on understanding concepts, relationships, facts, and applications. <em>(अवधारणाओं, संबंधों और सिद्धांतों की समझ पर जोर।)</em></li>
+                        <li>Mastery of subject matter is emphasized. <em>(विषय वस्तु पर महारत हासिल करना।)</em></li>
+                        <li>Both teacher and student are active participants. <em>(शिक्षक और छात्र दोनों सक्रिय भूमिका निभाते हैं।)</em></li>
+                        <li><strong>Evaluation Method:</strong> Essay-type and Objective-type questions.</li>
+                    </ul>
+                </div>
+
+                <!-- 3. REFLECTIVE LEVEL -->
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark">3. Reflective Level of Teaching (RLT) - चिंतनशील स्तर</h4>
+                    <ul class="list-unstyled ms-2">
+                        <li><strong>Proponent (प्रतिपादक):</strong> Hunt (हंट)</li>
+                        <li><strong>Nature (प्रकृति):</strong> Upper Thoughtful Level (उच्चतम विचारशील स्तर)</li>
+                        <li><strong>Level:</strong> Highest / Advanced level of teaching</li>
+                    </ul>
+                    <p><strong>Key Points (मुख्य बिंदु):</strong></p>
+                    <ul>
+                        <li>Focuses on problem-solving, critical thinking, and independent decision making. <em>(समस्या समाधान, समालोचनात्मक सोच और स्वतंत्र सोच पर केंद्रित।)</em></li>
+                        <li>Learner-centered and democratic environment. <em>(छात्र-केंद्रित वातावरण।)</em></li>
+                        <li>Students identify problems and find solutions independently. <em>(छात्र खुद समस्याओं की पहचान करते हैं और समाधान निकालते हैं।)</em></li>
+                        <li><strong>Evaluation Method:</strong> Problem-solving ability, attitude test, and essay-type tests.</li>
+                    </ul>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- OBJECTIVES OF TEACHING (BLOOM'S TAXONOMY) -->
+                <div class="mb-4">
+                    <h3 class="fw-bold text-primary mb-3">Objectives of Teaching (शिक्षण के उद्देश्य - Bloom's Taxonomy)</h3>
+                    <p>Benjamin Bloom categorized educational objectives into three domains <em>(तीन मुख्य क्षेत्र):</em></p>
+
+                    <ol class="lh-lg">
+                        <li><strong>Cognitive Domain (ज्ञानात्मक पक्ष):</strong> Knowledge, Comprehension, Application, Analysis, Synthesis, Evaluation. <em>(ज्ञान से मूल्यांकन तक का विकास)</em></li>
+                        <li><strong>Affective Domain (भावात्मक पक्ष):</strong> Deals with feelings, emotions, values, and attitudes. <em>(भावनाएं, मूल्य और दृष्टिकोण)</em></li>
+                        <li><strong>Psychomotor Domain (मनोगत्यात्मक / क्रियात्मक पक्ष):</strong> Motor skills, physical actions, and practical performance. <em>(शारीरिक कौशल और व्यावहारिक कार्य)</em></li>
+                    </ol>
+                </div>
+            </div>
+        }
+    </div>
+</div>
