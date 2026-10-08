@@ -47,6 +47,7 @@
         public Guid LessonId { get; set; }
         public string LessonTitle { get; set; } = string.Empty;
         public string VideoUrl { get; set; } = string.Empty;
+        public string? NotesUrl { get; set; }
         public string? Notes { get; set; }
         public bool IsCompleted { get; set; }
         public Guid? NextLessonId { get; set; }
@@ -68,5 +69,11 @@
         public string Duration { get; set; } = string.Empty;
         public bool IsCompleted { get; set; }
         public bool IsFree { get; set; }
+    }
+
+    public class AskDoubtViewModel
+    {
+        public Guid LessonId { get; set; } 
+        public string DoubtText { get; set; } = string.Empty;
     }
 }

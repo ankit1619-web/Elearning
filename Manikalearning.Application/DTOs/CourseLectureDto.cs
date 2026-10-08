@@ -9,6 +9,7 @@
         public string VideoUrl { get; set; }
         public int? VideoDurationSeconds { get; set; }
         public string NotesUrl { get; set; }
+        public string Notes { get; set; }
         public bool IsFreePreview { get; set; }
         public int DisplayOrder { get; set; }
         public bool IsPublished { get; set; }

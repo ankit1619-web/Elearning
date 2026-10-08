@@ -1,0 +1,30 @@
+﻿@model Manikalearning.Application.DTOs.AskDoubtViewModel
+
+@{
+    string title = "Ask a Doubt";
+} 
+
+<div class="modal-header border-bottom-0 pb-0">
+    <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">@title</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-area="Student" asp-controller="Watch" asp-action="AskDoubt" method="post" onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken() 
+    <div class="modal-body p-4">
+        <input type="hidden"   asp-for="@Model.LessonId" />
+
+        <div class="mb-3">
+            <label for="txtDoubtText" class="form-label fw-semibold text-secondary">Your Question / Doubt</label>
+            <textarea class="form-control" asp-for="@Model.DoubtText" rows="4" placeholder="Type your doubt here in detail..." required></textarea>
+        </div>
+    </div>
+
+   
+    <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> Save Changes
+        </button>
+    </div>
+</form>

@@ -37,6 +37,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.CourseLecture
                     LectureTitle = x.LectureTitle,
                     VideoUrl = x.VideoUrl,
                     NotesUrl = x.NotesUrl,
+                    Notes = x.Notes ?? "",
                     VideoDurationSeconds = x.VideoDurationSeconds,
                     DisplayOrder = x.DisplayOrder,
                     IsFreePreview = x.IsFreePreview,

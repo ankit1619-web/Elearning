@@ -1,5 +1,7 @@
 ﻿using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Students;
+using Manikalearning.Application.Interface;
+using Manikalearning.Web.Areas.Admin.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +14,13 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Route("Student/[controller]")]
     public class WatchController : Controller
     {
+        private readonly IFileStorageService _fileService;
         private readonly IMediator _mediator;
 
-        public WatchController(IMediator mediator)
+        public WatchController(IMediator mediator, IFileStorageService fileService)
         {
             _mediator = mediator;
+            _fileService = fileService;
         }
 
         [HttpGet("Index/{courseId}/{lessonId?}")]
@@ -49,6 +53,45 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             var lessonModel = await _mediator.Send(new GetLessonPlayerQuery(userId, courseId, lessonId), cancellationToken);
 
             return PartialView("_LessonPlayerPartial", lessonModel);
+        }
+
+        [HttpGet("GetMedia")]
+        [Authorize]
+        public IActionResult GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs")
+        {
+            if (string.IsNullOrEmpty(fileName)) return BadRequest("File name is required.");
+
+            var filePath = _fileService.GetFilePath(fileName, mediaType);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("Requested media file does not exist.");
+            }
+
+            var contentType = mediaType.Equals("pdfs", StringComparison.OrdinalIgnoreCase)
+                ? "application/pdf"
+                : "video/mp4";
+
+            Response.Headers.Append("Content-Disposition", $"inline; filename=\"{fileName}\"");
+
+            return PhysicalFile(filePath, contentType, enableRangeProcessing: true);
+        }
+
+        [HttpGet("AskDoubt")]
+        public IActionResult AskDoubt(Guid lessonId)
+        {
+            var model = new AskDoubtViewModel
+            {
+                LessonId = lessonId
+            };
+            return PartialView("_AskDoubtPartial", model);
+        }
+
+        [HttpPost("AskDoubt")]
+        [ValidateAntiForgeryToken]
+        public IActionResult AskDoubt(AskDoubtViewModel model)
+        { 
+            return PartialView("_AskDoubtPartial", model);
         }
     }
 }

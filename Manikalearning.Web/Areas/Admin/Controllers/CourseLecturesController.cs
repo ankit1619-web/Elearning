@@ -1,6 +1,7 @@
 ﻿using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.CourseLecture;
-using Manikalearning.Application.Features.Commands.Assessments.Coursesection; 
+using Manikalearning.Application.Features.Commands.Assessments.Coursesection;
+using Manikalearning.Application.Interface;
 using Manikalearning.Web.Areas.Admin.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,11 +14,13 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
     [Route("Admin/[controller]")]
     public class CourseLecturesController : Controller
     {
+        private readonly IFileStorageService _fileService;
         private readonly IMediator _mediator;
 
-        public CourseLecturesController(IMediator mediator)
+        public CourseLecturesController(IMediator mediator, IFileStorageService fileService)
         {
             _mediator = mediator;
+            _fileService = fileService;
         }
 
         [HttpGet("{sectionId:guid}")]
@@ -64,6 +67,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 Title = response.Data.LectureTitle,
                 VideoUrl = response.Data.VideoUrl,
                 PdfUrl = response.Data.NotesUrl,
+                Notes = response.Data.Notes ?? "",
                 DurationInMinutes = response.Data.VideoDurationSeconds ?? 0,
                 DisplayOrder = response.Data.DisplayOrder,
                 IsPreview = response.Data.IsFreePreview,
@@ -79,7 +83,17 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
                 return PartialView("_CreateUpdateLecture", model);
-
+            if (model.PdfFile != null && model.PdfFile.Length > 0)
+            {
+                string savedPdfFileName = await _fileService.SaveFileAsync(model.PdfFile, "Pdfs");
+                model.PdfUrl = $"/Admin/CourseLectures/GetMedia/{savedPdfFileName}/Pdfs";
+            }
+             
+            if (model.VideoFile != null && model.VideoFile.Length > 0)
+            {
+                string savedVideoFileName = await _fileService.SaveFileAsync(model.VideoFile, "Videos");
+                model.VideoUrl = $"/Admin/CourseLectures/GetMedia/{savedVideoFileName}/Videos";
+            }
             var response = await _mediator.Send(model.ToCreateCommand());
             return Json(response);
         }
@@ -90,9 +104,63 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
                 return PartialView("_CreateUpdateLecture", model);
-
+            if (model.PdfFile != null && model.PdfFile.Length > 0)
+            {
+                string savedPdfFileName = await _fileService.SaveFileAsync(model.PdfFile, "Pdfs");
+                model.PdfUrl = $"/{savedPdfFileName}/Pdfs";
+            }
+            else if (!string.IsNullOrEmpty(model.PdfUrl))
+            {
+                model.PdfUrl = model.PdfUrl;
+            }
+             
+            if (model.VideoFile != null && model.VideoFile.Length > 0)
+            {
+                string savedVideoFileName = await _fileService.SaveFileAsync(model.VideoFile, "Videos");
+                model.VideoUrl = $"/{savedVideoFileName}/Videos";
+            }
+            else if (!string.IsNullOrEmpty(model.VideoUrl))
+            {
+                model.VideoUrl = model.VideoUrl;
+            }
             var response = await _mediator.Send(model.ToUpdateCommand());
             return Json(response);
+        }
+
+        [HttpPost("UploadMedia")]
+        public async Task<IActionResult> UploadMedia(IFormFile file, string mediaType) 
+        {
+            try
+            {
+                string savedFileName = await _fileService.SaveFileAsync(file, mediaType);
+                return Ok(new { success = true, fileName = savedFileName });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet("GetMedia")]
+        [Authorize]  
+        public IActionResult GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs")
+        {
+            if (string.IsNullOrEmpty(fileName)) return BadRequest("File name is required.");
+
+            var filePath = _fileService.GetFilePath(fileName, mediaType);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("Requested media file does not exist.");
+            }
+
+            var contentType = mediaType.Equals("pdfs", StringComparison.OrdinalIgnoreCase)
+                ? "application/pdf"
+                : "video/mp4";
+             
+            Response.Headers.Append("Content-Disposition", $"inline; filename=\"{fileName}\"");
+
+            return PhysicalFile(filePath, contentType, enableRangeProcessing: true);
         }
 
         [HttpPost("Delete/{id:guid}")]

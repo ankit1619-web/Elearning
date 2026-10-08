@@ -70,6 +70,8 @@ namespace Manikalearning.Domain.Entities
         [StringLength(1000)]
         public string NotesUrl { get; set; }
 
+        [Column("Notes")]
+        public string? Notes { get; set; }
         [Required]
         public bool IsFreePreview { get; set; }
 

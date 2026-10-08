@@ -58,6 +58,17 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddSingleton<GoogleTranslator>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
+var uploadBasePath = Path.Combine(builder.Environment.ContentRootPath, "SecureUploads");
+var pdfDirectory = Path.Combine(uploadBasePath, "Pdfs");
+var videoDirectory = Path.Combine(uploadBasePath, "Videos");
+Directory.CreateDirectory(pdfDirectory);
+Directory.CreateDirectory(videoDirectory);
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+ 
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 524288000; // 500 MB
+});
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

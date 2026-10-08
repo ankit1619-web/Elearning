@@ -10,6 +10,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.CourseLecture
          string Title,
          string? VideoUrl,
          string? PdfUrl,
+         string? Notes,
          int DurationInSeconds,
          int DisplayOrder,
          bool IsPreview,

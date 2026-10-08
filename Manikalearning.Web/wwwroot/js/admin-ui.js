@@ -126,11 +126,13 @@
     submitModalForm: function (formElement, successCallback) {
         Toast.showLoader();
         const $form = $(formElement);
-
+        var formData = new FormData(formElement);
         $.ajax({
             url: $form.attr('action'),
             type: $form.attr('method') || 'POST',
-            data: $form.serialize(),
+            data: formData,
+            contentType: false, // Required for File Upload
+            processData: false,
             success: function (response) {
                 Toast.hideLoader();
                  

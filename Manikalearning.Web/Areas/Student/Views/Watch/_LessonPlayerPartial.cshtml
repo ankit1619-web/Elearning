@@ -1,5 +1,37 @@
 ﻿@model Manikalearning.Application.DTOs.LessonPlayerViewModel
 
+@{ 
+    string videoUrl = Model.VideoUrl ?? string.Empty;
+    bool isYouTube = videoUrl.Contains("youtube.com") || videoUrl.Contains("youtu.be");
+    bool isDirectVideoFile = videoUrl.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
+                             videoUrl.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ||
+                             videoUrl.EndsWith(".mkv", StringComparison.OrdinalIgnoreCase) ||
+                             videoUrl.Contains("mediaType=videos", StringComparison.OrdinalIgnoreCase);
+ 
+    string embedVideoUrl = videoUrl;
+    if (isYouTube)
+    {
+        if (videoUrl.Contains("watch?v="))
+        {
+            var videoId = videoUrl.Split("v=")[1].Split("&")[0];
+            embedVideoUrl = $"https://www.youtube.com/embed/{videoId}?rel=0&autoplay=1";
+        }
+        else if (videoUrl.Contains("youtu.be/"))
+        {
+            var videoId = videoUrl.Split("youtu.be/")[1].Split("?")[0];
+            embedVideoUrl = $"https://www.youtube.com/embed/{videoId}?rel=0&autoplay=1";
+        }
+    }
+    else if (!videoUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+             !videoUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+             !string.IsNullOrEmpty(videoUrl))
+    { 
+        var cleanFileName = System.IO.Path.GetFileName(videoUrl);
+        embedVideoUrl = $"/Student/Watch/GetMedia?fileName={Uri.EscapeDataString(cleanFileName)}&mediaType=videos";
+        isDirectVideoFile = true;
+    }
+}
+
 <style>
     .player-container {
         background-color: #0b0f19;
@@ -76,11 +108,23 @@
 <div class="player-container ratio ratio-16x9 mb-4">
     @if (!string.IsNullOrEmpty(Model.VideoUrl))
     {
-        <iframe src="@Model.VideoUrl"
-                title="@Model.LessonTitle"
-                allowfullscreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-        </iframe>
+        @if (isDirectVideoFile)
+        {
+            <!-- HTML5 Video Player for Local / Direct MP4 Files -->
+            <video controls controlsList="nodownload" class="w-100 h-100" style="object-fit: contain;">
+                <source src="@embedVideoUrl" type="video/mp4">
+                Your browser does not support video playback.
+            </video>
+        }
+        else
+        {
+            <!-- iFrame Player for External / YouTube Embed Links -->
+            <iframe src="@embedVideoUrl"
+                    title="@Model.LessonTitle"
+                    allowfullscreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+            </iframe>
+        }
     }
     else
     {
@@ -93,21 +137,32 @@
         </div>
     }
 </div>
- 
+
+<!-- ACTION BAR WITH PDF PREVIEW & ASK DOUBT -->
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 px-1">
     <h2 class="fw-bold text-dark mb-0 fs-3">@Model.LessonTitle</h2>
 
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-action-pill">
+        <!-- PDF Notes Preview Button (If PDF exists) -->
+        @if (!string.IsNullOrEmpty(Model.NotesUrl))
+        {
+            <button type="button" class="btn btn-action-pill" onclick="openSecurePdfPreview('@Model.NotesUrl')">
+                <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> PDF Notes
+            </button>
+        }
+        <button type="button" class="btn btn-action-pill"
+                onclick="Toast.openModal('/Student/Watch/AskDoubt/@Model.LessonId', 'modal-md')">
             <i class="bi bi-question-circle me-1 text-primary"></i> Ask Doubt
         </button>
+       
         <button type="button" class="btn btn-action-pill">
             <i class="bi bi-star-fill me-1 text-warning"></i> Reviews
         </button>
     </div>
 </div>
- 
-<div class="notes-card shadow-sm"> 
+
+<!-- NOTES CARD -->
+<div class="notes-card shadow-sm">
     <div class="notes-dark-header">
         <h5 class="fw-bold mb-0 fs-6 text-truncate pe-2">@Model.LessonTitle</h5>
 
@@ -120,92 +175,53 @@
             </button>
         </div>
     </div>
-     
+
     <div class="p-4 bg-white">
-        @if (string.IsNullOrWhiteSpace(Model.Notes))
+        @if (!string.IsNullOrWhiteSpace(Model.Notes))
         {
             <div class="lecture-notes-html">
                 @Html.Raw(Model.Notes)
             </div>
         }
-        else
-        {
-            <div class="lecture-content">
-                <!-- Main Heading -->
-                <h3 class="fw-bold text-primary mb-3">Levels of Teaching (शिक्षण के स्तर)</h3>
-                <p class="text-muted">
-                    Teaching process is structured across three distinct levels of learning based on cognitive development:
-                    <br>
-                    <em>(शिक्षण प्रक्रिया को संज्ञानात्मक विकास के आधार पर तीन अलग-अलग स्तरों में विभाजित किया गया है:)</em>
-                </p>
-
-                <hr class="my-4">
-
-                <!-- 1. MEMORY LEVEL -->
-                <div class="mb-4">
-                    <h4 class="fw-bold text-dark">1. Memory Level of Teaching (MLT) - स्मृति स्तर</h4>
-                    <ul class="list-unstyled ms-2">
-                        <li><strong>Proponent (प्रतिपादक):</strong> Johann Friedrich Herbart (हर्बर्ट)</li>
-                        <li><strong>Nature (प्रकृति):</strong> Thoughtless Teaching (विचारहीन शिक्षण)</li>
-                        <li><strong>Level:</strong> Initial / Lowest level of teaching</li>
-                    </ul>
-                    <p><strong>Key Points (मुख्य बिंदु):</strong></p>
-                    <ul>
-                        <li>Focuses on rote learning, memorization, recalling facts, and figures. <em>(तथ्यों को रटने, याद करने और पुन: स्मरण करने पर जोर देता है।)</em></li>
-                        <li>Teacher plays a dominant and active role, while students are passive listeners. <em>(शिक्षक मुख्य भूमिका में होता है और छात्र निष्क्रिय श्रोता होते हैं।)</em></li>
-                        <li>Instructional material includes definitions, formulas, and tables. <em>(सूत्र, परिभाषाएं और पहाड़े याद कराना इसका हिस्सा है।)</em></li>
-                        <li><strong>Evaluation Method:</strong> Oral, Written, and Short-type tests.</li>
-                    </ul>
-                </div>
-
-                <!-- 2. UNDERSTANDING LEVEL -->
-                <div class="mb-4">
-                    <h4 class="fw-bold text-dark">2. Understanding Level of Teaching (ULT) - बोध / समझ का स्तर</h4>
-                    <ul class="list-unstyled ms-2">
-                        <li><strong>Proponent (प्रतिपादक):</strong> H. C. Morrison (मॉरिसन)</li>
-                        <li><strong>Nature (प्रकृति):</strong> Thoughtful Teaching (विचारशील शिक्षण)</li>
-                        <li><strong>Level:</strong> Middle level of teaching</li>
-                    </ul>
-                    <p><strong>Key Points (मुख्य बिंदु):</strong></p>
-                    <ul>
-                        <li>Focuses on understanding concepts, relationships, facts, and applications. <em>(अवधारणाओं, संबंधों और सिद्धांतों की समझ पर जोर।)</em></li>
-                        <li>Mastery of subject matter is emphasized. <em>(विषय वस्तु पर महारत हासिल करना।)</em></li>
-                        <li>Both teacher and student are active participants. <em>(शिक्षक और छात्र दोनों सक्रिय भूमिका निभाते हैं।)</em></li>
-                        <li><strong>Evaluation Method:</strong> Essay-type and Objective-type questions.</li>
-                    </ul>
-                </div>
-
-                <!-- 3. REFLECTIVE LEVEL -->
-                <div class="mb-4">
-                    <h4 class="fw-bold text-dark">3. Reflective Level of Teaching (RLT) - चिंतनशील स्तर</h4>
-                    <ul class="list-unstyled ms-2">
-                        <li><strong>Proponent (प्रतिपादक):</strong> Hunt (हंट)</li>
-                        <li><strong>Nature (प्रकृति):</strong> Upper Thoughtful Level (उच्चतम विचारशील स्तर)</li>
-                        <li><strong>Level:</strong> Highest / Advanced level of teaching</li>
-                    </ul>
-                    <p><strong>Key Points (मुख्य बिंदु):</strong></p>
-                    <ul>
-                        <li>Focuses on problem-solving, critical thinking, and independent decision making. <em>(समस्या समाधान, समालोचनात्मक सोच और स्वतंत्र सोच पर केंद्रित।)</em></li>
-                        <li>Learner-centered and democratic environment. <em>(छात्र-केंद्रित वातावरण।)</em></li>
-                        <li>Students identify problems and find solutions independently. <em>(छात्र खुद समस्याओं की पहचान करते हैं और समाधान निकालते हैं।)</em></li>
-                        <li><strong>Evaluation Method:</strong> Problem-solving ability, attitude test, and essay-type tests.</li>
-                    </ul>
-                </div>
-
-                <hr class="my-4">
-
-                <!-- OBJECTIVES OF TEACHING (BLOOM'S TAXONOMY) -->
-                <div class="mb-4">
-                    <h3 class="fw-bold text-primary mb-3">Objectives of Teaching (शिक्षण के उद्देश्य - Bloom's Taxonomy)</h3>
-                    <p>Benjamin Bloom categorized educational objectives into three domains <em>(तीन मुख्य क्षेत्र):</em></p>
-
-                    <ol class="lh-lg">
-                        <li><strong>Cognitive Domain (ज्ञानात्मक पक्ष):</strong> Knowledge, Comprehension, Application, Analysis, Synthesis, Evaluation. <em>(ज्ञान से मूल्यांकन तक का विकास)</em></li>
-                        <li><strong>Affective Domain (भावात्मक पक्ष):</strong> Deals with feelings, emotions, values, and attitudes. <em>(भावनाएं, मूल्य और दृष्टिकोण)</em></li>
-                        <li><strong>Psychomotor Domain (मनोगत्यात्मक / क्रियात्मक पक्ष):</strong> Motor skills, physical actions, and practical performance. <em>(शारीरिक कौशल और व्यावहारिक कार्य)</em></li>
-                    </ol>
-                </div>
-            </div>
-        }
     </div>
 </div>
+
+<!-- JAVASCRIPT FOR SECURE BLOB PDF PREVIEW -->
+<script>
+    async function openSecurePdfPreview(pdfPath) {
+        if (!pdfPath) return;
+
+        // 1. External URL Check (e.g. Google Drive, external server)
+        if (pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
+            window.open(pdfPath, '_blank');
+            return;
+        }
+ 
+        var targetUrl = `/Student/Watch/GetMedia?fileName=${encodeURIComponent(pdfPath)}&mediaType=pdfs`;
+
+        try {
+            var response = await fetch(targetUrl, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) {
+                alert('Unable to load PDF document.');
+                return;
+            }
+
+            var blob = await response.blob();
+            var blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank');
+
+            // Memory cleanup after 1 minute
+            setTimeout(function () {
+                URL.revokeObjectURL(blobUrl);
+            }, 60000);
+
+        } catch (error) {
+            console.error('Error opening PDF preview:', error);
+            alert('An error occurred while opening the PDF.');
+        }
+    }
+</script>

@@ -20,7 +20,9 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
         public string? VideoUrl { get; set; }
 
         [Display(Name = "Resource / PDF URL")]
-        public string? PdfUrl { get; set; }
+        public string? PdfUrl { get; set; } 
+        public IFormFile? PdfFile { get; set; }
+        public IFormFile? VideoFile { get; set; }
 
         [Display(Name = "Duration (in Seconds)")]
         [Range(0, 1000000, ErrorMessage = "Duration must be between 0 and 1000000 Seconds.")]
@@ -36,16 +38,19 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
         [Display(Name = "Publish Status")]
         public bool IsActive { get; set; } = true;
 
+        [Display(Name = "Notes")]
+        public string Notes { get; set; } = string.Empty;
+
         public bool IsEdit => LectureId != Guid.Empty;
 
         public CreateCourseLectureCommand ToCreateCommand()
         {
-            return new CreateCourseLectureCommand(CourseSectionId, Title, VideoUrl, PdfUrl, DurationInMinutes, DisplayOrder, IsPreview);
+            return new CreateCourseLectureCommand(CourseSectionId, Title, VideoUrl, PdfUrl,Notes, DurationInMinutes, DisplayOrder, IsPreview);
         }
 
         public UpdateCourseLectureCommand ToUpdateCommand()
         {
-            return new UpdateCourseLectureCommand(LectureId, CourseSectionId, Title, VideoUrl, PdfUrl, DurationInMinutes, DisplayOrder, IsPreview, IsActive);
+            return new UpdateCourseLectureCommand(LectureId, CourseSectionId, Title, VideoUrl, PdfUrl,Notes, DurationInMinutes, DisplayOrder, IsPreview, IsActive);
         }
     }
 }

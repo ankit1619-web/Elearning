@@ -289,11 +289,35 @@
 
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Global Loader -->
+            <div id="globalLoader" class="d-none position-fixed top-50 start-50 translate-middle" style="z-index: 1060;">
+                <div class="spinner-border text-primary shadow-sm" style="width: 3.5rem; height: 3.5rem; border-width: 0.35em;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Global Modal -->
+            <div class="modal fade" id="globalModal" tabindex="-1" aria-labelledby="globalModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down" id="globalModalSize">
+                    <div class="modal-content rounded-4 border-0 shadow-lg" id="globalModalContent"></div>
+                </div>
+            </div>
+
+            <!-- Global Toast Container -->
+            <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 1055;" id="toastContainer"></div>
 
             @RenderBody()
         </div>

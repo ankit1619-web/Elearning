@@ -34,7 +34,8 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 LessonId = lecture.LectureId,
                 LessonTitle = lecture.LectureTitle,
                 VideoUrl = lecture.VideoUrl,
-                Notes = lecture.NotesUrl
+                NotesUrl = lecture.NotesUrl,
+                Notes = lecture.Notes
             };
         }
     }
