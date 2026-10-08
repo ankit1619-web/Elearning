@@ -48,6 +48,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<QuestionMistake> QuestionMistakes { get; set; }
         public DbSet<TopicContent> TopicContents { get; set; }
+        public DbSet<DoubtEntity> Doubts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

@@ -1,7 +1,7 @@
-﻿using Manikalearning.Application.DTOs;
+﻿using Azure;
+using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Application.Interface;
-using Manikalearning.Web.Areas.Admin.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +55,16 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             return PartialView("_LessonPlayerPartial", lessonModel);
         }
 
+        [HttpGet("AskDoubtPartial/{lessonId:guid}")] 
+        public async Task<IActionResult> AskDoubtPartial(Guid lessonId, CancellationToken cancellationToken)
+        {
+            var model = new AskDoubtViewModel
+            {
+                LessonId = lessonId
+            };
+            return PartialView("_AskDoubtPartial", model);
+        }
+
         [HttpGet("GetMedia")]
         [Authorize]
         public IActionResult GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs")
@@ -77,21 +87,23 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             return PhysicalFile(filePath, contentType, enableRangeProcessing: true);
         }
 
-        [HttpGet("AskDoubt")]
-        public IActionResult AskDoubt(Guid lessonId)
-        {
-            var model = new AskDoubtViewModel
-            {
-                LessonId = lessonId
-            };
-            return PartialView("_AskDoubtPartial", model);
-        }
 
         [HttpPost("AskDoubt")]
         [ValidateAntiForgeryToken]
-        public IActionResult AskDoubt(AskDoubtViewModel model)
-        { 
-            return PartialView("_AskDoubtPartial", model);
+        public async Task<IActionResult> AskDoubt(AskDoubtViewModel model, CancellationToken cancellationToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                return PartialView("_AskDoubtPartial", model);
+            }
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+             
+            var response = await _mediator.Send(
+                new SaveAskDoubtCommand(userId, model.LessonId, model.DoubtText),
+                cancellationToken
+            ); 
+            return Json(response); 
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Manikalearning.Application.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Manikalearning.Application.DTOs
 {
     public class EnrolledCourseDto
     {
@@ -73,7 +75,11 @@
 
     public class AskDoubtViewModel
     {
-        public Guid LessonId { get; set; } 
-        public string DoubtText { get; set; } = string.Empty;
+        public Guid LessonId { get; set; }
+
+        [Required(ErrorMessage = "Please write your question/doubt.")]
+        [MinLength(10, ErrorMessage = "Doubt must be at least 10 characters long.")]
+        [MaxLength(1000, ErrorMessage = "Doubt cannot exceed 1000 characters.")]
+        public string DoubtText { get; set; } = string.Empty; 
     }
 }
