@@ -1,21 +1,17 @@
 ﻿using Manikalearning.Application.DTOs;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Manikalearning.Application.Features.Commands.Assessments.Pyq
 {
+    
     public class UserAnswerDto
     {
         public Guid QuestionId { get; set; }
-        public Guid? SelectedOptionId { get; set; } // Option ki Foreign Key ID
+        public Guid? SelectedOptionId { get; set; }
+        public int? SelectedOptionNumber { get; set; } // 1, 2, 3, ya 4
         public bool IsAnswered { get; set; }
         public bool IsMarkedForReview { get; set; }
     }
-
     public record SubmitTopicPyqTestCommand(
         Guid LectureId,
         Guid UserId,

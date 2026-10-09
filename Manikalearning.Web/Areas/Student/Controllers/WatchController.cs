@@ -145,5 +145,32 @@ namespace Manikalearning.Web.Areas.Student.Controllers
 
             return PartialView("_TopicPyqsTestPartial", result.Data ?? new TopicPyqListDto());
         }
+        [HttpPost("SubmitTopicPyqTest")]
+        public async Task<IActionResult> SubmitTopicPyqTest([FromBody] SubmitTopicPyqTestCommand command, CancellationToken cancellationToken)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+            {
+                return Ok(new
+                {
+                    success = true,
+                    isGuest = true,
+                    message = "Guest mode: Result calculated locally without saving to database."
+                });
+            }
+
+            var authenticatedCommand = new SubmitTopicPyqTestCommand(
+                command.LectureId,
+                userId,
+                command.TestId,
+                command.TimeTakenSeconds,
+                command.Answers
+            );
+
+            var result = await _mediator.Send(authenticatedCommand, cancellationToken);
+
+            return Json(result);
+        }
     }
 }

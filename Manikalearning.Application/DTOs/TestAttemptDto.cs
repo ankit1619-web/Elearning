@@ -5,7 +5,7 @@ namespace Manikalearning.Application.DTOs
     public class TestAttemptDto
     {
         public Guid AttemptId { get; set; }
-        public Guid TestId { get; set; }
+        public Guid? TestId { get; set; }
         public string TestTitle { get; set; } = string.Empty;
 
         public Guid UserId { get; set; }

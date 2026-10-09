@@ -56,7 +56,7 @@ namespace Manikalearning.Domain.Entities
         [ForeignKey("CreatedBy")]
         public User? Creator { get; set; }
 
-        public virtual Exam Exam { get; set; } = null!;
+        public virtual Exam? Exam { get; set; } 
 
         public virtual Paper? Paper { get; set; }
 
@@ -84,21 +84,22 @@ namespace Manikalearning.Domain.Entities
 
         [Required]
         public Guid QuestionId { get; set; }
-        [ForeignKey("QuestionId")]
-        public Question Question { get; set; }
+
+        [ForeignKey(nameof(QuestionId))]
+        public virtual Question Question { get; set; } = null!;
 
         [Required, MaxLength(10)]
-        public string OptionLabel { get; set; } // A, B, C, D
+        public string OptionLabel { get; set; } = string.Empty; // A, B, C, D
 
         [Required]
-        public string OptionText { get; set; }
+        public string OptionText { get; set; } = string.Empty;
         public string? OptionTextHindi { get; set; }
 
         public bool IsCorrect { get; set; } = false;
+        public int DisplayOrder { get; set; } = 1;
 
-        public int DisplayOrder { get; set; }
-         
-        public ICollection<TestAttemptAnswer> TestAttemptAnswers { get; set; }
+        public virtual ICollection<TestAttemptAnswer> TestAttemptAnswers { get; set; }
+            = new List<TestAttemptAnswer>();
     }
 
     [Table("Tests")]

@@ -34,7 +34,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Questions
 
         public bool IsApproved { get; set; }
         public bool IsActive { get; set; }
-
+        public int? CorrectOptionIndex { get; set; }
         public List<QuestionOptionDto> Options { get; set; } = new();
     }
 }

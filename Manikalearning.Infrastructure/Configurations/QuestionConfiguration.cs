@@ -77,7 +77,9 @@ namespace Manikalearning.Infrastructure.Configurations
             builder.HasMany(x => x.Options)
                 .WithOne(x => x.Question)
                 .HasForeignKey(x => x.QuestionId)
+                .IsRequired() // CRITICAL: Tells EF Core options CANNOT exist without Question
                 .OnDelete(DeleteBehavior.Cascade);
+
             // Subject
             builder.HasOne(x => x.Subject)
                 .WithMany(x => x.Questions) // Link to the collection on Subject, if it exists

@@ -7,12 +7,10 @@ namespace Manikalearning.Domain.Entities
     public class TestAttempt
     {
         [Key]
-        public Guid AttemptId { get; set; } = Guid.NewGuid();
-
-        [Required]
-        public Guid TestId { get; set; }
+        public Guid AttemptId { get; set; } = Guid.NewGuid(); 
+        public Guid? TestId { get; set; }
         [ForeignKey("TestId")]
-        public Test Test { get; set; }
+        public Test? Test { get; set; }
 
         [Required]
         public Guid UserId { get; set; }
