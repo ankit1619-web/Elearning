@@ -59,7 +59,7 @@ namespace Manikalearning.Domain.Entities
         [Required]
         [StringLength(250)]
         public string LectureTitle { get; set; }
-
+        public Guid? TopicId { get; set; } 
         public string? Description { get; set; }
 
         [StringLength(1000)]
@@ -86,6 +86,9 @@ namespace Manikalearning.Domain.Entities
 
         [ForeignKey("CourseSectionId")]
         public virtual CourseSection CourseSection { get; set; }
+
+        [ForeignKey("TopicId")]
+        public virtual Topic? Topic { get; set; }
         public virtual ICollection<StudentLectureProgress> StudentLectureProgresses { get; set; } = new List<StudentLectureProgress>();
     }
 

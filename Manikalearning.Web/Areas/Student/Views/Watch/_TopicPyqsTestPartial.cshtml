@@ -1,0 +1,450 @@
+﻿@model Manikalearning.Application.DTOs.TopicPyqListDto
+
+<style>
+    .cbt-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+    }
+
+    .cbt-header-brand {
+        background: linear-gradient(90deg, #0d6efd, #0056b3);
+    }
+
+    .cbt-banner-alert {
+        background-color: #ff4d4d;
+        color: #fff;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .cbt-option-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 2px solid #6c757d;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: #fff;
+    }
+
+        .cbt-option-circle.active {
+            border-color: #198754;
+            background-color: #198754;
+            color: #fff;
+        }
+
+    .cbt-palette-btn {
+        width: 36px;
+        height: 36px;
+        font-weight: 600;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        background-color: #e9ecef;
+        color: #333;
+    }
+
+        .cbt-palette-btn.current {
+            border: 2px solid #0d6efd !important;
+            font-weight: bold;
+        }
+
+        .cbt-palette-btn.status-0 {
+            background-color: #e9ecef;
+            color: #333;
+        }
+        /* Not Visited */
+        .cbt-palette-btn.status-1 {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        /* Not Answered */
+        .cbt-palette-btn.status-2 {
+            background-color: #198754;
+            color: #fff;
+        }
+        /* Answered */
+        .cbt-palette-btn.status-3 {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+    /* Marked for Review */
+    .cbt-close-corner {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-top: 45px solid #dc3545;
+        border-left: 45px solid transparent;
+        z-index: 1050;
+        cursor: pointer;
+    }
+
+        .cbt-close-corner i {
+            position: absolute;
+            top: -40px;
+            right: 6px;
+            color: #fff;
+            font-size: 16px;
+        }
+</style>
+
+<div class="cbt-container position-relative bg-white rounded-3 overflow-hidden shadow-lg border">
+   
+    <div class="cbt-close-corner" data-bs-dismiss="modal" title="Close">
+        <i class="bi bi-x-lg"></i>
+    </div>
+    <div class="cbt-header-brand text-white text-center py-2 fw-semibold">
+        <span>Provided by <strong class="text-warning">Manika Learning</strong></span>
+    </div>
+
+    @if (Model.IsPreviewOnly)
+    {
+        <div class="cbt-banner-alert text-center py-2 px-3 border-bottom">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            @Model.BannerMessage
+            <a href="/Student/Subscription" class="text-white text-decoration-underline ms-2 fw-bold">Upgrade Now</a>
+        </div>
+    }
+
+    <div class="row g-0 p-3">
+        <div class="col-lg-8 col-md-7 pe-md-3">
+            <div class="border rounded-3 p-3 mb-3 bg-white" style="min-height: 430px;">
+               
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-dark fs-6" id="q-number-title">Q. 1 / @(Model?.Questions?.Count ?? 0)</span>
+                        <span class="badge bg-secondary font-monospace" id="q-topic-tag">Topic PYQ</span>
+                    </div>
+                    <button type="button"
+                            id="btn-q-bookmark"
+                            class="btn btn-sm btn-outline-warning border-0"
+                            title="Bookmark Question"
+                            onclick="toggleCurrentQuestionBookmark()">
+                        <i class="bi bi-bookmark fs-5"></i>
+                    </button>
+                </div>
+
+                <div class="text-muted extra-small mb-1" id="q-id-display">(ID ----)</div>
+                <div class="fw-bold text-dark mb-1 fs-6" id="q-text-display">Loading Question...</div>
+                <div class="text-secondary small mb-3" id="q-text-hindi-display"></div>
+
+                <div class="mb-3 ps-2" id="q-options-list"></div>
+
+                <div class="p-2 bg-light rounded text-muted extra-small mb-3" id="q-exam-tag">
+                    This Question came in --
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <button type="button" class="btn btn-sm btn-outline-success px-3" onclick="toggleExplanation()">Explanation</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger px-3"><i class="bi bi-flag"></i> Report Question</button>
+                </div>
+
+                <div id="q-explanation-box" class="alert alert-success small mb-3 d-none">
+                    <strong>Explanation:</strong> <span id="q-explanation-text"></span>
+                    <div id="q-explanation-hindi-text" class="mt-1 text-muted"></div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-center gap-3 pt-2 border-top">
+                    <div class="cbt-option-circle" onclick="selectOption(1)">1</div>
+                    <div class="cbt-option-circle" onclick="selectOption(2)">2</div>
+                    <div class="cbt-option-circle" onclick="selectOption(3)">3</div>
+                    <div class="cbt-option-circle" onclick="selectOption(4)">4</div>
+                </div>
+            </div>
+
+            <div class="border rounded-3 p-2 bg-light d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-success fw-bold btn-sm px-4" onclick="saveAndNext()">Save & Next</button>
+                <button type="button" class="btn btn-primary fw-bold btn-sm px-3" onclick="markForReview()">Mark for Review</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" onclick="clearOption()">Clear</button>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-5 mt-3 mt-md-0 border-start ps-md-3">
+            <div class="border rounded-3 p-2 mb-3 bg-light" style="max-height: 220px; overflow-y: auto;">
+                <div class="d-flex flex-wrap gap-2" id="q-palette-container"></div>
+            </div>
+
+            <div class="border rounded-3 p-3 bg-light">
+                <div class="row g-2 extra-small">
+                    <div class="col-6"><span class="badge bg-secondary rounded-1" id="cnt-not-visited">0</span> Not Visited</div>
+                    <div class="col-6"><span class="badge bg-danger rounded-1" id="cnt-not-answered">0</span> Not Answered</div>
+                    <div class="col-6"><span class="badge bg-success rounded-1" id="cnt-answered">0</span> Answered</div>
+                    <div class="col-6"><span class="badge bg-primary rounded-1" id="cnt-marked">0</span> Marked For Review</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="border-top bg-light p-2 px-3 d-flex justify-content-between align-items-center">
+        <div>
+            <button type="button" class="btn btn-sm btn-outline-secondary px-3" onclick="prevQuestion()">&lt; Back</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary px-3 ms-1" onclick="nextQuestion()">Next &gt;</button>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-bold font-monospace text-primary fs-6" id="cbt-timer">00:59:52</span>
+             
+            <button type="button" class="btn btn-success btn-sm fw-bold px-4" onclick="submitTest()">
+                <i class="bi bi-check-circle me-1"></i> Submit Test
+            </button>
+        </div>
+    </div>
+    <div id="cbt-result-screen" class="d-none p-4 text-center bg-white rounded-3">
+        <div class="mb-3">
+            <i class="bi bi-trophy-fill text-warning display-3"></i>
+            <h4 class="fw-bold text-dark mt-2">Test Submitted Successfully!</h4>
+            <p class="text-muted small">Aapke Topic-wise PYQ Test Performance ka Summary Niche Diya Gaya Hai:</p>
+        </div>
+
+        <div class="row g-3 justify-content-center mb-4">
+            <div class="col-md-3 col-6">
+                <div class="p-3 border rounded-3 bg-light">
+                    <div class="text-muted extra-small">Total Questions</div>
+                    <div class="fs-4 fw-bold text-dark" id="res-total-q">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 border rounded-3 bg-success bg-opacity-10">
+                    <div class="text-success extra-small fw-semibold">Correct</div>
+                    <div class="fs-4 fw-bold text-success" id="res-correct-q">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 border rounded-3 bg-danger bg-opacity-10">
+                    <div class="text-danger extra-small fw-semibold">Incorrect</div>
+                    <div class="fs-4 fw-bold text-danger" id="res-wrong-q">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 border rounded-3 bg-secondary bg-opacity-10">
+                    <div class="text-secondary extra-small fw-semibold">Unattempted</div>
+                    <div class="fs-4 fw-bold text-secondary" id="res-unattempted-q">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info border-0 rounded-3 mb-4 d-inline-block px-5">
+            <span class="fs-5 fw-bold">Score: <span id="res-score-percent">0</span>%</span>
+        </div>
+
+        <div>
+            <button type="button" class="btn btn-primary fw-bold px-4" data-bs-dismiss="modal">
+                Close Engine
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    const pyqData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.Questions ?? new List<Manikalearning.Application.DTOs.TopicPyqDto>()));
+    let currentIndex = 0;
+    let userState = pyqData.map(() => ({ selectedOption: null, status: 0 }));
+     
+    function initPyqEngine() {
+        if (pyqData && pyqData.length > 0) {
+            renderPalette();
+            loadQuestion(0);
+        }
+    }
+
+    function loadQuestion(index) {
+        if (index < 0 || index >= pyqData.length) return;
+        currentIndex = index;
+
+        const q = pyqData[index];
+        if (userState[index].status === 0) userState[index].status = 1;
+
+        $('#q-number-title').text(`Q. ${index + 1} / ${pyqData.length}`);
+        $('#q-topic-tag').text(`PYQ - ${q.ExamName || 'Topic PYQ'}`);
+        $('#q-id-display').text(`(ID ${q.QuestionId ? q.QuestionId.toString().substring(0, 8) : '5495'})`);
+
+        $('#q-text-display').text(q.QuestionText);
+        $('#q-text-hindi-display').text(q.QuestionTextHindi || '');
+
+        let optionsHtml = `
+                <div class="mb-1"><strong>1.</strong> ${q.OptionA}</div>
+                <div class="mb-1"><strong>2.</strong> ${q.OptionB}</div>
+                <div class="mb-1"><strong>3.</strong> ${q.OptionC}</div>
+                <div class="mb-1"><strong>4.</strong> ${q.OptionD}</div>
+            `;
+        $('#q-options-list').html(optionsHtml);
+
+        let examMeta = `This Question came in ${q.ExamName || 'Competitive Exam'}`;
+        if (q.PYQYear) examMeta += ` - ${q.PYQYear}`;
+        if (q.PYQSession) examMeta += ` (${q.PYQSession})`;
+        $('#q-exam-tag').text(examMeta);
+
+        $('#q-explanation-text').text(q.Explanation || "Correct Option: " + q.CorrectOption);
+        $('#q-explanation-hindi-text').text(q.ExplanationHindi || "");
+        $('#q-explanation-box').addClass('d-none');
+         
+        const bmIcon = $('#btn-q-bookmark').find('i');
+        if (q.IsBookmarked) {
+            bmIcon.removeClass('bi-bookmark').addClass('bi-bookmark-fill text-warning');
+        } else {
+            bmIcon.removeClass('bi-bookmark-fill text-warning').addClass('bi-bookmark');
+        }
+
+        updateSelectionUI(userState[index].selectedOption);
+        renderPalette();
+        updateLegendCounts();
+    }
+
+    function selectOption(num) {
+        userState[currentIndex].selectedOption = num;
+        updateSelectionUI(num);
+    }
+
+    function updateSelectionUI(num) {
+        $('.cbt-option-circle').removeClass('active');
+        if (num) $(`.cbt-option-circle:nth-child(${num})`).addClass('active');
+    }
+
+    function saveAndNext() {
+        userState[currentIndex].status = (userState[currentIndex].selectedOption != null) ? 2 : 1;
+        renderPalette();
+        updateLegendCounts();
+        if (currentIndex < pyqData.length - 1) loadQuestion(currentIndex + 1);
+    }
+
+    function markForReview() {
+        userState[currentIndex].status = 3;
+        renderPalette();
+        updateLegendCounts();
+        if (currentIndex < pyqData.length - 1) loadQuestion(currentIndex + 1);
+    }
+
+    function clearOption() {
+        userState[currentIndex].selectedOption = null;
+        userState[currentIndex].status = 1;
+        updateSelectionUI(null);
+        renderPalette();
+        updateLegendCounts();
+    }
+
+    function prevQuestion() { if (currentIndex > 0) loadQuestion(currentIndex - 1); }
+    function nextQuestion() { if (currentIndex < pyqData.length - 1) loadQuestion(currentIndex + 1); }
+    function toggleExplanation() { $('#q-explanation-box').toggleClass('d-none'); }
+
+    function toggleCurrentQuestionBookmark() {
+        const q = pyqData[currentIndex];
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.post('/Student/Watch/ToggleBookmark', {
+            questionId: q.QuestionId,
+            __RequestVerificationToken: token
+        }, function(res) {
+            if (res.success) {
+                q.IsBookmarked = res.isBookmarked;
+                const bmIcon = $('#btn-q-bookmark').find('i');
+                if (res.isBookmarked) {
+                    bmIcon.removeClass('bi-bookmark').addClass('bi-bookmark-fill text-warning');
+                } else {
+                    bmIcon.removeClass('bi-bookmark-fill text-warning').addClass('bi-bookmark');
+                }
+            }
+        });
+    }
+
+    function renderPalette() {
+        let html = '';
+        userState.forEach((st, idx) => {
+            const isCur = idx === currentIndex ? 'current' : '';
+            html += `<div class="cbt-palette-btn status-${st.status} ${isCur}" onclick="loadQuestion(${idx})">${idx + 1}</div>`;
+        });
+        $('#q-palette-container').html(html);
+    }
+
+    function updateLegendCounts() {
+        let nv = 0, na = 0, ans = 0, mk = 0;
+        userState.forEach(st => {
+            if (st.status === 0) nv++;
+            else if (st.status === 1) na++;
+            else if (st.status === 2) ans++;
+            else if (st.status === 3) mk++;
+        });
+        $('#cnt-not-visited').text(nv);
+        $('#cnt-not-answered').text(na);
+        $('#cnt-answered').text(ans);
+        $('#cnt-marked').text(mk);
+    }
+     
+    function submitTest() {
+        let total = pyqData.length;
+        let answered = 0;
+        let marked = 0;
+        let notVisited = 0;
+
+        userState.forEach(st => {
+            if (st.selectedOption != null) answered++;
+            if (st.status === 3) marked++;
+            if (st.status === 0) notVisited++;
+        });
+
+        let unattempted = total - answered;
+
+        let confirmMessage = `Test Submit Confirmation:\n\n` +
+            `• Total Questions: ${total}\n` +
+            `• Answered: ${answered}\n` +
+            `• Unattempted: ${unattempted}\n` +
+            `• Marked for Review: ${marked}\n\n` +
+            `Kya aap sach me test submit karna chahte hain?`;
+
+        if (confirm(confirmMessage)) {
+            calculateAndDisplayResult();
+        }
+    }
+
+    function calculateAndDisplayResult() {
+        let total = pyqData.length;
+        let correct = 0;
+        let wrong = 0;
+        let unattempted = 0;
+
+        userState.forEach((st, idx) => {
+            if (st.selectedOption != null) {
+                let correctOpt = pyqData[idx].CorrectOption.toString().trim().toUpperCase();
+                let userOpt = st.selectedOption.toString().trim();
+
+                // Handle mappings for Options ("1" -> "A", "2" -> "B", etc.)
+                let isCorrect = false;
+                if (userOpt === correctOpt) isCorrect = true;
+                else if (userOpt === "1" && correctOpt === "A") isCorrect = true;
+                else if (userOpt === "2" && correctOpt === "B") isCorrect = true;
+                else if (userOpt === "3" && correctOpt === "C") isCorrect = true;
+                else if (userOpt === "4" && correctOpt === "D") isCorrect = true;
+
+                if (isCorrect) {
+                    correct++;
+                } else {
+                    wrong++;
+                }
+            } else {
+                unattempted++;
+            }
+        });
+
+        let percent = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
+
+        // Populate Results
+        $('#res-total-q').text(total);
+        $('#res-correct-q').text(correct);
+        $('#res-wrong-q').text(wrong);
+        $('#res-unattempted-q').text(unattempted);
+        $('#res-score-percent').text(percent);
+
+        // Hide Question Engine View & Show Result Card
+        $('.row.g-0.p-3').addClass('d-none');
+        $('.border-top.bg-light.p-2').addClass('d-none'); $('#cbt-result-screen').removeClass('d-none');
+    }
+
+    setTimeout(initPyqEngine, 50);
+</script>

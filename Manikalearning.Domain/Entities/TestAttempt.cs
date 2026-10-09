@@ -68,25 +68,26 @@ namespace Manikalearning.Domain.Entities
         public DateTime? AnsweredAt { get; set; }
     }
 
-    [Table("Bookmarks")]
     public class Bookmark
     {
-        
         [Key]
         public Guid BookmarkId { get; set; }
 
         public Guid UserId { get; set; }
-
-        public Guid QuestionId { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation Properties
+         
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
 
+        public Guid? LectureId { get; set; }
+        [ForeignKey(nameof(LectureId))]
+        public virtual CourseLecture? Lecture { get; set; }
+
+        public Guid? QuestionId { get; set; }
         [ForeignKey(nameof(QuestionId))]
-        public virtual Question Question { get; set; } = null!;
+        public virtual Question? Question { get; set; }
+
+        public string ItemType { get; set; } = "Lecture";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
     [Table("QuestionMistakes")]

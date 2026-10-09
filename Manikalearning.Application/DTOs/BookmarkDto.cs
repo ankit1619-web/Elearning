@@ -7,7 +7,8 @@
         public string StudentName { get; set; } = string.Empty;
         public string StudentEmail { get; set; } = string.Empty;
 
-        public Guid QuestionId { get; set; }
+        public Guid? QuestionId { get; set; }
+        public Guid? LectureId { get; set; }
         public string QuestionTitle { get; set; } = string.Empty;
         public string SubjectOrCourse { get; set; } = string.Empty;
 

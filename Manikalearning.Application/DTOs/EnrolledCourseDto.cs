@@ -52,6 +52,7 @@ namespace Manikalearning.Application.DTOs
         public string? NotesUrl { get; set; }
         public string? Notes { get; set; }
         public bool IsCompleted { get; set; }
+        public bool IsBookmarked { get; set; }
         public Guid? NextLessonId { get; set; }
         public Guid? PreviousLessonId { get; set; }
         public List<ModuleDto> CourseNavigation { get; set; } = new();

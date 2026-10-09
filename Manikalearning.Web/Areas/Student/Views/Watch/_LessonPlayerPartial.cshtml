@@ -31,94 +31,20 @@
         isDirectVideoFile = true;
     }
 }
-
-<style>
-    .player-container {
-        background-color: #0b0f19;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-
-    .btn-action-pill {
-        background-color: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        color: #475569;
-        font-weight: 600;
-        font-size: 0.85rem;
-        padding: 6px 16px;
-        border-radius: 999px;
-        transition: all 0.2s ease;
-    }
-
-        .btn-action-pill:hover {
-            background-color: #e2e8f0;
-            color: #0f172a;
-        }
-
-    .notes-card {
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        overflow: hidden;
-        background: #ffffff;
-    }
-
-    .notes-dark-header {
-        background-color: #18181b;
-        color: #ffffff;
-        padding: 1rem 1.25rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .btn-pyq-blue {
-        background-color: #2563eb;
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 0.825rem;
-        padding: 6px 16px;
-        border-radius: 8px;
-        border: none;
-    }
-
-        .btn-pyq-blue:hover {
-            background-color: #1d4ed8;
-            color: #ffffff;
-        }
-
-    .btn-bookmark {
-        background: rgba(255,255,255,0.15);
-        color: #ffffff;
-        border: none;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .btn-bookmark:hover {
-            background: rgba(255,255,255,0.25);
-        }
-</style>
-
-<!-- VIDEO PLAYER SCREEN -->
+ 
+ 
 <div class="player-container ratio ratio-16x9 mb-4">
     @if (!string.IsNullOrEmpty(Model.VideoUrl))
     {
         @if (isDirectVideoFile)
-        {
-            <!-- HTML5 Video Player for Local / Direct MP4 Files -->
+        { 
             <video controls controlsList="nodownload" class="w-100 h-100" style="object-fit: contain;">
                 <source src="@embedVideoUrl" type="video/mp4">
                 Your browser does not support video playback.
             </video>
         }
         else
-        {
-            <!-- iFrame Player for External / YouTube Embed Links -->
+        { 
             <iframe src="@embedVideoUrl"
                     title="@Model.LessonTitle"
                     allowfullscreen
@@ -137,13 +63,11 @@
         </div>
     }
 </div>
-
-<!-- ACTION BAR WITH PDF PREVIEW & ASK DOUBT -->
+ 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 px-1">
     <h2 class="fw-bold text-dark mb-0 fs-3">@Model.LessonTitle</h2>
 
-    <div class="d-flex gap-2">
-        <!-- PDF Notes Preview Button (If PDF exists) -->
+    <div class="d-flex gap-2"> 
         @if (!string.IsNullOrEmpty(Model.NotesUrl))
         {
             <button type="button" class="btn btn-action-pill" onclick="openSecurePdfPreview('@Model.NotesUrl')">
@@ -154,24 +78,30 @@
                 onclick="Toast.openModal('/Student/Watch/AskDoubtPartial/@Model.LessonId', 'modal-md')">
             <i class="bi bi-question-circle me-1 text-primary"></i> Ask Doubt
         </button>
-       
-        <button type="button" class="btn btn-action-pill">
+        @* <button type="button"
+                class="btn btn-action-pill"
+                onclick="Toast.openModal('/Student/Watch/CourseReviewsPartial/@Model?.CourseId', 'modal-lg')">
             <i class="bi bi-star-fill me-1 text-warning"></i> Reviews
-        </button>
+        </button>  *@
     </div>
 </div>
-
-<!-- NOTES CARD -->
+ 
 <div class="notes-card shadow-sm">
     <div class="notes-dark-header">
         <h5 class="fw-bold mb-0 fs-6 text-truncate pe-2">@Model.LessonTitle</h5>
 
         <div class="d-flex align-items-center gap-2 flex-shrink-0">
-            <button type="button" class="btn btn-pyq-blue">
-                Topic-wise PYQs
+            <button type="button" 
+                    class="btn btn-pyq-blue" 
+                    onclick="Toast.openModal('/Student/Watch/TopicPyqsTestPartial/@Model?.LessonId', 'modal-xl')">
+                <i class="bi bi-journal-text me-1"></i> Topic-wise PYQs
             </button>
-            <button type="button" class="btn btn-bookmark" title="Save Bookmark">
-                <i class="bi bi-bookmark"></i>
+            <button type="button" 
+                    id="btn-bookmark-@Model?.LessonId"
+                    class="btn btn-bookmark @(Model?.IsBookmarked == true ? "active text-warning" : "")" 
+                    title="@(Model?.IsBookmarked == true ? "Remove Bookmark" : "Save Bookmark")"
+                    onclick="toggleBookmark('@Model?.LessonId')">
+                <i class="bi @(Model?.IsBookmarked == true ? "bi-bookmark-fill" : "bi-bookmark")"></i>
             </button>
         </div>
     </div>
@@ -185,13 +115,42 @@
         }
     </div>
 </div>
-
-<!-- JAVASCRIPT FOR SECURE BLOB PDF PREVIEW -->
+ 
 <script>
+    function toggleBookmark(lectureId) {
+       if (!lectureId) return; 
+       const token = $('input[name="__RequestVerificationToken"]').val(); 
+       $.ajax({
+           url: '/Student/Watch/ToggleBookmark',
+           type: 'POST',
+           data: {
+               lectureId: lectureId,
+               __RequestVerificationToken: token
+           },
+           success: function (res) {
+               if (res.success) {
+                   const btn = $('#btn-bookmark-' + lectureId);
+                   const icon = btn.find('i');
+   
+                   if (res.isBookmarked) { 
+                       btn.addClass('active text-warning').attr('title', 'Remove Bookmark');
+                       icon.removeClass('bi-bookmark').addClass('bi-bookmark-fill');
+                   } else { 
+                       btn.removeClass('active text-warning').attr('title', 'Save Bookmark');
+                       icon.removeClass('bi-bookmark-fill').addClass('bi-bookmark');
+                   }
+               } else {
+                   alert(res.message || "Bookmark process karne me issue aaya.");
+               }
+           },
+           error: function () {
+               alert("Network error. Please try again.");
+           }
+       });
+   }
     async function openSecurePdfPreview(pdfPath) {
         if (!pdfPath) return;
-
-        // 1. External URL Check (e.g. Google Drive, external server)
+         
         if (pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
             window.open(pdfPath, '_blank');
             return;
@@ -213,8 +172,7 @@
             var blob = await response.blob();
             var blobUrl = URL.createObjectURL(blob);
             window.open(blobUrl, '_blank');
-
-            // Memory cleanup after 1 minute
+             
             setTimeout(function () {
                 URL.revokeObjectURL(blobUrl);
             }, 60000);

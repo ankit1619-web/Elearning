@@ -1,9 +1,12 @@
 ﻿using Azure;
 using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Assessments.Bookmarks;
+using Manikalearning.Application.Features.Commands.Assessments.Pyq;
 using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Application.Interface;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -64,7 +67,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             };
             return PartialView("_AskDoubtPartial", model);
         }
-
+         
         [HttpGet("GetMedia")]
         [Authorize]
         public IActionResult GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs")
@@ -104,6 +107,43 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 cancellationToken
             ); 
             return Json(response); 
+        }
+
+        [HttpPost("ToggleBookmark")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleBookmark(Guid? lectureId, Guid? questionId, CancellationToken cancellationToken)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var command = new ToggleBookmarkCommand(userId, lectureId, questionId);
+            var result = await _mediator.Send(command, cancellationToken);
+            return Json(new
+            {
+                success = result.IsSuccess,
+                isBookmarked = result.Data,
+                message = result.Message
+            }); 
+        }
+
+        [AllowAnonymous]
+        [HttpGet("TopicPyqsTestPartial/{lectureId}")]
+        public async Task<IActionResult> TopicPyqsTestPartial(Guid lectureId, CancellationToken cancellationToken)
+        {
+            Guid? userId = null;
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var parsedId))
+            {
+                userId = parsedId;
+            }
+
+            var query = new GetTopicPyqsTestQuery(lectureId, userId);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return PartialView("_TopicPyqsTestPartial", result.Data ?? new TopicPyqListDto());
         }
     }
 }

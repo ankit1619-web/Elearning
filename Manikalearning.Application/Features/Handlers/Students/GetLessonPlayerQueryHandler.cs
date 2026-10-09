@@ -10,10 +10,12 @@ namespace Manikalearning.Application.Features.Handlers.Students
     public class GetLessonPlayerQueryHandler : IRequestHandler<GetLessonPlayerQuery, LessonPlayerViewModel>
     {
         private readonly IRepository<CourseLecture> _lectureRepository;
+        private readonly IRepository<Bookmark> _bookmarkRepository;
 
-        public GetLessonPlayerQueryHandler(IRepository<CourseLecture> lectureRepository)
+        public GetLessonPlayerQueryHandler(IRepository<CourseLecture> lectureRepository, IRepository<Bookmark> bookmarkRepository)
         {
             _lectureRepository = lectureRepository;
+            _bookmarkRepository = bookmarkRepository;
         }
 
         public async Task<LessonPlayerViewModel> Handle(GetLessonPlayerQuery request, CancellationToken cancellationToken)
@@ -27,7 +29,9 @@ namespace Manikalearning.Application.Features.Handlers.Students
             {
                 throw new KeyNotFoundException($"Lecture ID {request.LessonId} not found in Course {request.CourseId}.");
             }
-
+            var isBookmarked = await _bookmarkRepository.Query()
+                .AsNoTracking()
+                .AnyAsync(b => b.UserId == request.UserId && b.LectureId == request.LessonId, cancellationToken);
             return new LessonPlayerViewModel
             {
                 CourseId = request.CourseId,
@@ -35,7 +39,8 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 LessonTitle = lecture.LectureTitle,
                 VideoUrl = lecture.VideoUrl,
                 NotesUrl = lecture.NotesUrl,
-                Notes = lecture.Notes
+                Notes = lecture.Notes,
+                IsBookmarked = isBookmarked
             };
         }
     }

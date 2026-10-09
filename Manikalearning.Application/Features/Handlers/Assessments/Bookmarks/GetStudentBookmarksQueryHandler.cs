@@ -52,6 +52,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Bookmarks
                         StudentName = b.User.FullName ?? "N/A",
                         StudentEmail = b.User.Email ?? "N/A",
                         QuestionId = b.QuestionId,
+                        LectureId = b.LectureId,
                         QuestionTitle = b.Question.QuestionText ?? "N/A",
                         CreatedAt = b.CreatedAt
                     }).ToListAsync(cancellationToken);

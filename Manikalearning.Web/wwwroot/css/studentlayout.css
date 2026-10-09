@@ -1,0 +1,217 @@
+﻿:root {
+    --saas-primary: #4f46e5;
+    --saas-primary-hover: #4338ca;
+    --saas-primary-light: #eef2ff;
+    --saas-bg: #f8fafc;
+    --saas-surface: #ffffff;
+    --saas-border: #e2e8f0;
+    --saas-text-main: #0f172a;
+    --saas-text-muted: #64748b;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--saas-bg);
+    color: var(--saas-text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Nav Styling */
+.student-topnav {
+    background: var(--saas-surface);
+    border-bottom: 1px solid var(--saas-border);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.brand-icon-box {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #ffffff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Clean Link Style */
+.top-nav-link {
+    color: var(--saas-text-muted) !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.6rem 0.9rem !important;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.15s ease-in-out;
+    position: relative;
+}
+
+    .top-nav-link:hover {
+        color: var(--saas-primary) !important;
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+
+    .top-nav-link.active {
+        color: var(--saas-primary) !important;
+        background-color: var(--saas-primary-light);
+        font-weight: 700;
+    }
+
+/* Search Input */
+.search-box {
+    background-color: #f1f5f9;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    width: 220px;
+    transition: all 0.2s;
+}
+
+    .search-box:focus-within {
+        background-color: #ffffff;
+        border-color: var(--saas-primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+.streak-pill {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #ffedd5;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    background: var(--saas-primary-light);
+    color: var(--saas-primary);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-saas-primary {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 10px 18px;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    transition: all 0.2s ease;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+    .btn-saas-primary:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        color: #ffffff;
+        box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+        transform: translateY(-1px);
+    }
+
+.btn-saas-secondary {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 10px 18px;
+    transition: all 0.2s ease;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+    .btn-saas-secondary:hover {
+        background: #f8fafc;
+        color: #0f172a;
+        border-color: #94a3b8;
+    }
+
+.player-container {
+    background-color: #0b0f19;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.btn-action-pill {
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+}
+
+    .btn-action-pill:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
+    }
+
+.notes-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.notes-dark-header {
+    background-color: #18181b;
+    color: #ffffff;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-pyq-blue {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.825rem;
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: none;
+}
+
+    .btn-pyq-blue:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+    }
+
+.btn-bookmark {
+    background: rgba(255,255,255,0.15);
+    color: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-bookmark:hover {
+        background: rgba(255,255,255,0.25);
+    }
