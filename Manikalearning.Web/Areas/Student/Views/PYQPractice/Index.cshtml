@@ -2,56 +2,222 @@
 @model PYQPracticeViewModel
 @{
     ViewData["Title"] = "PYQ Bank";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
 }
 
-<div class="container-fluid py-3">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h3 class="fw-bold mb-1"><i class="bi bi-file-earmark-text text-primary me-2"></i>PYQ Practice Bank</h3>
-            <p class="text-muted small mb-0">Select a subject and section to practice previous year questions topic-wise.</p>
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+    .pyq-dashboard {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #0f172a;
+        background-color: #f8fafc;
+        border-radius: 24px;
+        overflow: hidden;
+        padding-bottom: 2rem;
+    }
+
+    /* Hero Banner Section (Matching MyCourses theme) */
+    .hero-banner-saas {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+        color: #ffffff;
+        padding: 2.75rem 2rem;
+        position: relative;
+        border-radius: 24px 24px 0 0;
+        overflow: hidden;
+    }
+
+        .hero-banner-saas::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
+            pointer-events: none;
+        }
+
+    .pill-hero-badge {
+        background: rgba(99, 102, 241, 0.2);
+        color: #a5b4fc;
+        border: 1px solid rgba(165, 180, 252, 0.3);
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Subject Toolbar Filter */
+    .toolbar-saas {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 10px 14px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+
+    .filter-btn-saas {
+        padding: 8px 18px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+        .filter-btn-saas:hover {
+            color: #1e293b;
+            background: #f1f5f9;
+        }
+
+        .filter-btn-saas.active {
+            background: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+    /* Section Cards Architecture */
+    .section-card-saas {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+
+        .section-card-saas:hover {
+            transform: translateY(-6px);
+            border-color: #c7d2fe;
+            box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.08);
+        }
+
+    /* Action Buttons */
+    .btn-saas-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        padding: 9px 18px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-saas-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+    .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Empty State */
+    .empty-state-saas {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 4rem 2rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+</style>
+
+<div class="pyq-dashboard">
+
+    <!-- HERO BANNER -->
+    <div class="hero-banner-saas mb-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="mb-3">
+                    <span class="pill-hero-badge">
+                        <i class="bi bi-file-earmark-text-fill me-2" style="color: #a5b4fc;"></i> EXAM PREP BANK
+                    </span>
+                </div>
+                <h2 class="fw-extrabold text-white mb-2 display-6">PYQ Practice Bank</h2>
+                <p class="text-slate-300 fs-6 mb-0" style="color: #cbd5e1;">
+                    Select a subject and explore topic-wise previous year questions modeled to real exam standards.
+                </p>
+            </div>
         </div>
     </div>
 
-    <!-- Subject Tabs -->
-    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
-        @foreach (var sub in Model.Subjects)
-        {
-            <a href="@Url.Action("Index", "PYQPractice", new { area = "Student", subjectId = sub.SubjectId })"
-               class="btn @(Model.SelectedSubjectId == sub.SubjectId ? "btn-primary" : "btn-outline-secondary") rounded-pill px-4">
-                @sub.SubjectName
-            </a>
-        }
-    </div>
-
-    <!-- Sections Grid (Using 'Sections' Master Table) -->
-    <div class="row g-3">
-        @if (Model.Sections.Any())
-        {
-            @foreach (var sec in Model.Sections)
+    <div class="px-3">
+        <!-- SUBJECT TABS TOOLBAR -->
+        <div class="toolbar-saas d-flex align-items-center gap-2 overflow-x-auto pb-1 mb-4">
+            @foreach (var sub in Model.Subjects)
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-card p-3">
-                        <div class="d-flex justify-content-between align-items-center">
+                bool isSelected = Model.SelectedSubjectId == sub.SubjectId;
+                <a href="@Url.Action("Index", "PYQPractice", new { area = "Student", subjectId = sub.SubjectId })"
+                   class="filter-btn-saas @(isSelected ? "active" : "")">
+                    @sub.SubjectName
+                </a>
+            }
+        </div>
+
+        <!-- SECTIONS GRID -->
+        @if (Model.Sections != null && Model.Sections.Any())
+        {
+            <div class="row g-4">
+                @foreach (var sec in Model.Sections)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="section-card-saas p-4 d-flex flex-column justify-content-between h-100">
                             <div>
-                                <h6 class="fw-bold text-dark mb-1">@sec.SectionName</h6>
-                                <span class="badge bg-primary-subtle text-primary rounded-pill">
-                                    <i class="bi bi-question-circle me-1"></i>@sec.TotalQuestions Questions
-                                </span>
+                                <div class="mb-3">
+                                    <h5 class="fw-bold text-slate-900 mb-2" style="font-size: 1.05rem;">@sec.SectionName</h5>
+                                </div>
+                                <div class="mb-4">
+                                    <span class="badge font-mono fw-semibold px-3 py-1.5 rounded-pill" style="background: #eef2ff; color: #4f46e5; font-size: 0.78rem;">
+                                        <i class="bi bi-question-circle me-1"></i> @sec.TotalQuestions Questions Available
+                                    </span>
+                                </div>
                             </div>
-                            <a href="@Url.Action("Practice", "PYQPractice", new { area = "Student", sectionId = sec.SectionId })"
-                               class="btn btn-sm btn-primary rounded-3 px-3">
-                                Start <i class="bi bg-arrow-right ms-1"></i>
-                            </a>
+
+                            <div class="pt-3 border-top border-slate-100 d-flex justify-content-end">
+                                <a href="@Url.Action("Practice", "PYQPractice", new { area = "Student", sectionId = sec.SectionId })"
+                                   class="btn-saas-primary w-100 text-center justify-content-center">
+                                    Start Practice <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         }
         else
         {
-            <div class="col-12 text-center py-5">
-                <p class="text-muted">Is subject ke liye koi sections abhi available nahi hain.</p>
+            <!-- EMPTY STATE -->
+            <div class="empty-state-saas text-center my-4">
+                <div class="mb-3">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: #eef2ff; color: #4f46e5;">
+                        <i class="bi bi-inbox fs-1"></i>
+                    </div>
+                </div>
+                <h4 class="fw-extrabold text-slate-900 mb-2">No Sections Available</h4>
+                <p class="text-muted mx-auto mb-0" style="max-width: 440px;">
+                    Is subject ke liye abhi koi sections available nahi hain. Kripya doosra subject select karein.
+                </p>
             </div>
         }
     </div>
+
 </div>

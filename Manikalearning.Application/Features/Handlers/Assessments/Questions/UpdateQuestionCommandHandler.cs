@@ -15,12 +15,11 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
     public class UpdateQuestionCommandHandler : IRequestHandler<UpdateQuestionCommand, ResponseDto<bool>>
     {
         private readonly IRepository<Question> _questionRepo;
-        private readonly IRepository<QuestionOption> _optionRepo;
+        // NOTE: IRepository<QuestionOption> is completely removed to prevent DbContext instance conflicts!
 
-        public UpdateQuestionCommandHandler(IRepository<Question> questionRepo, IRepository<QuestionOption> optionRepo)
+        public UpdateQuestionCommandHandler(IRepository<Question> questionRepo)
         {
             _questionRepo = questionRepo;
-            _optionRepo = optionRepo;
         }
 
         public async Task<ResponseDto<bool>> Handle(UpdateQuestionCommand request, CancellationToken cancellationToken)
@@ -30,7 +29,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                 if (request == null || request.QuestionId == Guid.Empty)
                     return ResponseDto<bool>.Failure("Invalid request payload.");
 
-                // 1. Fetch Question WITH Options (Tracked Entity)
+                // 1. Fetch Question WITH Options (Tracked by single DbContext)
                 var question = await _questionRepo.Entity()
                     .Include(q => q.Options)
                     .FirstOrDefaultAsync(q => q.QuestionId == request.QuestionId, cancellationToken);
@@ -38,7 +37,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                 if (question == null)
                     return ResponseDto<bool>.Failure("Question not found in database.");
 
-                // 2. Map Question Scalar Properties
+                // 2. Map Scalar Properties
                 question.SubjectId = request.SubjectId == Guid.Empty ? null : request.SubjectId;
                 question.SectionId = request.SectionId == Guid.Empty ? null : request.SectionId;
                 question.TopicId = request.TopicId == Guid.Empty ? null : request.TopicId;
@@ -65,7 +64,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                 question.IsActive = request.IsActive;
                 question.UpdatedAt = DateTime.UtcNow;
 
-                // 3. Process Option Radio Button Selection
+                // Handle Radio Button Selection Index
                 var incomingOptions = request.Options ?? new List<QuestionOptionDto>();
                 if (request.CorrectOptionIndex.HasValue && request.CorrectOptionIndex.Value < incomingOptions.Count)
                 {
@@ -75,26 +74,23 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     }
                 }
 
-                // 4. Smart Option Synchronization
-                var existingDbOptions = question.Options.ToList();
-
+                // 3. Native Aggregate Collection Synchronization (No separate repositories!)
                 var incomingOptionIds = incomingOptions
                     .Where(o => o.OptionId != Guid.Empty)
                     .Select(o => o.OptionId)
                     .ToHashSet();
 
-                // Delete options removed from UI
-                var optionsToDelete = existingDbOptions
+                // A. Remove options that were deleted in the UI form
+                var optionsToRemove = question.Options
                     .Where(o => !incomingOptionIds.Contains(o.OptionId))
                     .ToList();
 
-                foreach (var optToRemove in optionsToDelete)
+                foreach (var optToRemove in optionsToRemove)
                 {
-                    _optionRepo.Remove(optToRemove);
-                    question.Options.Remove(optToRemove);
+                    question.Options.Remove(optToRemove); // EF Core tracks this as a DELETE operation automatically
                 }
 
-                // Update Existing or Add New Options
+                // B. Update existing options or Add new ones
                 int order = 1;
                 string[] defaultLabels = { "A", "B", "C", "D", "E", "F", "G", "H" };
 
@@ -104,13 +100,12 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                         ? optDto.OptionLabel
                         : (order <= defaultLabels.Length ? defaultLabels[order - 1] : order.ToString());
 
-                    var existingOption = (optDto.OptionId != Guid.Empty)
-                        ? existingDbOptions.FirstOrDefault(o => o.OptionId == optDto.OptionId)
-                        : null;
+                    var existingOption = question.Options
+                        .FirstOrDefault(o => o.OptionId != Guid.Empty && o.OptionId == optDto.OptionId);
 
                     if (existingOption != null)
                     {
-                        // In-place Update (EF Core updates tracked properties directly)
+                        // Update existing option in-place
                         existingOption.OptionLabel = label;
                         existingOption.OptionText = optDto.OptionText ?? "";
                         existingOption.OptionTextHindi = optDto.OptionTextHindi;
@@ -119,7 +114,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     }
                     else
                     {
-                        // Add New Option
+                        // Add brand new option to collection
                         question.Options.Add(new QuestionOption
                         {
                             OptionId = Guid.NewGuid(),
@@ -133,16 +128,14 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Questions
                     }
                 }
 
-                // IMPORTANT: NEVER CALL _questionRepo.Update(question) HERE!
-
-                // 5. Atomic Save
+                // 4. Single Unified Save (Managed entirely by Question Aggregate Root)
                 await _questionRepo.SaveChangesAsync( );
 
                 return ResponseDto<bool>.Success(true, "Question updated successfully.");
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
-                return ResponseDto<bool>.Failure("Concurrency Error: Question data modify hone se pehle change ho gaya. Page refresh karke dobara try karein.");
+                return ResponseDto<bool>.Failure($"Concurrency Error: {ex.Message}");
             }
             catch (DbUpdateException dbEx)
             {

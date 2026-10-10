@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Students
 {
-    public record GetPYQQuestionsQuery(Guid SectionId) : IRequest<List<QuestionDto>>;
+    public record GetPYQQuestionsQuery(Guid SectionId, Guid? UserId) : IRequest<ResponseDto<TopicPyqListDto>>;
 }

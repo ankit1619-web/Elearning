@@ -1,5 +1,5 @@
 ﻿using Manikalearning.Application.DTOs;
-using Manikalearning.Application.Features.Commands.Assessments.Sections;
+using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Application.Interface;
 using Manikalearning.Domain.Entities;
 using MediatR;

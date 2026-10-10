@@ -35,6 +35,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.CourseLecture
                     DisplayOrder = request.DisplayOrder,
                     IsFreePreview = request.IsPreview,
                     IsPublished = true,
+                    TopicId = request.TopicId,
                     CreatedAt = DateTime.UtcNow
                 };
 

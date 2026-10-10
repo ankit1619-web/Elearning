@@ -1,4 +1,5 @@
 ﻿using Manikalearning.Application.Features.Commands.Assessments.CourseLecture;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Manikalearning.Web.Areas.Admin.ViewModels
@@ -42,15 +43,16 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
         public string Notes { get; set; } = string.Empty;
 
         public bool IsEdit => LectureId != Guid.Empty;
-
+        public Guid? TopicId { get; set; }
+        public IEnumerable<SelectListItem>? Topics { get; set; }
         public CreateCourseLectureCommand ToCreateCommand()
         {
-            return new CreateCourseLectureCommand(CourseSectionId, Title, VideoUrl, PdfUrl,Notes, DurationInMinutes, DisplayOrder, IsPreview);
+            return new CreateCourseLectureCommand(CourseSectionId, Title, VideoUrl, PdfUrl,Notes, DurationInMinutes, DisplayOrder, IsPreview, TopicId);
         }
 
         public UpdateCourseLectureCommand ToUpdateCommand()
         {
-            return new UpdateCourseLectureCommand(LectureId, CourseSectionId, Title, VideoUrl, PdfUrl,Notes, DurationInMinutes, DisplayOrder, IsPreview, IsActive);
+            return new UpdateCourseLectureCommand(LectureId, CourseSectionId, Title, VideoUrl, PdfUrl,Notes, DurationInMinutes, DisplayOrder, IsPreview, IsActive, TopicId);
         }
     }
 }

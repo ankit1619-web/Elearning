@@ -12,7 +12,8 @@ namespace Manikalearning.Application.Features.Commands.Assessments.CourseLecture
          string? Notes,
          int DurationInSeconds,
          int DisplayOrder,
-         bool IsPreview
+         bool IsPreview,
+         Guid? TopicId
      ) : IRequest<ResponseDto<Guid>>;
      
     public class CreateCourseLectureCommandValidator : AbstractValidator<CreateCourseLectureCommand>

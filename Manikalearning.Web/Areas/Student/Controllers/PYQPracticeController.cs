@@ -3,7 +3,9 @@ using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Web.Areas.Student.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Manikalearning.Web.Areas.Student.Controllers
 {
@@ -19,13 +21,20 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         [HttpGet("")]
         public async Task<IActionResult> Index(Guid? subjectId, CancellationToken ct)
         {
-            var subjects = await _mediator.Send(new GetAllSubjectsQuery(), ct);
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdStr, out Guid userId))
+            {
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+            var subjects = await _mediator.Send(new GetSubjectsByStudentQuery{ UserId = userId }, ct);
             var selectedSubjectId = subjectId ?? subjects.FirstOrDefault()?.SubjectId;
 
             List<SectionDto> sections = new();
             if (selectedSubjectId.HasValue)
             {
-                sections = await _mediator.Send(new GetSectionsBySubjectQuery(selectedSubjectId.Value), ct);
+                var response = await _mediator.Send(new GetSectionsBySubjectQuery(selectedSubjectId.Value), ct);
+                sections = response.Data;
             }
 
             var vm = new PYQPracticeViewModel
@@ -41,8 +50,15 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         [HttpGet("Practice/{sectionId}")]
         public async Task<IActionResult> Practice(Guid sectionId, CancellationToken ct)
         {
-            var questions = await _mediator.Send(new GetPYQQuestionsQuery(sectionId), ct);
-            return View(questions);
+            Guid? userId = null;
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var parsedId))
+            {
+                userId = parsedId;
+            }
+            var result = await _mediator.Send(new GetPYQQuestionsQuery(sectionId, userId), ct);
+
+            return PartialView("_TopicPyqsTestPartial", result.Data ?? new TopicPyqListDto()); 
         }
     }
 }

@@ -14,7 +14,8 @@ namespace Manikalearning.Application.Features.Commands.Assessments.CourseLecture
          int DurationInSeconds,
          int DisplayOrder,
          bool IsPreview,
-         bool IsActive
+         bool IsActive,
+         Guid? TopicId
      ) : IRequest<ResponseDto<bool>>;
      
     public class UpdateCourseLectureCommandValidator : AbstractValidator<UpdateCourseLectureCommand>

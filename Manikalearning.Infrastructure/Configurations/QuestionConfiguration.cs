@@ -54,7 +54,11 @@ namespace Manikalearning.Infrastructure.Configurations
                 x.IsPYQ,
                 x.PYQYear
             });
-
+            builder.HasMany(x => x.Options)
+            .WithOne(x => x.Question)
+            .HasForeignKey(x => x.QuestionId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
             // Exam
             builder.HasOne(x => x.Exam)
                 .WithMany(x => x.Questions)
@@ -73,12 +77,7 @@ namespace Manikalearning.Infrastructure.Configurations
                 .HasForeignKey(x => x.PassageId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Options
-            builder.HasMany(x => x.Options)
-                .WithOne(x => x.Question)
-                .HasForeignKey(x => x.QuestionId)
-                .IsRequired() // CRITICAL: Tells EF Core options CANNOT exist without Question
-                .OnDelete(DeleteBehavior.Cascade);
+            
 
             // Subject
             builder.HasOne(x => x.Subject)

@@ -97,9 +97,7 @@ namespace Manikalearning.Domain.Entities
 
         public bool IsCorrect { get; set; } = false;
         public int DisplayOrder { get; set; } = 1;
-
-        public virtual ICollection<TestAttemptAnswer> TestAttemptAnswers { get; set; }
-            = new List<TestAttemptAnswer>();
+         
     }
 
     [Table("Tests")]

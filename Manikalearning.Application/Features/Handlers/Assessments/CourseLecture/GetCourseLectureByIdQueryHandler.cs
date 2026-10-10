@@ -41,7 +41,8 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.CourseLecture
                     VideoDurationSeconds = x.VideoDurationSeconds,
                     DisplayOrder = x.DisplayOrder,
                     IsFreePreview = x.IsFreePreview,
-                    IsPublished = x.IsPublished
+                    IsPublished = x.IsPublished,
+                    TopicId= x.TopicId,
                 };
 
                 return ResponseDto<CourseLectureDto>.Success(dto, "Lecture retrieved successfully!");

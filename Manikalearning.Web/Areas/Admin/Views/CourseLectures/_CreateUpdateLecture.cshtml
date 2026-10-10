@@ -72,6 +72,13 @@
              
             <div class="tab-pane fade show active" id="tab-details-pane" role="tabpanel" aria-labelledby="tab-details-btn">
                 <div class="mb-3">
+                    <label asp-for="TopicId" class="form-label text-muted small fw-semibold">Related Topic</label>
+                    <select asp-for="TopicId" asp-items="Model.Topics" class="form-select rounded-3 shadow-none">
+                        <option value="">-- Select Topic --</option>
+                    </select>
+                    <span asp-validation-for="TopicId" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
                     <label asp-for="Title" class="form-label text-muted small fw-semibold"></label>
                     <input asp-for="Title" class="form-control rounded-3 shadow-none" placeholder="e.g. 1.1 Overview of C# Syntax" required />
                     <span asp-validation-for="Title" class="text-danger small"></span>

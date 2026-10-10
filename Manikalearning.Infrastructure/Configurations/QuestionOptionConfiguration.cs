@@ -6,9 +6,8 @@ namespace Manikalearning.Infrastructure.Configurations
 {
     public class QuestionOptionConfiguration
     : IEntityTypeConfiguration<QuestionOption>
-    {
-        public void Configure(
-            EntityTypeBuilder<QuestionOption> builder)
+    { 
+        public void Configure(EntityTypeBuilder<QuestionOption> builder)
         {
             builder.ToTable("QuestionOptions");
 

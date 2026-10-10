@@ -39,8 +39,9 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.CourseLecture
                 lecture.DisplayOrder = request.DisplayOrder;
                 lecture.IsFreePreview = request.IsPreview;
                 lecture.IsPublished = request.IsActive;
+                lecture.TopicId = request.TopicId;
 
-                  _lectureRepository.Update(lecture);
+                _lectureRepository.Update(lecture);
                 await _lectureRepository.SaveChangesAsync();
 
                 _logger.LogInformation("Course lecture updated successfully: {LectureId}", lecture.LectureId);

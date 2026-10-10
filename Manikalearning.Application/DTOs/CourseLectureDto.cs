@@ -13,6 +13,7 @@
         public bool IsFreePreview { get; set; }
         public int DisplayOrder { get; set; }
         public bool IsPublished { get; set; }
+        public Guid? TopicId { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.CourseLecture;
 using Manikalearning.Application.Features.Commands.Assessments.Coursesection;
+using Manikalearning.Application.Features.Commands.Assessments.Topics;
 using Manikalearning.Application.Interface;
 using Manikalearning.Web.Areas.Admin.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Manikalearning.Web.Areas.Admin.Controllers
 {
@@ -42,13 +44,21 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
         }
 
         [HttpGet("CreatePartial/{sectionId:guid}")]
-        public IActionResult CreatePartial(Guid sectionId)
+        public async Task<IActionResult> CreatePartial(Guid sectionId)
         {
+            var topicsLookup = await _mediator.Send(new GetTopicsLookupQuery(Guid.Empty));
+            var topics = topicsLookup.IsSuccess ? topicsLookup.Data : new List<LookupDto>();
+
             var viewModel = new CourseLectureViewModel
             {
                 CourseSectionId = sectionId,
                 DisplayOrder = 1,
-                IsActive = true
+                IsActive = true,
+                Topics = topics.Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.Name
+                }).ToList()
             };
             return PartialView("_CreateUpdateLecture", viewModel);
         }
@@ -59,6 +69,9 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
             var response = await _mediator.Send(new GetCourseLectureByIdQuery(id));
             if (!response.IsSuccess || response.Data == null)
                 return BadRequest(response.Message);
+
+            var topicsLookup = await _mediator.Send(new GetTopicsLookupQuery(Guid.Empty));
+            var topics = topicsLookup.IsSuccess ? topicsLookup.Data : new List<LookupDto>();
 
             var viewModel = new CourseLectureViewModel
             {
@@ -71,7 +84,13 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 DurationInMinutes = response.Data.VideoDurationSeconds ?? 0,
                 DisplayOrder = response.Data.DisplayOrder,
                 IsPreview = response.Data.IsFreePreview,
-                IsActive = response.Data.IsPublished
+                IsActive = response.Data.IsPublished,
+                TopicId = response.Data.TopicId,
+                Topics = topics.Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.Name
+                }).ToList()
             };
 
             return PartialView("_CreateUpdateLecture", viewModel);

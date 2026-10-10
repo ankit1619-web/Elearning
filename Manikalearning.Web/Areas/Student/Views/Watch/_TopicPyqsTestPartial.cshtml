@@ -104,7 +104,7 @@
 
 <div id="@instanceId" class="cbt-container position-relative bg-white rounded-3 overflow-hidden shadow-lg border">
 
-    <!-- JSON Data Isolation Block (Syntax Error Safe) -->
+    <!-- JSON Data Isolation Block -->
     <script type="application/json" class="js-json-data">
             @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.Questions ?? new List<Manikalearning.Application.DTOs.TopicPyqDto>()))
     </script>
@@ -115,7 +115,7 @@
         <span>Provided by <strong class="text-warning">Manika Learning</strong></span>
     </div>
 
-    @if (Model.IsPreviewOnly)
+    @if (Model != null && Model.IsPreviewOnly)
     {
         <div class="cbt-banner-alert text-center py-2 px-3 border-bottom">
             <i class="bi bi-exclamation-triangle-fill me-1"></i>
@@ -197,7 +197,7 @@
             <button type="button" class="btn btn-sm btn-outline-secondary px-3 ms-1 js-btn-next">Next &gt;</button>
         </div>
         <div class="d-flex align-items-center gap-3">
-            <span class="fw-bold font-monospace text-primary fs-6">00:59:52</span>
+            <span class="fw-bold font-monospace text-danger fs-6 js-timer">00:00:00</span>
             <button type="button" class="btn btn-success btn-sm fw-bold px-4 js-btn-submit">
                 <i class="bi bi-check-circle me-1"></i> Submit Test
             </button>
@@ -229,7 +229,7 @@
     (function() {
         const $root = $('#' + '@instanceId');
 
-        // Safely Parse JSON Data without script string injection issues
+        // Safely Parse JSON Data
         let pyqData = [];
         try {
             const rawJson = $root.find('.js-json-data').text();
@@ -243,8 +243,37 @@
         let currentIndex = 0;
         const userState = [];
         for (let i = 0; i < pyqData.length; i++) {
-            userState.push({ selectedOptionNumber: null, status: 0 });
+            userState.push({ selectedOptionNumber: null, status: 0, isBookmarked: false });
         }
+
+        // Live Countdown Timer
+        let totalSeconds = pyqData.length * 60;
+        const $timerDisplay = $root.find('.js-timer');
+
+        const timerInterval = setInterval(function() {
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                alert("Time is up! Your test is being submitted automatically.");
+                submitTest(true);
+                return;
+            }
+
+            totalSeconds--;
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            let formattedTime =
+                (hours < 10 ? "0" + hours : hours) + ":" +
+                (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                (seconds < 10 ? "0" + seconds : seconds);
+
+            $timerDisplay.text(formattedTime);
+
+            if (totalSeconds < 120) {
+                $timerDisplay.addClass('text-danger');
+            }
+        }, 1000);
 
         function loadQuestion(index) {
             if (index < 0 || index >= pyqData.length) return;
@@ -276,6 +305,7 @@
             $root.find('.js-exp-box').addClass('d-none');
 
             updateCircleSelection(userState[index].selectedOptionNumber);
+            updateBookmarkIcon(userState[index].isBookmarked);
             renderPalette();
         }
 
@@ -283,6 +313,15 @@
             $root.find('.cbt-option-circle').removeClass('active');
             if (num) {
                 $root.find('.cbt-option-circle[data-opt="' + num + '"]').addClass('active');
+            }
+        }
+
+        function updateBookmarkIcon(isBookmarked) {
+            const $btn = $root.find('.js-btn-bookmark i');
+            if (isBookmarked) {
+                $btn.removeClass('bi-bookmark').addClass('bi-bookmark-fill text-warning');
+            } else {
+                $btn.removeClass('bi-bookmark-fill text-warning').addClass('bi-bookmark');
             }
         }
 
@@ -307,8 +346,10 @@
             }
         }
 
-        function submitTest() {
-            if (!confirm("Test Submit karna chahte hain?")) return;
+        function submitTest(isAutoSubmit = false) {
+            if (!isAutoSubmit && !confirm("Are you sure you want to submit the test?")) return;
+
+            clearInterval(timerInterval);
 
             var answersPayload = [];
             for (var i = 0; i < pyqData.length; i++) {
@@ -325,13 +366,15 @@
                 firstLectureId = pyqData[0].LectureId;
             }
 
+            var timeSpent = (pyqData.length * 60) - totalSeconds;
+
             $.ajax({
                 url: '/Student/Watch/SubmitTopicPyqTest',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
                     lectureId: firstLectureId,
-                    timeTakenSeconds: 300,
+                    timeTakenSeconds: timeSpent > 0 ? timeSpent : 1,
                     answers: answersPayload
                 }),
                 success: function(res) {
@@ -358,6 +401,11 @@
             var opt = parseInt($(this).attr('data-opt'));
             userState[currentIndex].selectedOptionNumber = opt;
             updateCircleSelection(opt);
+        });
+
+        $root.find('.js-btn-bookmark').on('click', function() {
+            userState[currentIndex].isBookmarked = !userState[currentIndex].isBookmarked;
+            updateBookmarkIcon(userState[currentIndex].isBookmarked);
         });
 
         $root.find('.js-btn-savenext').on('click', function() {
@@ -395,7 +443,13 @@
             $root.find('.js-exp-box').toggleClass('d-none');
         });
 
-        $root.find('.js-btn-submit').on('click', submitTest);
+        $root.find('.js-btn-submit').on('click', function() {
+            submitTest(false);
+        });
+
+        $root.find('[data-bs-dismiss="modal"]').on('click', function() {
+            clearInterval(timerInterval);
+        });
 
         setTimeout(function() {
             loadQuestion(0);

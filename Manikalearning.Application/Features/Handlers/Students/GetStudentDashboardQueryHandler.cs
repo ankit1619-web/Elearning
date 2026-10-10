@@ -71,16 +71,16 @@ namespace Manikalearning.Application.Features.Handlers.Students
             var completedPayments = await _transactionRepo.Entity()
                 .AsNoTracking()
                 .Where(p => p.UserId == request.UserId && p.Status == "Success")
-                .ToListAsync(cancellationToken);        
+                .ToListAsync(cancellationToken);
             var subjectStrengths = attempts
-                .Where(a => !string.IsNullOrEmpty(a.Test.TestName))
-                .GroupBy(a => a.Test.TestName)
-                .Select(g => new SubjectStrengthDto
-                {
-                    SubjectName = g.Key,
-                    AccuracyPercentage = (double)Math.Round(g.Average(x => x.Accuracy), 1)
-                })
-                .ToList();
+     .Where(a => a.Test != null && !string.IsNullOrEmpty(a.Test.TestName))
+     .GroupBy(a => a.Test.TestName)
+     .Select(g => new SubjectStrengthDto
+     {
+         SubjectName = g.Key,
+         AccuracyPercentage = (double)Math.Round(g.Average(x => x.Accuracy), 1)
+     })
+     .ToList();
 
             return new StudentDashboardViewModel
             {

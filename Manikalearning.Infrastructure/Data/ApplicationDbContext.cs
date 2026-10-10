@@ -64,11 +64,6 @@ namespace Manikalearning.Infrastructure.Data
              
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
              
-            modelBuilder.Entity<TestAttemptAnswer>()
-                .HasOne(taa => taa.SelectedOption)
-                .WithMany(qo => qo.TestAttemptAnswers)
-                .HasForeignKey(taa => taa.SelectedOptionId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StudentSubscription>()
                 .HasOne(ss => ss.Payment)
