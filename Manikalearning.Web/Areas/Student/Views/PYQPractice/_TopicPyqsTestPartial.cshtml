@@ -103,13 +103,11 @@
 </style>
 
 <div id="@instanceId" class="cbt-container position-relative bg-white rounded-3 overflow-hidden shadow-lg border">
-
-    <!-- JSON Data Isolation Block -->
+     
     <script type="application/json" class="js-json-data">
             @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.Questions ?? new List<Manikalearning.Application.DTOs.TopicPyqDto>()))
     </script>
-
-    <!-- Top Bar & Banner -->
+     
     <div class="cbt-close-corner" data-bs-dismiss="modal" title="Close"><i class="bi bi-x-lg"></i></div>
     <div class="cbt-header-brand text-white text-center py-2 fw-semibold">
         <span>Provided by <strong class="text-warning">Manika Learning</strong></span>
@@ -123,8 +121,7 @@
             <a href="/Student/Subscription" class="text-white text-decoration-underline ms-2 fw-bold">Upgrade Now</a>
         </div>
     }
-
-    <!-- Workspace -->
+     
     <div class="js-workspace row g-0 p-3">
         <div class="col-lg-8 col-md-7 pe-md-3">
             <div class="border rounded-3 p-3 mb-3 bg-white" style="min-height: 430px;">
@@ -155,8 +152,7 @@
                     <strong>Explanation:</strong> <span class="js-exp-text"></span>
                     <div class="js-exp-hindi mt-1 text-muted"></div>
                 </div>
-
-                <!-- Circular Option Selectors -->
+                 
                 <div class="d-flex align-items-center justify-content-center gap-3 pt-2 border-top">
                     <div class="cbt-option-circle" data-opt="1">1</div>
                     <div class="cbt-option-circle" data-opt="2">2</div>
@@ -164,16 +160,14 @@
                     <div class="cbt-option-circle" data-opt="4">4</div>
                 </div>
             </div>
-
-            <!-- Action Controls -->
+             
             <div class="border rounded-3 p-2 bg-light d-flex align-items-center gap-2">
                 <button type="button" class="btn btn-success fw-bold btn-sm px-4 js-btn-savenext">Save & Next</button>
                 <button type="button" class="btn btn-primary fw-bold btn-sm px-3 js-btn-mark">Mark for Review</button>
                 <button type="button" class="btn btn-outline-secondary btn-sm px-3 js-btn-clear">Clear</button>
             </div>
         </div>
-
-        <!-- Right Palette Panel -->
+         
         <div class="col-lg-4 col-md-5 mt-3 mt-md-0 border-start ps-md-3">
             <div class="border rounded-3 p-2 mb-3 bg-light" style="max-height: 220px; overflow-y: auto;">
                 <div class="d-flex flex-wrap gap-2 js-q-palette"></div>
@@ -189,8 +183,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Bottom Footer -->
+     
     <div class="js-footer border-top bg-light p-2 px-3 d-flex justify-content-between align-items-center">
         <div>
             <button type="button" class="btn btn-sm btn-outline-secondary px-3 js-btn-prev">&lt; Back</button>
@@ -203,8 +196,7 @@
             </button>
         </div>
     </div>
-
-    <!-- Result Overlay -->
+     
     <div class="js-result-screen d-none p-4 text-center bg-white rounded-3">
         <div class="mb-3">
             <i class="bi bi-trophy-fill text-warning display-3"></i>
@@ -228,8 +220,7 @@
 <script>
     (function() {
         const $root = $('#' + '@instanceId');
-
-        // Safely Parse JSON Data
+         
         let pyqData = [];
         try {
             const rawJson = $root.find('.js-json-data').text();
@@ -245,8 +236,7 @@
         for (let i = 0; i < pyqData.length; i++) {
             userState.push({ selectedOptionNumber: null, status: 0, isBookmarked: false });
         }
-
-        // Live Countdown Timer
+         
         let totalSeconds = pyqData.length * 60;
         const $timerDisplay = $root.find('.js-timer');
 
@@ -367,8 +357,7 @@
             }
 
             var timeSpent = (pyqData.length * 60) - totalSeconds;
-
-            // UPDATED ROUTE: Points directly to PYQPracticeController
+             
             $.ajax({
                 url: '/Student/PYQPractice/SubmitPyqTest',
                 type: 'POST',
