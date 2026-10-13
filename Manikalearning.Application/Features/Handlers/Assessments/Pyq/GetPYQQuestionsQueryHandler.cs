@@ -59,22 +59,22 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Pyq
                     .Select(b => b.QuestionId!.Value)
                     .ToListAsync(cancellationToken);
             }
+            var pyqBaseQuery = await _questionRepo.Query()
+               .AsNoTracking()
+               .Include(q => q.Options)
+               .Where(q => q.SectionId == request.SectionId 
+                        && q.IsPYQ
+                        && q.IsActive
+                        && q.IsApproved)
+               .OrderByDescending(q => q.PYQYear)
+               .ToListAsync(cancellationToken);
 
-            var pyqBaseQuery = _questionRepo.Query()
-                .AsNoTracking()
-                .Include(q => q.Options)
-                .Where(q => q.SectionId == lecture.SectionId
-                         && q.IsPYQ
-                         && q.IsActive
-                         && q.IsApproved)
-                .OrderByDescending(q => q.PYQYear);
-
-            var totalQuestions = await pyqBaseQuery.CountAsync(cancellationToken);
+            var totalQuestions =  pyqBaseQuery.Count();
 
             bool isPreviewOnly = !isSubscribed;
             var rawQuestions = isPreviewOnly
-                ? await pyqBaseQuery.Take(10).ToListAsync(cancellationToken)
-                : await pyqBaseQuery.ToListAsync(cancellationToken);
+                ?  pyqBaseQuery.Take(10)
+                :  pyqBaseQuery.ToList();
 
             var pyqDtos = rawQuestions.Select(q => new TopicPyqDto
             {

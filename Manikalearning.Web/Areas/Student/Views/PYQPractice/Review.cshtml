@@ -1,0 +1,30 @@
+﻿@* Views/PYQPractice/Review.cshtml - replaces the JS confirm() popup *@
+@model Manikalearning.Application.DTOs.PyqReviewVm
+@{
+    Layout = "_CbtLayout";
+    ViewData["Title"] = "Review and submit";
+}
+@section Head {
+    <meta http-equiv="refresh" content="@(Model.SecondsLeft + 1);url=@Url.Action("Review", "PYQPractice", new { area = "Student" })" />
+}
+
+<div class="cbt-center">
+    <div class="cbt-card">
+        <h1 style="font-size:1.5rem;font-weight:800;letter-spacing:-.02em">Ready to submit?</h1>
+        <p style="color:var(--cb-muted)">Check your summary. You cannot change answers after submitting.</p>
+
+        <div class="res-grid">
+            <div class="res-box"><small>Total</small><strong>@Model.Total</strong></div>
+            <div class="res-box good"><small>Answered</small><strong>@Model.Answered</strong></div>
+            <div class="res-box bad"><small>Not answered</small><strong>@Model.NotAnswered</strong></div>
+            <div class="res-box"><small>Marked for review</small><strong>@Model.Marked</strong></div>
+        </div>
+
+        <form method="post" asp-area="Student" asp-controller="PYQPractice" asp-action="Review">
+            <div class="b-group b-group-stack" style="justify-content:center">
+                <a class="b b-line" asp-area="Student" asp-controller="PYQPractice" asp-action="Question" asp-route-q="0">Back to test</a>
+                <button type="submit" class="b b-success">Yes, submit now</button>
+            </div>
+        </form>
+    </div>
+</div>

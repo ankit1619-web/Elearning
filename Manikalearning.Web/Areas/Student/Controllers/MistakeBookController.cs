@@ -28,7 +28,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _mediator.Send(new RemoveMistakeCommand(userId, mistakeId), ct);
-            return Json(new { success = true });
+            return View(nameof(Index)) ;
         }
     }
 }

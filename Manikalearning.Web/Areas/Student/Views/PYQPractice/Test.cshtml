@@ -1,0 +1,116 @@
+﻿@* Views/PYQPractice/Test.cshtml *@
+@model Manikalearning.Application.DTOs.PyqQuestionVm
+@{
+    Layout = "_CbtLayout";
+    ViewData["Title"] = "PYQ Practice";
+
+    var q = Model.Question;
+    var opts = new[] { q.OptionA, q.OptionB, q.OptionC, q.OptionD };
+    var counts = new int[4];
+    foreach (var s in Model.Statuses) counts[s]++;
+
+    // countdown start values (CSS animates from here)
+    var m0 = Model.SecondsLeft / 60;
+    var s0 = Model.SecondsLeft % 60;
+    var qid = q.QuestionId.ToString() ?? "";
+    if (qid.Length > 8) qid = qid.Substring(0, 8);
+}
+
+@section Head {
+    @* When time ends the browser reloads this page; the server then auto-submits. *@
+    <meta http-equiv="refresh" content="@(Model.SecondsLeft + 1);url=@Url.Action("Question", "PYQPractice", new { area = "Student", q = Model.Index })" />
+}
+
+<header class="cbt-top">
+    <a class="cbt-brand" asp-area="Student" asp-controller="PYQPractice" asp-action="Index"><i class="bi bi-mortarboard-fill"></i> Manika<em>Learning</em></a>
+    <span class="cbt-title">PYQ Practice</span>
+    <span class="cbt-spacer"></span>
+    <span class="cd-pill" title="Time left">
+        <i class="bi bi-clock"></i>
+        <span class="cd @(m0 == 0 ? "no-min" : "")" role="timer"
+              style="--m:@m0;--m0:@m0;--dm:@(s0 + 1)s;--ds:-@(59 - s0)s"></span>
+        <span class="sr-only">@m0 minutes @s0 seconds left when this page loaded</span>
+    </span>
+    <a class="b b-line b-sm" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">Exit</a>
+</header>
+
+@if (Model.IsPreviewOnly)
+{
+    <div class="cbt-banner">
+        <i class="bi bi-exclamation-triangle-fill"></i> @Model.BannerMessage
+        <a href="/Student/Subscription">Upgrade now</a>
+    </div>
+}
+
+<form method="post" asp-area="Student" asp-controller="PYQPractice" asp-action="Question">
+    <input type="hidden" name="q" value="@Model.Index" />
+
+    <div class="cbt-grid">
+        <section class="cbt-card">
+            <div class="q-head">
+                <span class="q-no">Q. @(Model.Index + 1) / @Model.Total</span>
+                <span class="chip">PYQ: @(string.IsNullOrWhiteSpace(q.ExamName) ? "Topic" : q.ExamName)</span>
+                <button type="submit" name="nav" value="bookmark" class="b b-line b-icon b-sm" style="margin-left:auto" aria-label="Bookmark question">
+                    <i class="bi @(Model.Bookmarked ? "bi-bookmark-fill" : "bi-bookmark")"></i>
+                </button>
+            </div>
+
+            <div class="q-id">(ID @qid)</div>
+            <div class="q-text">@q.QuestionText</div>
+            @if (!string.IsNullOrWhiteSpace(q.QuestionTextHindi))
+            {
+                <div class="q-hindi">@q.QuestionTextHindi</div>
+            }
+
+            <div class="opts" role="radiogroup" aria-label="Options">
+                @for (var n = 1; n <= 4; n++)
+                {
+                    <label class="opt">
+                        <input type="radio" name="option" value="@n" @(Model.Selected == n ? "checked" : null) />
+                        <span class="dot">@n</span>
+                        <span class="txt">@opts[n - 1]</span>
+                    </label>
+                }
+            </div>
+
+            <div class="b-group">
+                <button type="submit" name="nav" value="clear" class="b b-line b-sm">Clear answer</button>
+                <details class="exp">
+                    <summary class="b b-soft b-sm">Explanation</summary>
+                    <div class="exp-body">
+                        @q.Explanation
+                        @if (!string.IsNullOrWhiteSpace(q.ExplanationHindi))
+                        {
+                            <div style="margin-top:.4rem;opacity:.85">@q.ExplanationHindi</div>
+                        }
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <aside class="cbt-card">
+            <div class="pal-grid">
+                @for (var i = 0; i < Model.Statuses.Count; i++)
+                {
+                    <button type="submit" name="nav" value="go:@i" class="pal s@(Model.Statuses[i]) @(i == Model.Index ? "cur" : "")" aria-label="Go to question @(i + 1)">@(i + 1)</button>
+                }
+            </div>
+            <div class="legend">
+                <div><b class="l0">@counts[0]</b>Not visited</div>
+                <div><b class="l1">@counts[1]</b>Not answered</div>
+                <div><b class="l2">@counts[2]</b>Answered</div>
+                <div><b class="l3">@counts[3]</b>Marked</div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="cbt-bar">
+        <div class="cbt-bar-in">
+            <button type="submit" name="nav" value="prev" class="b b-line" disabled="@(Model.Index == 0)">&lt; Back</button>
+            <button type="submit" name="nav" value="next" class="b b-line" disabled="@(Model.Index >= Model.Total - 1)">Next &gt;</button>
+            <button type="submit" name="nav" value="mark" class="b b-soft push">Mark for review</button>
+            <button type="submit" name="nav" value="save" class="b b-solid">Save &amp; next</button>
+            <button type="submit" name="nav" value="submit" class="b b-success"><i class="bi bi-check-circle"></i> Submit test</button>
+        </div>
+    </div>
+</form>

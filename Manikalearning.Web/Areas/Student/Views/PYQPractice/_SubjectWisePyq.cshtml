@@ -104,12 +104,10 @@
 
 <div id="@instanceId" class="cbt-container position-relative bg-white rounded-3 overflow-hidden shadow-lg border">
 
-    <!-- JSON Data Isolation Block -->
     <script type="application/json" class="js-json-data">
             @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.Questions ?? new List<Manikalearning.Application.DTOs.TopicPyqDto>()))
     </script>
 
-    <!-- Top Bar & Banner -->
     <div class="cbt-close-corner" data-bs-dismiss="modal" title="Close"><i class="bi bi-x-lg"></i></div>
     <div class="cbt-header-brand text-white text-center py-2 fw-semibold">
         <span>Provided by <strong class="text-warning">Manika Learning</strong></span>
@@ -124,7 +122,6 @@
         </div>
     }
 
-    <!-- Workspace -->
     <div class="js-workspace row g-0 p-3">
         <div class="col-lg-8 col-md-7 pe-md-3">
             <div class="border rounded-3 p-3 mb-3 bg-white" style="min-height: 430px;">

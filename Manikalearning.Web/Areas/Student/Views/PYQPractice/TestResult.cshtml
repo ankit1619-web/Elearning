@@ -1,0 +1,29 @@
+﻿@* Views/PYQPractice/TestResult.cshtml *@
+@model Manikalearning.Application.DTOs.PyqResultVm
+@{
+    Layout = "_CbtLayout";
+    ViewData["Title"] = "Result";
+}
+
+<div class="cbt-center">
+    <div class="cbt-card">
+        <i class="bi bi-trophy-fill" style="font-size:3.2rem;color:#f59e0b"></i>
+        <h1 style="font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin:.5rem 0">
+            @(Model.AutoSubmitted ? "Time is up. Your test was submitted." : "Test submitted successfully!")
+        </h1>
+
+        <div class="res-grid">
+            <div class="res-box"><small>Total</small><strong>@Model.TotalQuestions</strong></div>
+            <div class="res-box good"><small>Correct</small><strong>@Model.CorrectAnswers</strong></div>
+            <div class="res-box bad"><small>Incorrect</small><strong>@Model.WrongAnswers</strong></div>
+            <div class="res-box"><small>Skipped</small><strong>@Model.SkippedQuestions</strong></div>
+        </div>
+
+        <div class="score">Score: @Model.Score / @Model.TotalMarks &nbsp;|&nbsp; Accuracy: @Model.Accuracy%</div>
+
+        <div class="b-group b-group-stack" style="justify-content:center">
+            <a class="b b-line" asp-area="Student" asp-controller="MistakeBook" asp-action="Index">Review mistakes</a>
+            <a class="b b-solid" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">Back to PYQ Bank</a>
+        </div>
+    </div>
+</div>

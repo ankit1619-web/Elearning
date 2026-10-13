@@ -69,6 +69,14 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(optio
 {
     options.MultipartBodyLengthLimit = 524288000; // 500 MB
 });
+
+builder.Services.AddDistributedMemoryCache();      
+builder.Services.AddSession(o =>
+{
+    o.IdleTimeout = TimeSpan.FromHours(3);
+    o.Cookie.HttpOnly = true;
+    o.Cookie.IsEssential = true;                  
+});
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -82,6 +90,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

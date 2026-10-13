@@ -1,62 +1,233 @@
-﻿@using Manikalearning.Application.DTOs
+﻿@* Areas/Student/Views/MistakeBook/Index.cshtml *@
+@using Manikalearning.Application.DTOs
 
 @model List<MistakeDto>
 @{
     ViewData["Title"] = "Mistake Book";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var list = Model ?? new List<MistakeDto>();
 }
 
-<div class="container-fluid py-3">
-    <div class="mb-4">
-        <h3 class="fw-bold mb-1"><i class="bi bi-exclamation-circle text-danger me-2"></i>Mistake Book</h3>
-        <p class="text-muted small mb-0">Tests aur PYQs me galat hue questions yahan automatic save hote hain revision ke liye.</p>
+@section Styles {
+    <style>
+        .mk-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .mk-card {
+            padding: 1.4rem;
+        }
+
+        .mk-top {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .mk-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .28rem .7rem;
+            border-radius: 999px;
+            background: #ffe4e9;
+            color: #be123c;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+        .mk-no {
+            color: var(--muted);
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .mk-form {
+            margin: 0 0 0 auto;
+        }
+
+        .mk-q {
+            font-size: 1.08rem;
+            font-weight: 700;
+            line-height: 1.5;
+            margin: 0 0 1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .mk-ans {
+            display: flex;
+            align-items: flex-start;
+            gap: .75rem;
+            padding: .8rem 1rem;
+            border-radius: 14px;
+            margin-bottom: .6rem;
+            overflow-wrap: anywhere;
+        }
+
+            .mk-ans i {
+                margin-top: .15rem;
+            }
+
+            .mk-ans small {
+                display: block;
+                font-size: .75rem;
+                font-weight: 700;
+                opacity: .8;
+            }
+
+            .mk-ans.bad {
+                background: #ffe4e9;
+                color: #9f1239;
+            }
+
+            .mk-ans.ok {
+                background: #d9f7ea;
+                color: #065f46;
+            }
+
+        .mk-exp {
+            margin-top: .5rem;
+        }
+
+            .mk-exp summary {
+                list-style: none;
+                display: inline-flex;
+            }
+
+                .mk-exp summary::-webkit-details-marker {
+                    display: none;
+                }
+
+            .mk-exp .mk-exp-body {
+                margin-top: .7rem;
+                padding: .9rem 1rem;
+                border-radius: 14px;
+                background: var(--paper);
+                color: var(--muted);
+                font-size: .9rem;
+                overflow-wrap: anywhere;
+            }
+
+        .mk-empty {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+            .mk-empty i {
+                font-size: 2.8rem;
+                color: var(--brand);
+            }
+
+            .mk-empty h2 {
+                font-size: 1.25rem;
+                font-weight: 800;
+                margin: .6rem 0 .3rem;
+            }
+
+            .mk-empty p {
+                color: var(--muted);
+                max-width: 42ch;
+                margin: 0 auto 1.2rem;
+            }
+
+        .mk-count {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .3rem .8rem;
+            border-radius: 999px;
+            background: var(--soft);
+            color: var(--brand);
+            font-weight: 700;
+            font-size: .82rem;
+            margin-top: .5rem;
+        }
+
+        @@media (max-width: 575.98px) {
+            .mk-card {
+                padding: 1rem;
+            }
+
+            .mk-form {
+                margin-left: 0;
+                width: 100%;
+            }
+
+                .mk-form .b {
+                    width: 100%;
+                }
+        }
+    </style>
+}
+
+<div class="dash">
+
+    <div class="head">
+        <div>
+            <h1>Mistake Book</h1>
+            <p>Questions you got wrong in tests and PYQs are saved here automatically for revision.</p>
+            @if (list.Count > 0)
+            {
+                <span class="mk-count"><i class="bi bi-exclamation-circle"></i> @list.Count to revise</span>
+            }
+        </div>
+        <div class="actions">
+            <a class="btn btn-pyq-blue btn-sm px-3 py-1.5 fw-semibold" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">
+                <i class="bi bi-lightning-charge"></i> Practice more
+            </a>
+        </div>
     </div>
 
-    <div class="row g-3">
-        @foreach (var m in Model)
-        {
-            <div class="col-12" id="mistake-card-@m.MistakeId">
-                <div class="card border-0 shadow-sm rounded-4 p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1">Galat Answered</span>
-                        <button class="btn btn-sm btn-outline-success rounded-pill" onclick="removeMistake('@m.MistakeId')">
-                            <i class="bi bi-check2-circle me-1"></i> Mark as Mastered
-                        </button>
+    @if (list.Count == 0)
+    {
+        <section class="panel mk-empty">
+            <i class="bi bi-patch-check"></i>
+            <h2>Your Mistake Book is empty</h2>
+            <p>Nice work! Wrong answers from your tests and PYQ practice will show up here so you can revise them.</p>
+            <a class="b b-solid" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">Start practising</a>
+        </section>
+    }
+    else
+    {
+        <div class="mk-list">
+            @{
+                var n = 0;
+            }
+            @foreach (var m in list)
+            {
+                n++;
+                <article class="panel mk-card" id="mistake-@m.MistakeId">
+                    <div class="mk-top">
+                        <span class="mk-tag"><i class="bi bi-x-circle"></i> Wrong answer</span>
+                        <span class="mk-no">#@n</span> 
+                        <form class="mk-form" method="post" asp-area="Student" asp-controller="MistakeBook" asp-action="Remove" asp-route-id="@m.MistakeId">
+                            <button type="submit" class="b b-line b-sm"><i class="bi bi-check2-circle"></i> Remove From Mistake Book</button>
+                        </form>
                     </div>
 
-                    <h6 class="fw-bold text-dark mb-3">@m.QuestionText</h6>
+                    <h2 class="mk-q">@m.QuestionText</h2>
 
-                    <div class="p-3 bg-light rounded-3 mb-2">
-                        <span class="text-danger fw-semibold">Aapka Jawab:</span> @m.SelectedAnswer
+                    <div class="mk-ans bad">
+                        <i class="bi bi-x-lg"></i>
+                        <div><small>Your answer</small>@(string.IsNullOrWhiteSpace(m.SelectedAnswer) ? "Not recorded" : m.SelectedAnswer)</div>
                     </div>
-                    <div class="p-3 bg-success-subtle text-success rounded-3 mb-3">
-                        <span class="fw-semibold">Sahi Jawab:</span> @m.CorrectAnswer
+                    <div class="mk-ans ok">
+                        <i class="bi bi-check-lg"></i>
+                        <div><small>Correct answer</small>@m.CorrectAnswer</div>
                     </div>
 
                     @if (!string.IsNullOrEmpty(m.Explanation))
                     {
-                        <div class="small text-muted border-top pt-2">
-                            <strong>Explanation:</strong> @m.Explanation
-                        </div>
+                        <details class="mk-exp">
+                            <summary class="b b-soft b-sm"><i class="bi bi-lightbulb"></i> Show explanation</summary>
+                            <div class="mk-exp-body">@m.Explanation</div>
+                        </details>
                     }
-                </div>
-            </div>
-        }
-    </div>
+                </article>
+            }
+        </div>
+    }
 </div>
-
-@section Scripts {
-    <script>
-        function removeMistake(mistakeId) {
-            fetch(`@Url.Action("Remove", "MistakeBook", new { area = "Student" })/${mistakeId}`, {
-                method: 'POST'
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        const card = document.getElementById(`mistake-card-${mistakeId}`);
-                        card.remove();
-                    }
-                });
-        }
-    </script>
-}

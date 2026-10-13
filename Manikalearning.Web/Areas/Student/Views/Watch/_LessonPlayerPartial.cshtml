@@ -63,49 +63,36 @@
         </div>
     }
 </div>
- 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 px-1">
-    <h2 class="fw-bold text-dark mb-0 fs-3">@Model.LessonTitle</h2>
-
-    <div class="d-flex gap-2"> 
+<div class="notes-card shadow-sm mb-4"> 
+    <div class="notes-dark-header py-3 px-4">
+        <h5 class="fw-bold mb-0 fs-5 text-white">@Model.LessonTitle</h5>
+    </div>
+     
+    <div class="notes-action-bar px-4 py-3 bg-light border-bottom d-flex align-items-center justify-content-end gap-2 flex-wrap">
         @if (!string.IsNullOrEmpty(Model.NotesUrl))
         {
-            <button type="button" class="btn btn-action-pill" onclick="openSecurePdfPreview('@Model.NotesUrl')">
+            <button type="button" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white" onclick="openSecurePdfPreview('@Model.NotesUrl')">
                 <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> PDF Notes
             </button>
         }
-        <button type="button" class="btn btn-action-pill"
+        <button type="button" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white"
                 onclick="Toast.openModal('/Student/Watch/AskDoubtPartial/@Model.LessonId', 'modal-md')">
             <i class="bi bi-question-circle me-1 text-primary"></i> Ask Doubt
         </button>
-        @* <button type="button"
-                class="btn btn-action-pill"
-                onclick="Toast.openModal('/Student/Watch/CourseReviewsPartial/@Model?.CourseId', 'modal-lg')">
-            <i class="bi bi-star-fill me-1 text-warning"></i> Reviews
-        </button>  *@
+        <button type="button"
+                class="btn btn-pyq-blue btn-sm px-3 py-1.5 fw-semibold"
+                onclick="Toast.openModal('/Student/Watch/TopicPyqsTestPartial/@Model?.LessonId', 'modal-xl')">
+            <i class="bi bi-journal-text me-1"></i> Topic-wise PYQs
+        </button>
+        <button type="button"
+                id="btn-bookmark-@Model?.LessonId"
+                class="btn btn-bookmark btn-sm px-2.5 py-1.5 @(Model?.IsBookmarked == true ? "active text-warning" : "text-secondary")"
+                title="@(Model?.IsBookmarked == true ? "Remove Bookmark" : "Save Bookmark")"
+                onclick="toggleBookmark('@Model?.LessonId')">
+            <i class="bi @(Model?.IsBookmarked == true ? "bi-bookmark-fill" : "bi-bookmark") fs-6"></i>
+        </button>
     </div>
-</div>
- 
-<div class="notes-card shadow-sm">
-    <div class="notes-dark-header">
-        <h5 class="fw-bold mb-0 fs-6 text-truncate pe-2">@Model.LessonTitle</h5>
-
-        <div class="d-flex align-items-center gap-2 flex-shrink-0">
-            <button type="button" 
-                    class="btn btn-pyq-blue" 
-                    onclick="Toast.openModal('/Student/Watch/TopicPyqsTestPartial/@Model?.LessonId', 'modal-xl')">
-                <i class="bi bi-journal-text me-1"></i> Topic-wise PYQs
-            </button>
-            <button type="button" 
-                    id="btn-bookmark-@Model?.LessonId"
-                    class="btn btn-bookmark @(Model?.IsBookmarked == true ? "active text-warning" : "")" 
-                    title="@(Model?.IsBookmarked == true ? "Remove Bookmark" : "Save Bookmark")"
-                    onclick="toggleBookmark('@Model?.LessonId')">
-                <i class="bi @(Model?.IsBookmarked == true ? "bi-bookmark-fill" : "bi-bookmark")"></i>
-            </button>
-        </div>
-    </div>
-
+     
     <div class="p-4 bg-white">
         @if (!string.IsNullOrWhiteSpace(Model.Notes))
         {

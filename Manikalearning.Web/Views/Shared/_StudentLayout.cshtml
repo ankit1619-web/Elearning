@@ -4,7 +4,14 @@
 
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    bool IsActive(params string[] controllers) =>
+        controllers.Contains(currentController, StringComparer.OrdinalIgnoreCase);
+
+    var userName = User.Identity?.Name ?? "Student User";
+    var initial = string.IsNullOrWhiteSpace(userName) ? "S" : userName.Substring(0, 1).ToUpper();
+ 
+    var moreActive = IsActive("Exams", "Performance", "Doubts", "Subscription", "Payments");
 }
 
 <!DOCTYPE html>
@@ -19,107 +26,132 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/studentlayout.css" asp-append-version="true" /> 
+    <link rel="stylesheet" href="~/css/studentlayout.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
+   
 </head>
 <body>
-
-    <!-- Header Navigation -->
+     
     <header class="student-topnav">
         <nav class="navbar navbar-expand-lg py-2">
             <div class="container-fluid px-3 px-lg-4">
-
-                <!-- Brand -->
-                <a class="navbar-brand d-flex align-items-center gap-2.5 me-4" asp-area="Student" asp-controller="Dashboard" asp-action="Index">
+                 
+                <a class="navbar-brand d-flex align-items-center gap-2 me-4" asp-area="Student" asp-controller="Dashboard" asp-action="Index">
                     <div class="brand-icon-box">
                         <i class="bi bi-mortarboard-fill fs-5"></i>
                     </div>
                     <span class="fw-bold fs-5 text-dark">Manika<span class="text-primary">Learning</span></span>
                 </a>
 
-                <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#topnavMenu">
+                <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#topnavMenu" aria-label="Toggle navigation">
                     <i class="bi bi-list fs-3"></i>
                 </button>
 
                 <div class="collapse navbar-collapse" id="topnavMenu">
-
-                    <!-- Clean Center Nav Links -->
+                     
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
                         <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "Dashboard" ? "active" : "")"
+                            <a class="nav-link top-nav-link @(IsActive("Dashboard") ? "active" : "")"
                                asp-area="Student" asp-controller="Dashboard" asp-action="Index">
                                 <i class="bi bi-grid-1x2 me-1"></i> Overview
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "MyCourses" || currentController == "Watch" ? "active" : "")"
+                            <a class="nav-link top-nav-link @(IsActive("MyCourses", "Watch") ? "active" : "")"
                                asp-area="Student" asp-controller="MyCourses" asp-action="Index">
                                 <i class="bi bi-play-circle me-1"></i> My Courses
                             </a>
                         </li>
-                        @* <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "MockTests" ? "active" : "")"
-                               asp-area="Student" asp-controller="MockTests" asp-action="Index">
-                                <i class="bi bi-lightning-charge me-1"></i> Mock Tests
-                            </a>
-                        </li> *@
+                      
                         <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "PYQPractice" ? "active" : "")"
+                            <a class="nav-link top-nav-link @(IsActive("PYQPractice") ? "active" : "")"
                                asp-area="Student" asp-controller="PYQPractice" asp-action="Index">
                                 <i class="bi bi-file-earmark-text me-1"></i> PYQ Bank
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "MistakeBook" ? "active" : "")"
+                            <a class="nav-link top-nav-link @(IsActive("MistakeBook") ? "active" : "")"
                                asp-area="Student" asp-controller="MistakeBook" asp-action="Index">
                                 <i class="bi bi-exclamation-circle me-1"></i> Mistake Book
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link top-nav-link @(currentController == "Bookmarks" ? "active" : "")"
+                            <a class="nav-link top-nav-link @(IsActive("Bookmarks") ? "active" : "")"
                                asp-area="Student" asp-controller="Bookmarks" asp-action="Index">
                                 <i class="bi bi-bookmark me-1"></i> Saved
                             </a>
                         </li>
+                         
+                        <li class="nav-item dropdown">
+                            <a class="nav-link top-nav-link dropdown-toggle @(moreActive ? "active" : "")"
+                               href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots me-1"></i> More
+                            </a>
+                            <ul class="dropdown-menu shadow border-0 rounded-3 mt-2 p-2">
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2 @(IsActive("Exams") ? "active" : "")"
+                                       asp-area="Student" asp-controller="Exams" asp-action="Index">
+                                        <i class="bi bi-bullseye me-2"></i> Exams
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2 @(IsActive("Performance") ? "active" : "")"
+                                       asp-area="Student" asp-controller="Performance" asp-action="Index">
+                                        <i class="bi bi-bar-chart-line me-2"></i> Performance
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2 @(IsActive("Doubts") ? "active" : "")"
+                                       asp-area="Student" asp-controller="Doubts" asp-action="Index">
+                                        <i class="bi bi-question-circle me-2"></i> Doubts
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2 @(IsActive("Subscription", "Payments") ? "active" : "")"
+                                       asp-area="Student" asp-controller="Subscription" asp-action="Index">
+                                        <i class="bi bi-credit-card me-2"></i> Plans & Payments
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
-
-                    <!-- Right Controls -->
+                     
                     <div class="d-flex align-items-center gap-3">
-
-                        <!-- Search Box -->
-                        <div class="search-box d-flex align-items-center">
+                         
+                      @*   <form class="search-box d-flex align-items-center" method="get" asp-area="Student" asp-controller="Search" asp-action="Index">
                             <i class="bi bi-search text-muted me-2 small"></i>
-                            <input type="text" class="form-control form-control-sm border-0 bg-transparent p-0 shadow-none" placeholder="Search tests, courses...">
-                        </div>
-
-                        <!-- Streak -->
+                            <input type="text" name="q" class="form-control form-control-sm border-0 bg-transparent p-0 shadow-none" placeholder="Search tests, courses...">
+                        </form>
+                         
                         <div class="streak-pill d-flex align-items-center gap-1" title="Practice Streak">
                             <i class="bi bi-fire text-danger"></i>
                             <span>5 Days</span>
-                        </div>
-
-                        <!-- User Profile Dropdown -->
+                        </div> *@
+                         
                         <div class="dropdown">
-                            <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
-                                <div class="avatar-circle">
-                                    @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "S")
-                                </div>
+                            <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="avatar-circle">@initial</div>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-2" style="min-width: 200px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-2" style="min-width: 220px;">
                                 <li class="px-3 py-2 border-bottom mb-1">
-                                    <div class="fw-bold text-dark small">@(User.Identity?.Name ?? "Student User")</div>
-                                    <div class="text-muted extra-small" style="font-size: 0.75rem;">Active Learner</div>
+                                    <div class="fw-bold text-dark small">@userName</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Active Learner</div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item rounded-2 py-1.5" asp-area="Student" asp-controller="Profile" asp-action="Index">
+                                    <a class="dropdown-item rounded-2 py-2" asp-area="Student" asp-controller="Profile" asp-action="Index">
                                         <i class="bi bi-person me-2"></i> Profile & Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2" asp-area="Student" asp-controller="Subscription" asp-action="Index">
+                                        <i class="bi bi-credit-card me-2"></i> My Subscription
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="dropdown-item rounded-2 py-1.5 text-danger">
+                                        <button type="submit" class="dropdown-item rounded-2 py-2 text-danger">
                                             <i class="bi bi-box-arrow-right me-2"></i> Log Out
                                         </button>
                                     </form>
@@ -133,46 +165,28 @@
             </div>
         </nav>
     </header>
-
-    <!-- Page Content -->
+     
     <main class="py-4 flex-grow-1">
-        <div class="container-fluid px-3 px-lg-4">
-
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
-            <!-- Global Loader -->
+        <div class="container-fluid px-3 px-lg-4"> 
+ 
             <div id="globalLoader" class="d-none position-fixed top-50 start-50 translate-middle" style="z-index: 1060;">
                 <div class="spinner-border text-primary shadow-sm" style="width: 3.5rem; height: 3.5rem; border-width: 0.35em;" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-
-            <!-- Global Modal -->
+ 
             <div class="modal fade" id="globalModal" tabindex="-1" aria-labelledby="globalModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                 <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down" id="globalModalSize">
                     <div class="modal-content rounded-4 border-0 shadow-lg" id="globalModalContent"></div>
                 </div>
             </div>
-
-            <!-- Global Toast Container -->
+ 
             <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 1055;" id="toastContainer"></div>
 
             @RenderBody()
         </div>
     </main>
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/admin-ui.js" asp-append-version="true"></script>
