@@ -45,7 +45,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 DoubtId = Guid.NewGuid(),
                 UserId = req.UserId,
                 CourseId = req.CourseId,
-                LectureId = null,                          
+                LectureId = null,                           
                 QuestionText = req.QuestionText.Trim(),
                 Status = DoubtStatus.Open,
                 CreatedAt = DateTime.UtcNow,

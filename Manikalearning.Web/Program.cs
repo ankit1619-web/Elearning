@@ -5,6 +5,7 @@ using Manikalearning.Application.Interface;
 using Manikalearning.Application.Services;
 using Manikalearning.Domain.Entities;
 using Manikalearning.Infrastructure.Data;
+using Manikalearning.Infrastructure.Payment;
 using Manikalearning.Infrastructure.Repositories;
 using Manikalearning.Web.Helpers;
 using MediatR;
@@ -53,6 +54,7 @@ builder.Services.AddMediatR(cfg =>
         typeof(GetHomePageQueryHandler).Assembly);
 });
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddScoped<ISubscriptionChecker, SubscriptionChecker>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
@@ -69,7 +71,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(optio
 {
     options.MultipartBodyLengthLimit = 524288000; // 500 MB
 });
-
+builder.Services.Configure<RazorpayOptions>(builder.Configuration.GetSection("Razorpay"));
+builder.Services.AddHttpClient<IRazorpayClient, RazorpayClient>();
 builder.Services.AddDistributedMemoryCache();      
 builder.Services.AddSession(o =>
 {

@@ -62,6 +62,7 @@ namespace Manikalearning.Domain.Entities
         public string Status { get; set; } = "Active";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
+    
 
 
     [Table("Payments")]
@@ -85,7 +86,7 @@ namespace Manikalearning.Domain.Entities
         [MaxLength(200)]
         public string GatewayOrderId { get; set; }
         [MaxLength(200)]
-        public string GatewayPaymentId { get; set; }
+        public string? GatewayPaymentId { get; set; }
 
         [MaxLength(30)]
         public string Status { get; set; }

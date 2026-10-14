@@ -1,4 +1,5 @@
 ﻿using Manikalearning.Application.Features.Commands.Students;
+using Manikalearning.Application.Features.Handlers.Students;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +18,9 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         {
             _mediator = mediator;
         }
-
-        // GET: /Student/MyCourses?filter=InProgress&search=net
+         
         [HttpGet]
-        public async Task<IActionResult> Index(string filter = "All", string search = "")
+        public async Task<IActionResult> Index(string filter = "All", string search = "", CancellationToken ct = default)
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -28,9 +28,10 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             {
                 return RedirectToAction("Login", "Account", new { area = "" });
             }
+
+            var viewModel = await _mediator.Send(new GetUserCoursesQuery(userId, filter, search), ct);
              
-            var query = new GetUserCoursesQuery(userId, filter, search);
-            var viewModel = await _mediator.Send(query);
+            ViewBag.AccessibleCourseIds = await _mediator.Send(new GetAccessibleCourseIdsQuery(userId), ct);
 
             return View("Index", viewModel);
         }

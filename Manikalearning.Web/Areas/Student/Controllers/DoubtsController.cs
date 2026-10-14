@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Assessments.Doubts;
 using Manikalearning.Application.Features.Handlers.Assessments.Dropdowns;
 using Manikalearning.Application.Features.Handlers.Students;
 using MediatR;
@@ -57,6 +58,35 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             var ok = await _mediator.Send(new DeleteDoubtCommand(userId.Value, id), ct);
             TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Doubt deleted." : "Only unanswered doubts can be deleted.";
             return RedirectToAction(nameof(Index), new { status, page });
+        } 
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> Thread(Guid id, CancellationToken ct)
+        {
+            var userId = CurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
+
+            var vm = await _mediator.Send(new GetDoubtThreadQuery(userId.Value, id), ct);  
+            return vm == null ? NotFound() : View(vm);
+        }
+
+        [HttpPost("{id:guid}/Reply")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reply(Guid id, string? text, CancellationToken ct)
+        {
+            var userId = CurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
+
+            try
+            {
+                await _mediator.Send(new ReplyToDoubtCommand(userId.Value, id, text ?? ""), ct);
+                TempData["SuccessMessage"] = "Message sent.";
+            }
+            catch (ValidationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Could not send your message.";
+            }
+            return RedirectToAction(nameof(Thread), new { id });
         }
 
         private async Task<DoubtsPageVm> BuildPageAsync(Guid userId, string? status, int page, AskDoubtInput input, CancellationToken ct) => new()

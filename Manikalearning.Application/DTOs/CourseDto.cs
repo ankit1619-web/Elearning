@@ -26,4 +26,9 @@
         public List<CourseSectionDto> Sections { get; set; } = new();
         public List<CourseLectureDto> Lectures { get; set; } = new();
     }
+    public class CourseAccessDto
+    {
+        public bool HasAccess { get; set; }
+        public string Reason { get; set; } = "";     // Free | Subscription | NoSubscription | NotFound
+    }
 }

@@ -19,11 +19,14 @@ namespace Manikalearning.Application.Features.Handlers.Students
             RuleFor(x => x.Status).MaximumLength(50);
         }
     }
+
     public class GetMyDoubtsQueryHandler : IRequestHandler<GetMyDoubtsQuery, DoubtListDto>
     {
         private readonly IRepository<DoubtEntity> _doubts;
         private readonly IRepository<Course> _courses;
-        public GetMyDoubtsQueryHandler(IRepository<DoubtEntity> doubts, IRepository<Course> courses) { _doubts = doubts; _courses = courses; }
+        private readonly IRepository<DoubtReplyEntity> _replies;
+        public GetMyDoubtsQueryHandler(IRepository<DoubtEntity> doubts, IRepository<Course> courses, IRepository<DoubtReplyEntity> replies)
+        { _doubts = doubts; _courses = courses; _replies = replies; }
 
         public async Task<DoubtListDto> Handle(GetMyDoubtsQuery req, CancellationToken ct)
         {
@@ -35,7 +38,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             var total = await q.CountAsync(ct);
             var page = await (from d in q
                               join c in _courses.Entity().AsNoTracking() on d.CourseId equals c.CourseId into cj
-                              from c in cj.DefaultIfEmpty()                       
+                              from c in cj.DefaultIfEmpty()                       // course is optional
                               orderby d.CreatedAt descending
                               select new DoubtDto
                               {
@@ -46,6 +49,12 @@ namespace Manikalearning.Application.Features.Handlers.Students
                                   CreatedAt = d.CreatedAt
                               })
                               .Skip((req.Page - 1) * req.PageSize).Take(req.PageSize).ToListAsync(ct);
+
+            var ids = page.Select(x => x.DoubtId).ToList();
+            var counts = await _replies.Entity().AsNoTracking().Where(r => ids.Contains(r.DoubtId) && !r.IsDeleted)
+                .GroupBy(r => r.DoubtId).Select(g => new { Id = g.Key, N = g.Count() }).ToListAsync(ct);
+            var byId = counts.ToDictionary(x => x.Id, x => x.N);
+            foreach (var d in page) d.ReplyCount = byId.TryGetValue(d.DoubtId, out var n) ? n : 0;
 
             return new DoubtListDto { Items = page, Status = status, Page = req.Page, PageSize = req.PageSize, TotalCount = total };
         }

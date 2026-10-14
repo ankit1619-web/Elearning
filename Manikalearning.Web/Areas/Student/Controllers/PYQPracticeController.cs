@@ -2,6 +2,7 @@
 using Manikalearning.Application.Features.Commands.Assessments.Pyq;
 using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Web.Areas.Student.ViewModels;
+using Manikalearning.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Area("Student")]
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
+    //[RequireCourseAccess]
     public class PYQPracticeController : Controller
     {
         private const string SessionKey = "pyq_test_state";

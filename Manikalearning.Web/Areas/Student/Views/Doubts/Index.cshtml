@@ -238,6 +238,11 @@
                         }
                     </div>
                     <p class="dv-q">@d.QuestionText</p>
+                    <div style="margin-top:.9rem">
+                        <a class="b b-soft b-sm" asp-action="Thread" asp-route-id="@d.DoubtId">
+                            <i class="bi bi-chat-dots"></i> @(d.ReplyCount > 0 ? $"{d.ReplyCount} {(d.ReplyCount == 1 ? "reply" : "replies")}" : "Open conversation")
+                        </a>
+                    </div>
                 </article>
             }
         </div>

@@ -1,4 +1,6 @@
-﻿namespace Manikalearning.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Manikalearning.Domain.Entities
 { 
     public class DoubtEntity
     {
@@ -15,5 +17,17 @@
         public virtual User User { get; set; } = null!;
         public virtual Course? Course { get; set; }
         public virtual CourseLecture? Lecture { get; set; }
+    }
+    public class DoubtReplyEntity
+    {
+        [Key]
+        public Guid ReplyId { get; set; }
+
+        public Guid DoubtId { get; set; }
+        public Guid UserId { get; set; }
+        public string ReplyText { get; set; } = "";
+        public bool IsFromStaff { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

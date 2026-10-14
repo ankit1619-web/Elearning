@@ -34,7 +34,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<Plan> Plans { get; set; }
         public DbSet<PlanCourse> PlanCourses { get; set; }
         public DbSet<StudentSubscription> StudentSubscriptions { get; set; }
-        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Manikalearning.Domain.Entities.Payment> Payments { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
 
         public DbSet<Question> Questions { get; set; }
@@ -49,6 +49,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<QuestionMistake> QuestionMistakes { get; set; }
         public DbSet<TopicContent> TopicContents { get; set; }
         public DbSet<DoubtEntity> Doubts { get; set; }
+        public DbSet<DoubtReplyEntity> DoubtReplies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

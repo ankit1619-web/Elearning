@@ -1,0 +1,50 @@
+﻿@using Manikalearning.Application.DTOs
+
+@model DoubtThreadDto
+@{
+    ViewData["Title"] = "Answer doubt";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";      
+    var d = Model.Doubt;
+}
+
+<div class="container py-3" style="max-width:860px">
+    <a asp-action="Index" class="text-decoration-none small">&larr; All doubts</a>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 my-3">
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+            <span class="badge @(d.Status == DoubtStatus.Open ? "text-bg-warning" : d.Status == DoubtStatus.Answered ? "text-bg-success" : "text-bg-secondary")">@d.Status</span>
+            <strong>@d.StudentName</strong>
+            @if (!string.IsNullOrEmpty(d.CourseName))
+            {
+                <span class="text-muted small">&middot; @d.CourseName</span>
+            }
+            <span class="text-muted small">&middot; @d.CreatedAt.ToLocalTime().ToString("d MMM yyyy, h:mm tt")</span>
+        </div>
+        <p class="mb-0" style="white-space:pre-line">@d.QuestionText</p>
+    </div>
+
+    @foreach (var r in Model.Replies)
+    {
+        <div class="d-flex mb-2 @(r.IsFromStaff ? "justify-content-end" : "")">
+            <div class="p-3 rounded-4 @(r.IsFromStaff ? "bg-primary text-white" : "bg-light")" style="max-width:85%">
+                <div class="small fw-bold mb-1">@(r.IsFromStaff ? "Teacher" : d.StudentName)</div>
+                <div style="white-space:pre-line">@r.Text</div>
+                <div class="small opacity-75 mt-1">@r.CreatedAt.ToLocalTime().ToString("d MMM, h:mm tt")</div>
+            </div>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 mt-3">
+        <form method="post" asp-area="Admin" asp-controller="Doubts" asp-action="Reply" asp-route-id="@d.DoubtId">
+            <label class="form-label fw-semibold">Your answer</label>
+            <textarea name="text" class="form-control mb-3" rows="5" maxlength="2000" required></textarea>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <button type="submit" class="btn btn-primary">Send answer</button>
+                <div class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" name="close" value="true" id="closeIt" />
+                    <label class="form-check-label" for="closeIt">Close this doubt</label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

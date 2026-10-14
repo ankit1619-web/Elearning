@@ -1,4 +1,5 @@
 ﻿using Manikalearning.Application.Features.Commands.Students;
+using Manikalearning.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Area("Student")]
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
+    [RequireSubscription]
     public class MockTestsController : Controller
     {
         private readonly IMediator _mediator;

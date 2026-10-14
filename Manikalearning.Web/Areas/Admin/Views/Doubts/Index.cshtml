@@ -1,0 +1,65 @@
+﻿@using Manikalearning.Application.DTOs
+
+@model StaffDoubtListDto
+@{
+    ViewData["Title"] = "Student Doubts";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";       
+    var filters = new[] { ((string?)DoubtStatus.Open, "Open"), (DoubtStatus.Answered, "Answered"), (DoubtStatus.Closed, "Closed"), ((string?)null, "All") };
+}
+
+<div class="container-fluid py-3">
+    <h3 class="fw-bold mb-3">Student doubts</h3>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        @foreach (var (value, label) in filters)
+        {
+            <a class="btn btn-sm @(Model.Status == value ? "btn-primary" : "btn-outline-secondary")"
+               asp-action="Index" asp-route-status="@(value ?? "")">@label</a>
+        }
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr><th>Student</th><th>Doubt</th><th>Course</th><th>Replies</th><th>Status</th><th>Asked</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-nowrap">@d.StudentName</td>
+                            <td style="min-width:260px;max-width:420px">@(d.QuestionText.Length > 140 ? d.QuestionText[..140] + "…" : d.QuestionText)</td>
+                            <td class="text-muted small">@d.CourseName</td>
+                            <td>@d.ReplyCount</td>
+                            <td>
+                                <span class="badge @(d.Status == DoubtStatus.Open ? "text-bg-warning" : d.Status == DoubtStatus.Answered ? "text-bg-success" : "text-bg-secondary")">@d.Status</span>
+                            </td>
+                            <td class="text-muted small text-nowrap">@d.CreatedAt.ToLocalTime().ToString("d MMM, h:mm tt")</td>
+                            <td class="text-end"><a class="btn btn-sm btn-primary" asp-action="Thread" asp-route-id="@d.DoubtId">Answer</a></td>
+                        </tr>
+                    }
+                    @if (Model.Items.Count == 0)
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-5">No doubts here.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
+            @if (Model.Page > 1)
+            {
+                <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-status="@Model.Status" asp-route-page="@(Model.Page - 1)">Previous</a>
+            }
+            <span class="text-muted small">Page @Model.Page of @Model.TotalPages</span>
+            @if (Model.Page < Model.TotalPages)
+            {
+                <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-status="@Model.Status" asp-route-page="@(Model.Page + 1)">Next</a>
+            }
+        </div>
+    }
+</div>

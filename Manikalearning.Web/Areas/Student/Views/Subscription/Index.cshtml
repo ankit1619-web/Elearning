@@ -1,5 +1,4 @@
-﻿ 
-@using System.Globalization
+﻿ @using System.Globalization
 @model Manikalearning.Web.Areas.Student.Controllers.SubscriptionPageVm
 @{
     ViewData["Title"] = "Plans & Payments";
@@ -7,6 +6,10 @@
     var inr = new CultureInfo("en-IN");
     var plans = Model.Plans;
     var pay = Model.Payments;
+    var mine = Model.Mine;
+    var activeByPlan = mine.Where(m => m.IsActive)
+                       .GroupBy(m => m.PlanId)
+                       .ToDictionary(g => g.Key, g => g.First());
     string Duration(int days) => days % 365 == 0 ? $"{days / 365} year" + (days / 365 > 1 ? "s" : "")
                               : days % 30 == 0 ? $"{days / 30} month" + (days / 30 > 1 ? "s" : "")
                               : $"{days} days";
@@ -14,6 +17,78 @@
 
 @section Styles {
     <style>
+        .sb-banner {
+            padding: .9rem 1.1rem;
+            border-radius: 14px;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            gap: .6rem;
+            align-items: flex-start;
+        }
+
+            .sb-banner.success {
+                background: #d9f7ea;
+                color: #065f46;
+            }
+
+            .sb-banner.failed {
+                background: #ffe4e9;
+                color: #9f1239;
+            }
+
+            .sb-banner.cancelled {
+                background: #fff4d6;
+                color: #92400e;
+            }
+
+        .sb-mine {
+            display: grid;
+            gap: .8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sb-sub {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 1.1rem 1.3rem;
+        }
+
+            .sb-sub .grow {
+                flex: 1;
+                min-width: 180px;
+            }
+
+            .sb-sub h3 {
+                font-size: 1.05rem;
+                font-weight: 800;
+                margin: 0 0 .15rem;
+            }
+
+        .sb-left {
+            text-align: right;
+        }
+
+            .sb-left strong {
+                font-size: 1.6rem;
+                font-weight: 800;
+                letter-spacing: -.03em;
+                display: block;
+                line-height: 1;
+            }
+
+            .sb-left span {
+                font-size: .78rem;
+                color: var(--muted);
+                font-weight: 600;
+            }
+
+        .sb-sub.old {
+            opacity: .7;
+        }
+
         .sb-coupon {
             display: flex;
             gap: .6rem;
@@ -131,10 +206,6 @@
                 margin-top: .1rem;
             }
 
-        .sb-card .b {
-            margin-top: auto;
-        }
-
         .sb-hist {
             display: flex;
             align-items: center;
@@ -219,7 +290,47 @@
             <p>Choose a plan and see your payment history.</p>
         </div>
     </div>
-     
+
+    @switch (Model.PaymentResult)
+    {
+        case "success":
+            <div class="sb-banner success" role="status"><i class="bi bi-check-circle-fill"></i> Payment successful. Your plan is active now.</div>
+            break;
+        case "failed":
+
+            <div class="sb-banner failed" role="alert"><i class="bi bi-x-circle-fill"></i> We could not confirm your payment. If money was deducted it will be refunded by your bank, or contact support.</div>
+            break;
+        case "cancelled":
+
+            <div class="sb-banner cancelled" role="status"><i class="bi bi-exclamation-circle-fill"></i> Payment cancelled. You were not charged.</div>
+            break;
+    }
+
+    @if (mine.Count > 0)
+    {
+        <div class="ptitle"><h2>Your subscription</h2></div>
+        <div class="sb-mine">
+            @foreach (var m in mine)
+            {
+                <section class="panel sb-sub @(m.IsActive ? "" : "old")">
+                    <div class="grow">
+                        <h3>@m.PlanName</h3>
+                        <div class="muted">@m.StartDate.ToLocalTime().ToString("d MMM yyyy") to @m.EndDate.ToLocalTime().ToString("d MMM yyyy")</div>
+                    </div>
+                    @if (m.IsActive)
+                    {
+                        <div class="sb-left"><strong>@m.DaysLeft</strong><span>days left</span></div>
+                    }
+                    else
+                    {
+
+                        <span class="sb-st">Expired</span>
+                    }
+                </section>
+            }
+        </div>
+    }
+ 
     <form class="sb-coupon" method="get" asp-area="Student" asp-controller="Subscription" asp-action="Index">
         <input type="text" name="code" value="@plans.CouponCode" maxlength="50" placeholder="Have a coupon code?" autocomplete="off" aria-label="Coupon code" />
         <button type="submit" class="b b-line"><i class="bi bi-tag"></i> Apply</button>
@@ -273,8 +384,14 @@
                         }
                     </ul>
                 }
-                 
-                <span class="b b-solid disabled" aria-disabled="true" title="Checkout is added in the next step">Choose plan</span>
+
+                <form method="post" asp-area="Student" asp-controller="Subscription" asp-action="Checkout" style="margin-top:auto">
+                    <input type="hidden" name="planId" value="@p.PlanId" />
+                    <input type="hidden" name="code" value="@plans.CouponCode" />
+                    <button type="submit" class="b b-solid b-block">
+                        @(activeByPlan.ContainsKey(p.PlanId) ? "Renew plan" : "Choose plan")@(p.FinalPrice <= 0 ? " (free)" : "")
+                    </button>
+                </form>
             </article>
         }
     </div>

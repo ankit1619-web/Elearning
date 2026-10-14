@@ -1,0 +1,90 @@
+﻿ 
+@using System.Globalization
+@model Manikalearning.Web.Areas.Student.Controllers.PayPageVm
+@{
+    ViewData["Title"] = "Confirm payment";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var inr = new CultureInfo("en-IN");
+    var c = Model.Checkout;
+}
+
+@section Styles {
+    <style>
+        .pay-wrap {
+            max-width: 520px;
+            margin: 1rem auto;
+        }
+
+        .pay-card {
+            padding: 1.6rem;
+        }
+
+            .pay-card h1 {
+                font-size: 1.3rem;
+                font-weight: 800;
+                letter-spacing: -.02em;
+                margin: 0 0 .2rem;
+            }
+
+        .pay-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: .7rem 0;
+            border-top: 1px solid var(--line);
+            font-size: .95rem;
+        }
+
+            .pay-line:first-of-type {
+                border-top: 0;
+            }
+
+            .pay-line.off {
+                color: #047857;
+                font-weight: 700;
+            }
+
+        .pay-total {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .pay-note {
+            color: var(--muted);
+            font-size: .82rem;
+            margin: 1rem 0 0;
+            display: flex;
+            gap: .5rem;
+            align-items: flex-start;
+        }
+    </style>
+}
+
+<div class="pay-wrap">
+    <section class="panel pay-card">
+        <h1>Confirm your payment</h1>
+        <p class="muted" style="margin:0 0 1rem">You will pay securely on Razorpay.</p>
+
+        <div class="pay-line"><span>@c.PlanName</span><span>₹@c.Price.ToString("N2", inr)</span></div>
+        @if (c.Discount > 0)
+        {
+            <div class="pay-line off"><span>Coupon discount</span><span>- ₹@c.Discount.ToString("N2", inr)</span></div>
+        }
+        <div class="pay-line pay-total"><span>You pay</span><span>₹@c.FinalAmount.ToString("N2", inr)</span></div>
+         
+        <form method="post" action="https://api.razorpay.com/v1/checkout/embedded" asp-antiforgery="false" style="margin-top:1.2rem">
+            <input type="hidden" name="key_id" value="@c.KeyId" />
+            <input type="hidden" name="order_id" value="@c.OrderId" />
+            <input type="hidden" name="name" value="ManikaLearning" />
+            <input type="hidden" name="description" value="@c.PlanName" />
+            <input type="hidden" name="prefill[name]" value="@Model.Name" />
+            <input type="hidden" name="prefill[email]" value="@Model.Email" />
+            <input type="hidden" name="callback_url" value="@Model.CallbackUrl" />
+            <input type="hidden" name="cancel_url" value="@Model.CancelUrl" />
+            <button type="submit" class="b b-solid b-lg b-block"><i class="bi bi-lock-fill"></i> Pay ₹@c.FinalAmount.ToString("N2", inr)</button>
+        </form>
+        <a class="b b-link b-block" style="margin-top:.5rem" asp-action="Index">Cancel</a>
+
+        <p class="pay-note"><i class="bi bi-shield-check"></i> Your card or UPI details go to Razorpay only. We never see or store them.</p>
+    </section>
+</div>

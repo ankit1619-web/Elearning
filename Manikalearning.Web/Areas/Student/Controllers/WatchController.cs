@@ -1,12 +1,11 @@
-﻿using Azure;
-using Manikalearning.Application.DTOs;
+﻿using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.Bookmarks;
 using Manikalearning.Application.Features.Commands.Assessments.Pyq;
 using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Application.Interface;
+using Manikalearning.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -15,6 +14,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Area("Student")]
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
+    [RequireCourseAccess]
     public class WatchController : Controller
     {
         private readonly IFileStorageService _fileService;

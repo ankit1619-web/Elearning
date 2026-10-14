@@ -13,6 +13,8 @@ namespace Manikalearning.Application.DTOs
         public string Status { get; set; } = "";
         public string? CourseName { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int ReplyCount { get; set; }
+        public string? StudentName { get; set; } 
     }
     public static class DoubtStatus
     {
@@ -23,6 +25,30 @@ namespace Manikalearning.Application.DTOs
      
 
     public class DoubtListDto
+    {
+        public List<DoubtDto> Items { get; set; } = new();
+        public string? Status { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalCount / (double)PageSize));
+    }
+    public class ReplyDto
+    {
+        public Guid ReplyId { get; set; }
+        public string Text { get; set; } = "";
+        public bool IsFromStaff { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class DoubtThreadDto
+    {
+        public DoubtDto Doubt { get; set; } = new();
+        public List<ReplyDto> Replies { get; set; } = new();
+        public bool CanStudentReply => Doubt.Status != DoubtStatus.Closed;
+    }
+
+    public class StaffDoubtListDto
     {
         public List<DoubtDto> Items { get; set; } = new();
         public string? Status { get; set; }

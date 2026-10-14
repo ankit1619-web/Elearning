@@ -5,11 +5,6 @@ using Manikalearning.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Manikalearning.Application.Features.Handlers.Students
 {
@@ -72,6 +67,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 .AsNoTracking()
                 .Where(p => p.UserId == request.UserId && p.Status == "Success")
                 .ToListAsync(cancellationToken);
+
             var subjectStrengths = attempts
      .Where(a => a.Test != null && !string.IsNullOrEmpty(a.Test.TestName))
      .GroupBy(a => a.Test.TestName)
