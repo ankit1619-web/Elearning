@@ -3,25 +3,40 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Manikalearning.Domain.Entities
 {
+   
     [Table("Courses")]
-    public class Course 
+    public class Course
     {
         [Key]
-        public Guid CourseId { get; set; } = Guid.NewGuid();
+        public Guid CourseId { get; set; }
 
-        [Required, MaxLength(200)]
-        public string CourseName { get; set; } 
-        public string Description { get; set; }
+        [Required]
+        [MaxLength(250)]
+        public string CourseName { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        [MaxLength(500)]
+        public string? ThumbnailUrl { get; set; }
+
+        [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
-        public bool IsPublished { get; set; } = true;
+
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? DiscountPrice { get; set; }
+
+        public bool IsFree { get; set; }
+
+        public bool IsPublished { get; set; }
+
+        public Guid? CreatedBy { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-         
+          
         public ICollection<StudentCourse> StudentCourses { get; set; }
-        public ICollection<PlanCourse> PlanCourses { get; set; } 
-        public virtual ICollection<CourseSection> CourseSections { get; set; } = new List<CourseSection>(); 
+        public ICollection<PlanCourse> PlanCourses { get; set; }
+        public virtual ICollection<CourseSection> CourseSections { get; set; } = new List<CourseSection>();
     }
-
     [Table("CourseSections")]
     public class CourseSection
     {

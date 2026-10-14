@@ -53,8 +53,11 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Bookmarks
                         StudentEmail = b.User.Email ?? "N/A",
                         QuestionId = b.QuestionId,
                         LectureId = b.LectureId,
-                        QuestionTitle = b.Question.QuestionText ?? "N/A",
-                        CreatedAt = b.CreatedAt
+                        QuestionTitle = b.Question!.QuestionText ?? "N/A",
+                        SavedAt = b.CreatedAt,
+                        Explanation = b.Question!.Explanation ?? "N/A",
+                        CorrectAnswer = b.Question!.Options.FirstOrDefault(x => x.IsCorrect)!.OptionText ?? "N/A",
+                        
                     }).ToListAsync(cancellationToken);
 
                 var result = new BookmarkPagedResultDto
@@ -62,7 +65,8 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Bookmarks
                     Bookmarks = items,
                     TotalCount = totalCount,
                     PageIndex = request.PageIndex,
-                    PageSize = request.PageSize
+                    PageSize = request.PageSize,
+                    Search = request.Search,
                 };
 
                 return ResponseDto<BookmarkPagedResultDto>.Success(result, "Bookmarks fetched successfully.");

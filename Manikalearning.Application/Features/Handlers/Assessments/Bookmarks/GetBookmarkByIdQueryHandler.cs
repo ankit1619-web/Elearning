@@ -44,7 +44,9 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Bookmarks
                     StudentEmail = bookmark.User?.Email ?? "N/A",
                     QuestionId = bookmark.QuestionId,
                     QuestionTitle = bookmark.Question?.QuestionText ?? "N/A",
-                    CreatedAt = bookmark.CreatedAt
+                    Explanation = bookmark.Question?.Explanation ?? "N/A",
+                    SavedAt = bookmark.CreatedAt,
+                    CorrectAnswer = bookmark.Question?.Options.FirstOrDefault(x => x.IsCorrect)?.OptionText ?? "N/A",
                 };
 
                 return ResponseDto<BookmarkDto>.Success(dto, "Bookmark details retrieved successfully.");

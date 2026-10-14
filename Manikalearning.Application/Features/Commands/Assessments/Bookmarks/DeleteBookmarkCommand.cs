@@ -3,5 +3,8 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Assessments.Bookmarks
 {
-    public record DeleteBookmarkCommand(Guid BookmarkId) : IRequest<ResponseDto<bool>>;
+    public record DeleteBookmarkCommand(Guid BookmarkId, Guid? Userid = null) : IRequest<ResponseDto<bool>>
+    { 
+        public DeleteBookmarkCommand(Guid bookmarkId) : this(bookmarkId, null) { }
+    }
 }

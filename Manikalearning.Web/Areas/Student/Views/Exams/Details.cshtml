@@ -1,0 +1,81 @@
+﻿ @using System.Globalization
+@using Manikalearning.Application.DTOs
+@model ExamListDetailsDto
+@{
+    ViewData["Title"] = Model.Exam.ExamName;
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var inr = new CultureInfo("en-IN");
+}
+
+@section Styles {
+    <style>
+        .ec-hero { padding: 1.6rem; margin-bottom: 1.5rem; display: flex; gap: 1.2rem; align-items: center; }
+        .ec-code { flex: 0 0 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; color: #fff; font-weight: 800; background: var(--grad); box-shadow: var(--glow); }
+        .ec-hero h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; margin: 0 0 .2rem; }
+        .ec-hero p { margin: 0; color: var(--muted); max-width: 70ch; }
+        .ec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+        .ec-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+        .ec-thumb { aspect-ratio: 16/9; background: linear-gradient(135deg, #312e81, #7c3aed); display: grid; place-items: center; color: rgba(255,255,255,.9); font-size: 2rem; }
+        .ec-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ec-body { padding: 1.1rem 1.2rem 1.2rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+        .ec-body h2 { font-size: 1.02rem; font-weight: 800; margin: 0; }
+        .ec-desc { color: var(--muted); font-size: .86rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .ec-foot { margin-top: auto; padding-top: .6rem; display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+        .ec-price { font-weight: 800; font-size: 1.1rem; }
+        .ec-price s { color: var(--muted); font-weight: 500; font-size: .85rem; margin-left: .3rem; }
+        .ec-free { color: #047857; background: #d9f7ea; padding: .2rem .65rem; border-radius: 999px; font-size: .8rem; font-weight: 800; }
+        .ec-empty { text-align: center; padding: 3rem 1.5rem; color: var(--muted); }
+        @@media (max-width: 575.98px) { .ec-hero { flex-direction: column; align-items: flex-start; } }
+    </style>
+}
+
+<div class="dash">
+    <a class="b b-link" style="margin-bottom:.6rem" asp-action="Index"><i class="bi bi-arrow-left"></i> All exams</a>
+
+    <section class="panel ec-hero">
+        <div class="ec-code">@Model.Exam.ExamCode</div>
+        <div>
+            <h1>@Model.Exam.ExamName</h1>
+            @if (!string.IsNullOrWhiteSpace(Model.Exam.Description)) { <p>@Model.Exam.Description</p> }
+        </div>
+    </section>
+
+    @if (Model.Courses.Count == 0)
+    {
+        <section class="panel ec-empty">No courses are published for this exam yet.</section>
+    }
+    else
+    {
+        <div class="ec-grid">
+            @foreach (var c in Model.Courses)
+            {
+                <article class="panel ec-card">
+                    <div class="ec-thumb">
+                        @if (!string.IsNullOrWhiteSpace(c.ThumbnailUrl)) { <img src="@c.ThumbnailUrl" alt="" loading="lazy" /> }
+                        else { <i class="bi bi-play-circle"></i> }
+                    </div>
+                    <div class="ec-body">
+                        <h2>@c.CourseName</h2>
+                        @if (!string.IsNullOrWhiteSpace(c.Description)) { <p class="ec-desc">@c.Description</p> }
+                        <div class="ec-foot">
+                            @if (c.IsFree) { <span class="ec-free">Free</span> }
+                            else
+                            {
+                                <span class="ec-price">₹@c.Price.ToString("N0", inr)@if (c.HasDiscount) { <s>₹@c.Price.ToString("N0", inr)</s> }</span>
+                            }
+
+                            @if (c.IsFree)
+                            {
+                                <a class="b b-solid b-sm" asp-area="Student" asp-controller="MyCourses" asp-action="Index">Start learning</a>
+                            }
+                            else
+                            {
+                                <a class="b b-line b-sm" asp-area="Student" asp-controller="Subscription" asp-action="Index">See plans</a>
+                            }
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>

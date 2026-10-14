@@ -3,20 +3,15 @@
     public class ExamDto
     {
         public Guid ExamId { get; set; }
-
-        public string ExamName { get; set; } = string.Empty;
-
-        public string? ExamCode { get; set; }
-
+        public string ExamName { get; set; } = "";
+        public string ExamCode { get; set; } = "";
         public string? Description { get; set; }
-
         public string? ImageUrl { get; set; }
-
+        public int CourseCount { get; set; } 
         public bool IsActive { get; set; }
-
         public int DisplayOrder { get; set; }
-
-        public DateTime CreatedAt { get; set; }
+         
+      
     }
     public class ExamListDto
     {
@@ -157,5 +152,23 @@
         public string Question { get; set; } = string.Empty;
 
         public string Answer { get; set; } = string.Empty;
+    }
+    
+    public class CourseCardDto
+    {
+        public Guid CourseId { get; set; }
+        public string CourseName { get; set; } = "";
+        public string? Description { get; set; }
+        public string? ThumbnailUrl { get; set; }
+        public decimal Price { get; set; }
+        public decimal EffectivePrice { get; set; }      // price after DiscountPrice
+        public bool IsFree { get; set; }
+        public bool HasDiscount => !IsFree && EffectivePrice < Price;
+    }
+
+    public class ExamListDetailsDto
+    {
+        public ExamDto Exam { get; set; } = new();
+        public List<CourseCardDto> Courses { get; set; } = new();
     }
 }

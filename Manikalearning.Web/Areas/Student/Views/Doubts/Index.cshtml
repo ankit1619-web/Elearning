@@ -1,0 +1,260 @@
+﻿@using Manikalearning.Application.DTOs
+
+@model Manikalearning.Web.Areas.Student.Controllers.DoubtsPageVm
+@{
+    ViewData["Title"] = "Doubts";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var list = Model.List;
+    var hasError = !ViewData.ModelState.IsValid;
+    var filters = new[] { ((string?)null, "All"), (DoubtStatus.Open, "Open"), (DoubtStatus.Answered, "Answered"), (DoubtStatus.Closed, "Closed") };
+}
+
+@section Styles {
+    <style>
+        .dv-ask summary {
+            list-style: none;
+            display: inline-flex;
+        }
+
+            .dv-ask summary::-webkit-details-marker {
+                display: none;
+            }
+
+        .dv-form {
+            margin-top: 1rem;
+            display: grid;
+            gap: .9rem;
+        }
+
+            .dv-form label {
+                font-weight: 700;
+                font-size: .88rem;
+                display: block;
+                margin-bottom: .35rem;
+            }
+
+            .dv-form select, .dv-form textarea {
+                width: 100%;
+                padding: .7rem 1rem;
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                background: var(--surface);
+                font: inherit;
+                color: var(--text);
+            }
+
+            .dv-form textarea {
+                min-height: 130px;
+                resize: vertical;
+            }
+
+                .dv-form select:focus, .dv-form textarea:focus {
+                    outline: 3px solid rgba(99,102,241,.25);
+                    border-color: var(--brand);
+                }
+
+        .dv-err {
+            color: #be123c;
+            font-size: .83rem;
+            font-weight: 600;
+            margin-top: .3rem;
+            display: block;
+        }
+
+        .dv-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .dv-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .dv-card {
+            padding: 1.2rem 1.4rem;
+        }
+
+        .dv-top {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            flex-wrap: wrap;
+            margin-bottom: .7rem;
+        }
+
+        .dv-status {
+            padding: .25rem .7rem;
+            border-radius: 999px;
+            font-size: .76rem;
+            font-weight: 800;
+        }
+
+            .dv-status.Open {
+                background: #fff4d6;
+                color: #92400e;
+            }
+
+            .dv-status.Answered {
+                background: #d9f7ea;
+                color: #065f46;
+            }
+
+            .dv-status.Closed {
+                background: #eceaf8;
+                color: #5b5a80;
+            }
+
+        .dv-meta {
+            color: var(--muted);
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .dv-form-del {
+            margin: 0 0 0 auto;
+        }
+
+        .dv-q {
+            margin: 0;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .dv-pager {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: .8rem;
+            margin-top: 1.5rem;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .dv-empty {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--muted);
+        }
+
+            .dv-empty i {
+                font-size: 2.8rem;
+                color: var(--brand);
+                display: block;
+                margin-bottom: .6rem;
+            }
+
+        @@media (max-width: 575.98px) {
+            .dv-card {
+                padding: 1rem;
+            }
+
+            .dv-form-del {
+                margin-left: 0;
+                width: 100%;
+            }
+
+                .dv-form-del .b {
+                    width: 100%;
+                }
+
+            .dv-filter .b {
+                flex: 1 1 calc(50% - .3rem);
+            }
+        }
+    </style>
+}
+
+<div class="dash">
+    <div class="head">
+        <div>
+            <h1>Doubts</h1>
+            <p>Ask a question and track its status here.</p>
+        </div>
+    </div>
+
+    @* details/summary = open and close without JavaScript. Stays open when there is an error. *@
+    <details class="panel pad dv-ask" @(hasError ? "open" : null)>
+        <summary class="b b-solid"><i class="bi bi-plus-lg"></i> Ask a new doubt</summary>
+
+        <form class="dv-form" method="post" asp-area="Student" asp-controller="Doubts" asp-action="Ask">
+            <div>
+                <label asp-for="Input.CourseId">Course (optional)</label>
+                <select asp-for="Input.CourseId">
+                    <option value="">Not about a particular course</option>
+                    @foreach (var c in Model.Courses)
+                    {
+                        <option value="@c.CourseId" selected="@(Model.Input.CourseId == c.CourseId)">@c.CourseName</option>
+                    }
+                </select>
+                <span class="dv-err" asp-validation-for="Input.CourseId"></span>
+            </div>
+            <div>
+                <label asp-for="Input.QuestionText">Your doubt</label>
+                <textarea asp-for="Input.QuestionText" maxlength="1000" placeholder="Write your question clearly, for example the topic, lecture and what you did not understand."></textarea>
+                <span class="dv-err" asp-validation-for="Input.QuestionText"></span>
+            </div>
+            <div><button type="submit" class="b b-solid"><i class="bi bi-send"></i> Send doubt</button></div>
+        </form>
+    </details>
+
+    <nav class="dv-filter" aria-label="Filter by status">
+        @foreach (var (value, label) in filters)
+        {
+            <a class="b b-sm @(list.Status == value ? "b-solid" : "b-line")" asp-action="Index" asp-route-status="@value">@label</a>
+        }
+    </nav>
+
+    @if (list.Items.Count == 0)
+    {
+        <section class="panel dv-empty">
+            <i class="bi bi-chat-square-text"></i>
+            @(list.Status == null ? "You have not asked any doubt yet." : "No doubts with this status.")
+        </section>
+    }
+    else
+    {
+        <div class="dv-list">
+            @foreach (var d in list.Items)
+            {
+                <article class="panel dv-card">
+                    <div class="dv-top">
+                        <span class="dv-status @d.Status">@d.Status</span>
+                        @if (!string.IsNullOrEmpty(d.CourseName))
+                        {
+                            <span class="dv-meta"><i class="bi bi-journal-text"></i> @d.CourseName</span>
+                        }
+                        <span class="dv-meta">@d.CreatedAt.ToLocalTime().ToString("d MMM yyyy, h:mm tt")</span>
+
+                        @if (d.Status == DoubtStatus.Open)
+                        {
+                            <form class="dv-form-del" method="post" asp-area="Student" asp-controller="Doubts" asp-action="Delete"
+                                  asp-route-id="@d.DoubtId" asp-route-status="@list.Status" asp-route-page="@list.Page">
+                                <button type="submit" class="b b-line b-sm"><i class="bi bi-trash"></i> Delete</button>
+                            </form>
+                        }
+                    </div>
+                    <p class="dv-q">@d.QuestionText</p>
+                </article>
+            }
+        </div>
+
+        @if (list.TotalPages > 1)
+        {
+            <nav class="dv-pager" aria-label="Pages">
+                @if (list.Page > 1)
+                {
+                    <a class="b b-line b-sm" asp-action="Index" asp-route-status="@list.Status" asp-route-page="@(list.Page - 1)"><i class="bi bi-chevron-left"></i> Previous</a>
+                }
+                <span>Page @list.Page of @list.TotalPages</span>
+                @if (list.Page < list.TotalPages)
+                {
+                    <a class="b b-line b-sm" asp-action="Index" asp-route-status="@list.Status" asp-route-page="@(list.Page + 1)">Next <i class="bi bi-chevron-right"></i></a>
+                }
+            </nav>
+        }
+    }
+</div>

@@ -40,8 +40,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Exams
                         Description = x.Description,
                         ImageUrl = x.ImageUrl,
                         IsActive = x.IsActive,
-                        DisplayOrder = x.DisplayOrder,
-                        CreatedAt = x.CreatedAt
+                        DisplayOrder = x.DisplayOrder
                     }).FirstOrDefaultAsync();
                       
 

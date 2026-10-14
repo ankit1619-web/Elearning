@@ -1,0 +1,134 @@
+﻿ @using Manikalearning.Application.DTOs
+@model PerformanceDto
+@{
+    ViewData["Title"] = "Performance";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+
+    string Tone(decimal p) => p >= 75 ? "good" : p >= 50 ? "mid" : "low";
+    string Dur(int sec) { var t = TimeSpan.FromSeconds(sec); return t.TotalHours >= 1 ? $"{(int)t.TotalHours}h {t.Minutes}m" : $"{t.Minutes}m"; }
+
+    var maxQ = Math.Max(1, Model.Daily.Max(d => d.Questions));
+    var today = DateTime.UtcNow.Date;
+    var ranges = new[] { (7, "7 days"), (30, "30 days"), (90, "90 days"), (365, "1 year") };
+}
+
+@section Styles {
+    <style>
+        .pf-range { display: flex; flex-wrap: wrap; gap: .5rem; }
+        .pf-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .pf-mix { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--line); margin: 1rem 0 .8rem; }
+        .pf-mix i { display: block; height: 100%; }
+        .pf-key { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; font-size: .85rem; color: var(--muted); }
+        .pf-key b { color: var(--text); }
+        .pf-key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .4rem; background: var(--c); }
+        .pf-date { font-size: .85rem; }
+        .pf-date small { display: block; color: var(--muted); }
+        .pf-empty { text-align: center; padding: 3rem 1.5rem; }
+        .pf-empty i { font-size: 2.8rem; color: var(--brand); }
+        .pf-empty h2 { font-size: 1.25rem; font-weight: 800; margin: .6rem 0 .3rem; }
+        .pf-empty p { color: var(--muted); max-width: 42ch; margin: 0 auto 1.2rem; }
+
+        @@media (max-width: 991.98px) { .pf-split { grid-template-columns: 1fr; } }
+        @@media (max-width: 575.98px) { .pf-range .b { flex: 1 1 calc(50% - .3rem); } }
+    </style>
+}
+
+<div class="dash">
+    <div class="head">
+        <div>
+            <h1>Performance</h1>
+            <p>How you did in the last @(Model.Days == 365 ? "year" : Model.Days + " days").</p>
+        </div>
+        <div class="pf-range">
+            @foreach (var (d, label) in ranges)
+            {
+                <a class="b b-sm @(Model.Days == d ? "b-solid" : "b-line")" asp-action="Index" asp-route-days="@d">@label</a>
+            }
+        </div>
+    </div>
+
+    @if (Model.Attempts == 0)
+    {
+        <section class="panel pf-empty">
+            <i class="bi bi-bar-chart-line"></i>
+            <h2>No tests in this period</h2>
+            <p>Submit a PYQ test and your accuracy, score and progress will show up here.</p>
+            <a class="b b-solid" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">Start a test</a>
+        </section>
+    }
+    else
+    {
+        <section class="panel stats">
+            <div class="stat">
+                <div class="l"><span class="ico"><i class="bi bi-journal-check"></i></span> Tests taken</div>
+                <div class="v">@Model.Attempts</div>
+                <div class="n">@Model.TotalQuestions questions in total</div>
+            </div>
+            <div class="stat">
+                <div class="l"><span class="ico"><i class="bi bi-bullseye"></i></span> Accuracy</div>
+                <div class="v">@Model.Accuracy%</div>
+                <div class="bar" style="margin-bottom:.45rem"><i class="@Tone(Model.Accuracy)" style="--w:@(Model.Accuracy)%"></i></div>
+                <div class="n">Correct out of attempted</div>
+            </div>
+            <div class="stat">
+                <div class="l"><span class="ico"><i class="bi bi-award"></i></span> Average score</div>
+                <div class="v">@Model.AvgScorePercent%</div>
+                <div class="n">Of the total marks</div>
+            </div>
+            <div class="stat">
+                <div class="l"><span class="ico"><i class="bi bi-clock-history"></i></span> Time spent</div>
+                <div class="v">@Dur(Model.TimeSpentSeconds)</div>
+                <div class="n"><i class="bi bi-fire"></i> @Model.StreakDays day streak</div>
+            </div>
+        </section>
+
+        <div class="pf-split" style="margin-top:0">
+            <section class="panel pad">
+                <div class="ptitle"><h2>Questions per day</h2></div>
+                <div class="bars">
+                    @foreach (var d in Model.Daily)
+                    {
+                        <div class="@(d.Date == today ? "on" : "")">
+                            <b>@d.Questions</b>
+                            <i style="--h:@(d.Questions * 100 / maxQ)%"></i>
+                            @d.Date.ToString("ddd")
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <section class="panel pad">
+                <div class="ptitle"><h2>Answer breakdown</h2></div>
+                @{
+                    var tot = Math.Max(1, Model.Correct + Model.Wrong + Model.Skipped);
+                }
+                <div class="pf-mix" role="img" aria-label="Correct @Model.Correct, wrong @Model.Wrong, skipped @Model.Skipped">
+                    <i style="width:@(Model.Correct * 100 / tot)%;background:var(--good)"></i>
+                    <i style="width:@(Model.Wrong * 100 / tot)%;background:var(--low)"></i>
+                    <i style="width:@(Model.Skipped * 100 / tot)%;background:#9d9bc0"></i>
+                </div>
+                <div class="pf-key">
+                    <span style="--c:var(--good)"><b>@Model.Correct</b> correct</span>
+                    <span style="--c:var(--low)"><b>@Model.Wrong</b> wrong</span>
+                    <span style="--c:#9d9bc0"><b>@Model.Skipped</b> skipped</span>
+                </div>
+                @if (Model.Wrong > 0)
+                {
+                    <a class="b b-soft b-sm" style="margin-top:1.2rem" asp-area="Student" asp-controller="MistakeBook" asp-action="Index"><i class="bi bi-exclamation-circle"></i> Revise your mistakes</a>
+                }
+            </section>
+        </div>
+
+        <section class="panel pad" style="margin-top:1.5rem">
+            <div class="ptitle"><h2>Recent tests</h2></div>
+            @foreach (var a in Model.Recent)
+            {
+                <div class="topic" style="grid-template-columns:120px 1fr 56px">
+                    <span class="pf-date">@a.SubmittedAt.ToLocalTime().ToString("d MMM")<small>@a.Score / @a.TotalMarks marks</small></span>
+                    <div class="bar"><i class="@Tone(a.Accuracy)" style="--w:@(a.Accuracy)%"></i></div>
+                    <b>@a.Accuracy%</b>
+                </div>
+            }
+        </section>
+    }
+</div>

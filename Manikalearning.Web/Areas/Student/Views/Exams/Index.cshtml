@@ -1,5 +1,68 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿ 
+@model Manikalearning.Web.Areas.Student.Controllers.ExamPageVM
 @{
+    ViewData["Title"] = "Exams";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
 }
+
+@section Styles {
+    <style>
+        .ex-search { display: flex; gap: .6rem; margin-bottom: 1.2rem; }
+        .ex-search input { flex: 1; min-width: 0; padding: .65rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font: inherit; color: var(--text); }
+        .ex-search input:focus { outline: 3px solid rgba(99,102,241,.25); border-color: var(--brand); }
+        .ex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+        .ex-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+        .ex-cover { aspect-ratio: 16/8; display: grid; place-items: center; color: #fff; font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; background: linear-gradient(135deg, #312e81, #7c3aed); }
+        .ex-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ex-body { padding: 1.1rem 1.2rem 1.2rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+        .ex-body h2 { font-size: 1.05rem; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+        .ex-desc { color: var(--muted); font-size: .88rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .ex-foot { margin-top: auto; padding-top: .6rem; display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+        .ex-count { font-size: .82rem; font-weight: 700; color: var(--brand); }
+        .ex-empty { text-align: center; padding: 3rem 1.5rem; color: var(--muted); }
+        .ex-empty i { font-size: 2.8rem; color: var(--brand); display: block; margin-bottom: .6rem; }
+        @@media (max-width: 575.98px) { .ex-search { flex-direction: column; } }
+    </style>
+}
+
+<div class="dash">
+    <div class="head">
+        <div>
+            <h1>Exams</h1>
+            <p>Pick your exam to see the courses made for it.</p>
+        </div>
+    </div>
+
+    <form class="ex-search" method="get" asp-area="Student" asp-controller="Exams" asp-action="Index">
+        <input type="search" name="q" value="@Model.Search" maxlength="100" placeholder="Search exams" aria-label="Search exams" />
+        <button type="submit" class="b b-line"><i class="bi bi-search"></i> Search</button>
+        @if (!string.IsNullOrEmpty(Model.Search)) { <a class="b b-link" asp-action="Index">Clear</a> }
+    </form>
+
+    @if (Model.Exams.Data.Count == 0)
+    {
+        <section class="panel ex-empty"><i class="bi bi-bullseye"></i>No exams found.</section>
+    }
+    else
+    {
+        <div class="ex-grid">
+            @foreach (var e in Model.Exams.Data)
+            {
+                <article class="panel ex-card">
+                    <div class="ex-cover">
+                        @if (!string.IsNullOrWhiteSpace(e.ImageUrl)) { <img src="@e.ImageUrl" alt="" loading="lazy" /> }
+                        else { @e.ExamCode }
+                    </div>
+                    <div class="ex-body">
+                        <h2>@e.ExamName</h2>
+                        @if (!string.IsNullOrWhiteSpace(e.Description)) { <p class="ex-desc">@e.Description</p> }
+                        <div class="ex-foot">
+                            <span class="ex-count">@e.CourseCount @(e.CourseCount == 1 ? "course" : "courses")</span>
+                            <a class="b b-solid b-sm" asp-area="Student" asp-controller="Exams" asp-action="Details" asp-route-id="@e.ExamId">View courses</a>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>

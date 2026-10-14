@@ -901,14 +901,14 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 /* ---------- Custom variants ---------- */
 .b-solid {
-    background: var(--mk-grad);
-    color: #fff;
-    box-shadow: var(--mk-glow);
+    background: var(--mk-surface);
+    color: var(--brand) !important;
+    border-color: var(--mk-line);
 }
-
     .b-solid:hover {
-        color: #fff;
-        filter: brightness(1.07);
+        color: var(--mk-brand);
+        border-color: var(--mk-brand);
+        background: var(--mk-soft);
     }
 
 .b-line {

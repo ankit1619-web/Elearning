@@ -1,0 +1,319 @@
+﻿ 
+@using System.Globalization
+@model Manikalearning.Web.Areas.Student.Controllers.SubscriptionPageVm
+@{
+    ViewData["Title"] = "Plans & Payments";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var inr = new CultureInfo("en-IN");
+    var plans = Model.Plans;
+    var pay = Model.Payments;
+    string Duration(int days) => days % 365 == 0 ? $"{days / 365} year" + (days / 365 > 1 ? "s" : "")
+                              : days % 30 == 0 ? $"{days / 30} month" + (days / 30 > 1 ? "s" : "")
+                              : $"{days} days";
+}
+
+@section Styles {
+    <style>
+        .sb-coupon {
+            display: flex;
+            gap: .6rem;
+            margin-bottom: .5rem;
+            max-width: 520px;
+        }
+
+            .sb-coupon input {
+                flex: 1;
+                min-width: 0;
+                padding: .65rem 1rem;
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                background: var(--surface);
+                font: inherit;
+                color: var(--text);
+                text-transform: uppercase;
+            }
+
+                .sb-coupon input:focus {
+                    outline: 3px solid rgba(99,102,241,.25);
+                    border-color: var(--brand);
+                }
+
+        .sb-note {
+            font-size: .88rem;
+            font-weight: 600;
+            margin: 0 0 1.2rem;
+        }
+
+            .sb-note.ok {
+                color: #047857;
+            }
+
+            .sb-note.bad {
+                color: #be123c;
+            }
+
+        .sb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .sb-card {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .7rem;
+        }
+
+            .sb-card h2 {
+                font-size: 1.15rem;
+                font-weight: 800;
+                margin: 0;
+                letter-spacing: -.01em;
+            }
+
+        .sb-dur {
+            color: var(--brand);
+            font-weight: 700;
+            font-size: .85rem;
+        }
+
+        .sb-price {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            line-height: 1.1;
+        }
+
+            .sb-price s {
+                font-size: 1rem;
+                font-weight: 500;
+                color: var(--muted);
+                margin-left: .4rem;
+            }
+
+        .sb-save {
+            display: inline-block;
+            background: #d9f7ea;
+            color: #065f46;
+            font-size: .78rem;
+            font-weight: 800;
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            width: fit-content;
+        }
+
+        .sb-desc {
+            color: var(--muted);
+            font-size: .88rem;
+            margin: 0;
+        }
+
+        .sb-courses {
+            list-style: none;
+            padding: 0;
+            margin: .3rem 0 0;
+            display: grid;
+            gap: .35rem;
+            font-size: .88rem;
+        }
+
+            .sb-courses li {
+                display: flex;
+                gap: .5rem;
+                align-items: flex-start;
+                overflow-wrap: anywhere;
+            }
+
+            .sb-courses i {
+                color: var(--good);
+                margin-top: .1rem;
+            }
+
+        .sb-card .b {
+            margin-top: auto;
+        }
+
+        .sb-hist {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .9rem 0;
+            border-top: 1px solid var(--line);
+            flex-wrap: wrap;
+        }
+
+            .sb-hist:first-of-type {
+                border-top: 0;
+            }
+
+            .sb-hist .grow {
+                flex: 1;
+                min-width: 160px;
+            }
+
+            .sb-hist .amt {
+                font-weight: 800;
+            }
+
+            .sb-hist .when {
+                color: var(--muted);
+                font-size: .82rem;
+            }
+
+        .sb-st {
+            padding: .25rem .7rem;
+            border-radius: 999px;
+            font-size: .76rem;
+            font-weight: 800;
+            background: #eceaf8;
+            color: #5b5a80;
+        }
+
+            .sb-st.Success, .sb-st.Paid, .sb-st.Captured, .sb-st.Completed {
+                background: #d9f7ea;
+                color: #065f46;
+            }
+
+            .sb-st.Failed {
+                background: #ffe4e9;
+                color: #be123c;
+            }
+
+            .sb-st.Pending, .sb-st.Created {
+                background: #fff4d6;
+                color: #92400e;
+            }
+
+        .sb-pager {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: .8rem;
+            margin-top: 1rem;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .sb-empty {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--muted);
+        }
+
+        @@media (max-width: 575.98px) {
+            .sb-coupon {
+                flex-direction: column;
+                max-width: none;
+            }
+        }
+    </style>
+}
+
+<div class="dash">
+    <div class="head">
+        <div>
+            <h1>Plans &amp; Payments</h1>
+            <p>Choose a plan and see your payment history.</p>
+        </div>
+    </div>
+     
+    <form class="sb-coupon" method="get" asp-area="Student" asp-controller="Subscription" asp-action="Index">
+        <input type="text" name="code" value="@plans.CouponCode" maxlength="50" placeholder="Have a coupon code?" autocomplete="off" aria-label="Coupon code" />
+        <button type="submit" class="b b-line"><i class="bi bi-tag"></i> Apply</button>
+        @if (!string.IsNullOrEmpty(plans.CouponCode))
+        {
+            <a class="b b-link" asp-action="Index">Remove</a>
+        }
+    </form>
+    @if (!string.IsNullOrEmpty(plans.CouponMessage))
+    {
+        <p class="sb-note @(plans.CouponValid == true ? "ok" : "bad")">@plans.CouponMessage</p>
+    }
+    else
+    {
+
+        <div style="height:1rem"></div>
+    }
+
+    @if (plans.Plans.Count == 0)
+    {
+        <section class="panel sb-empty">No plans are available right now.</section>
+    }
+    else
+    {
+        <div class="sb-grid">
+            @foreach (var p in plans.Plans)
+            {
+                <article class="panel sb-card">
+                    <h2>@p.PlanName</h2>
+                    <span class="sb-dur"><i class="bi bi-calendar-event"></i> @Duration(p.DurationDays) access</span>
+                    <div class="sb-price">
+                        ₹@p.FinalPrice.ToString("N0", inr)@if (p.CouponApplied) {
+                        <s>₹@p.Price.ToString("N0", inr)</s>
+                    }
+                </div>
+                @if (p.CouponApplied)
+                {
+                    <span class="sb-save">You save ₹@p.Discount.ToString("N0", inr)</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(p.Description))
+                {
+                    <p class="sb-desc">@p.Description</p>
+                }
+
+                @if (p.Courses.Count > 0)
+                {
+                    <ul class="sb-courses">
+                        @foreach (var c in p.Courses)
+                        {
+                            <li><i class="bi bi-check-circle-fill"></i> @c</li>
+                        }
+                    </ul>
+                }
+                 
+                <span class="b b-solid disabled" aria-disabled="true" title="Checkout is added in the next step">Choose plan</span>
+            </article>
+        }
+    </div>
+}
+
+<section class="panel pad">
+    <div class="ptitle"><h2>Payment history</h2></div>
+
+    @if (pay.Items.Count == 0)
+    {
+        <div class="sb-empty">No payments yet.</div>
+    }
+    else
+    {
+        foreach (var x in pay.Items)
+        {
+            <div class="sb-hist">
+                <div class="grow">
+                    <div class="amt">@(x.Currency == "INR" ? "₹" : x.Currency + " ")@x.Amount.ToString("N2", inr)</div>
+                    <div class="when">@(x.PaidAt ?? x.CreatedAt).ToLocalTime().ToString("d MMM yyyy, h:mm tt") &middot; @x.Gateway</div>
+                </div>
+                <span class="sb-st @x.Status">@x.Status</span>
+            </div>
+        }
+
+        @if (pay.TotalPages > 1)
+        {
+            <nav class="sb-pager" aria-label="Pages">
+                @if (pay.Page > 1)
+                {
+                    <a class="b b-line b-sm" asp-action="Index" asp-route-code="@plans.CouponCode" asp-route-page="@(pay.Page - 1)"><i class="bi bi-chevron-left"></i> Previous</a>
+                }
+                <span>Page @pay.Page of @pay.TotalPages</span>
+                @if (pay.Page < pay.TotalPages)
+                {
+                    <a class="b b-line b-sm" asp-action="Index" asp-route-code="@plans.CouponCode" asp-route-page="@(pay.Page + 1)">Next <i class="bi bi-chevron-right"></i></a>
+                }
+            </nav>
+        }
+    }
+</section>
+</div>

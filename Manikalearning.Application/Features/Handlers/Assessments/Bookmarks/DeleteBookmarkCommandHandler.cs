@@ -21,7 +21,8 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Bookmarks
             try
             {
                 var bookmark = await _bookmarkRepo.Entity()
-                    .FirstOrDefaultAsync(b => b.BookmarkId == request.BookmarkId, cancellationToken);
+                    .FirstOrDefaultAsync(b => b.BookmarkId == request.BookmarkId 
+                     && (!request.Userid.HasValue || b.UserId == request.Userid.Value), cancellationToken);
 
                 if (bookmark == null)
                     return ResponseDto<bool>.Failure("Bookmark record not found.");
