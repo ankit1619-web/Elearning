@@ -1,0 +1,91 @@
+﻿ 
+ 
+@using Manikalearning.Application.Features.Handlers.Students
+@model SearchResultsDto
+@{
+    ViewData["Title"] = "Search";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .sr-form { display: flex; gap: .6rem; margin-bottom: 1.5rem; max-width: 640px; }
+        .sr-form input { flex: 1; min-width: 0; padding: .7rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font: inherit; color: var(--text); }
+        .sr-form input:focus { outline: 3px solid rgba(99,102,241,.25); border-color: var(--brand); }
+        .sr-group { margin-bottom: 1.5rem; }
+        .sr-row { display: flex; align-items: center; gap: 1rem; padding: .9rem 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+        .sr-row:first-of-type { border-top: 0; }
+        .sr-row .grow { flex: 1; min-width: 200px; overflow-wrap: anywhere; }
+        .sr-row .nm { font-weight: 700; }
+        .sr-row .mt { color: var(--muted); font-size: .82rem; }
+        .sr-tag { padding: .2rem .65rem; border-radius: 999px; font-size: .72rem; font-weight: 800; background: #d9f7ea; color: #065f46; }
+        .sr-lock { color: var(--muted); font-size: .8rem; font-weight: 700; }
+        .sr-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+        @@media (max-width: 575.98px) { .sr-form { flex-direction: column; } }
+    </style>
+}
+
+<div class="dash">
+    <div class="head"><div><h1>Search</h1><p>Courses, exams and lectures.</p></div></div>
+
+    <form class="sr-form" method="get" asp-area="Student" asp-controller="Search" asp-action="Index">
+        <input type="search" name="q" value="@Model.Query" maxlength="100" placeholder="Search courses, exams, lectures" aria-label="Search" autofocus />
+        <button type="submit" class="b b-solid"><i class="bi bi-search"></i> Search</button>
+    </form>
+
+    @if (ViewBag.Error != null)
+    {
+        <section class="panel sr-empty">@ViewBag.Error</section>
+    }
+    else if (!string.IsNullOrEmpty(Model.Query) && Model.Total == 0)
+    {
+        <section class="panel sr-empty"><i class="bi bi-search" style="font-size:2.4rem;color:var(--brand)"></i><p>Nothing found for "@Model.Query". Try another word.</p></section>
+    }
+    else if (Model.Total > 0)
+    {
+        @if (Model.Exams.Count > 0)
+        {
+            <section class="panel pad sr-group">
+                <div class="ptitle"><h2>Exams</h2></div>
+                @foreach (var e in Model.Exams)
+                {
+                    <div class="sr-row">
+                        <div class="grow"><div class="nm">@e.ExamName</div><div class="mt">@e.ExamCode</div></div>
+                        <a class="b b-line b-sm" asp-area="Student" asp-controller="Exams" asp-action="Details" asp-route-id="@e.ExamId">View courses</a>
+                    </div>
+                }
+            </section>
+        }
+
+        @if (Model.Courses.Count > 0)
+        {
+            <section class="panel pad sr-group">
+                <div class="ptitle"><h2>Courses</h2></div>
+                @foreach (var c in Model.Courses)
+                {
+                    <div class="sr-row">
+                        <div class="grow"><div class="nm">@c.CourseName</div></div>
+                        @if (c.IsFree) { <span class="sr-tag">Free</span> }
+                        @if (c.CanOpen) { <a class="b b-solid b-sm" asp-area="Student" asp-controller="Watch" asp-action="Index" asp-route-courseId="@c.CourseId">Open</a> }
+                        else { <span class="sr-lock"><i class="bi bi-lock-fill"></i> Not in your plan</span><a class="b b-line b-sm" asp-area="Student" asp-controller="Subscription" asp-action="Index">See plans</a> }
+                    </div>
+                }
+            </section>
+        }
+
+        @if (Model.Lectures.Count > 0)
+        {
+            <section class="panel pad sr-group">
+                <div class="ptitle"><h2>Lectures</h2></div>
+                @foreach (var l in Model.Lectures)
+                {
+                    <div class="sr-row">
+                        <div class="grow"><div class="nm">@l.LectureTitle</div><div class="mt">@l.CourseName</div></div>
+                        @if (l.CanOpen) { <a class="b b-solid b-sm" asp-area="Student" asp-controller="Watch" asp-action="Index" asp-route-courseId="@l.CourseId" asp-route-lessonId="@l.LectureId"><i class="bi bi-play-fill"></i> Watch</a> }
+                        else { <span class="sr-lock"><i class="bi bi-lock-fill"></i> Not in your plan</span> }
+                    </div>
+                }
+            </section>
+        }
+    }
+</div>

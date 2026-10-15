@@ -42,7 +42,8 @@ namespace Manikalearning.Application.Features.Handlers.Students
             var plan = await _plans.Entity().AsNoTracking().FirstOrDefaultAsync(p => p.PlanId == req.PlanId && p.IsActive, ct)
                        ?? throw Guard.Fail("PlanId", "This plan is not available.");
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.UtcNow; 
+             
             var code = req.CouponCode?.Trim();
             Coupon? coupon = null;
             decimal discount = 0;
@@ -84,6 +85,14 @@ namespace Manikalearning.Application.Features.Handlers.Students
              
             if (final <= 0)
             {
+                var alreadyClaimedFree = await _subs.Entity().AsNoTracking()
+                        .AnyAsync(s => s.UserId == req.UserId && s.PlanId == req.PlanId, ct);
+
+                if (alreadyClaimedFree)
+                {
+                    throw Guard.Fail("PlanId", "You have already claimed this free plan in the past.");
+                } 
+                
                 await SubscriptionActivator.ActivateAsync(_subs, sub, plan.DurationDays, now, ct);
                 await EnrollmentActivator.EnrollAsync(_planCourses, _enrollments, req.UserId, plan.PlanId, sub.StartDate, sub.EndDate, now, ct);
                 if (coupon != null) coupon.UsedCount++;
@@ -107,7 +116,14 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 dto.IsFree = true;
                 return dto;
             }
-             
+            var activeSubExists = await _subs.Entity().AsNoTracking()
+                        .AnyAsync(s => s.UserId == req.UserId && s.PlanId == req.PlanId && s.EndDate > now, ct);
+
+            if (activeSubExists)
+            {
+                throw Guard.Fail("PlanId", "You already have an active subscription for this plan.");
+            }
+
             var notes = new Dictionary<string, string>
             {
                 ["userId"] = req.UserId.ToString(),

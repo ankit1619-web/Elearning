@@ -1,0 +1,145 @@
+﻿ 
+@model Manikalearning.Web.Areas.Student.Controllers.ProfilePageVm
+@{
+    ViewData["Title"] = "Profile & Settings";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var p = Model.Profile;
+    var name = string.IsNullOrWhiteSpace(p.FullName) ? "S" : p.FullName.Trim();
+}
+
+@section Styles {
+    <style>
+        .pr-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+        .pr-form { display: grid; gap: 1rem; }
+        .pr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .pr-form label { display: block; font-weight: 700; font-size: .85rem; margin-bottom: .3rem; }
+        .pr-form input[type=text], .pr-form input[type=tel], .pr-form input[type=email], .pr-form input[type=number], .pr-form input[type=date], .pr-form input[type=password], .pr-form select {
+            width: 100%; padding: .65rem .95rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font: inherit; color: var(--text); }
+        .pr-form input:disabled { background: var(--paper); color: var(--muted); }
+        .pr-form input:focus, .pr-form select:focus { outline: 3px solid rgba(99,102,241,.25); border-color: var(--brand); }
+        .pr-err { color: #be123c; font-size: .82rem; font-weight: 600; margin-top: .3rem; display: block; }
+        .pr-badge { display: inline-block; margin-left: .4rem; padding: .1rem .55rem; border-radius: 999px; font-size: .7rem; font-weight: 800; vertical-align: middle; }
+        .pr-badge.ok { background: #d9f7ea; color: #065f46; } .pr-badge.no { background: #fff4d6; color: #92400e; }
+        .pr-hint { color: var(--muted); font-size: .8rem; margin-top: .3rem; }
+        .pr-avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; background: var(--grad); color: #fff; font-size: 2.2rem; font-weight: 800; box-shadow: var(--glow); }
+        .pr-photo { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .pr-photo input[type=file] { max-width: 100%; font: inherit; font-size: .85rem; }
+        .pr-side { display: grid; gap: 1.5rem; }
+        @@media (max-width: 991.98px) { .pr-grid { grid-template-columns: 1fr; } }
+        @@media (max-width: 575.98px) { .pr-row { grid-template-columns: 1fr; } }
+    </style>
+}
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    var alertClass = Model.StatusType == "error" ? "alert-danger" : "alert-success";
+    var iconClass = Model.StatusType == "error" ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill";
+
+    <div class="alert @alertClass alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="bi @iconClass fs-5"></i>
+        <div>@Model.StatusMessage</div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="dash">
+    <div class="head">
+        <div>
+            <h1>Profile &amp; settings</h1>
+            <p>Member since @p.MemberSince.ToLocalTime().ToString("MMMM yyyy")</p>
+        </div>
+    </div>
+
+    <div class="pr-grid"> 
+        <section class="panel pad">
+            <div class="ptitle"><h2>Your details</h2></div>
+            <form class="pr-form" method="post" asp-area="Student" asp-controller="Profile" asp-action="Save">
+                <div>
+                    <label asp-for="Input.FullName">Full name</label>
+                    <input asp-for="Input.FullName" type="text" maxlength="150" autocomplete="name" />
+                    <span class="pr-err" asp-validation-for="Input.FullName"></span>
+                </div>
+                <div class="pr-row">
+                    <div>
+                        <label for="email">Email @if (p.IsEmailVerified) { <span class="pr-badge ok">Verified</span> } else { <span class="pr-badge no">Not verified</span> }</label>
+                        <input id="email" type="email" value="@p.Email" disabled />
+                    </div>
+                    <div>
+                        <label asp-for="Input.Mobile">Mobile @if (p.IsMobileVerified) { <span class="pr-badge ok">Verified</span> }</label>
+                        <input asp-for="Input.Mobile" type="tel" maxlength="20" autocomplete="tel" placeholder="10 digit number" />
+                        <span class="pr-err" asp-validation-for="Input.Mobile"></span>
+                    </div>
+                </div>
+
+                <div class="pr-row">
+                    <div>
+                        <label asp-for="Input.TargetExamId">Target exam</label>
+                        <select asp-for="Input.TargetExamId">
+                            <option value="">Not chosen</option>
+                            @foreach (var e in p.Exams) { <option value="@e.ExamId" selected="@(Model.Input.TargetExamId == e.ExamId)">@e.ExamName</option> }
+                        </select>
+                        <span class="pr-err" asp-validation-for="Input.TargetExamId"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Input.TargetExamDate">Exam date</label>
+                        <input asp-for="Input.TargetExamDate" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span class="pr-err" asp-validation-for="Input.TargetExamDate"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <label asp-for="Input.DailyGoal">Daily practice goal (questions)</label>
+                    <input asp-for="Input.DailyGoal" type="number" min="5" max="200" />
+                    <div class="pr-hint">Your dashboard shows your progress against this number every day.</div>
+                    <span class="pr-err" asp-validation-for="Input.DailyGoal"></span>
+                </div>
+
+                <div><button type="submit" class="b b-solid"><i class="bi bi-check2"></i> Save changes</button></div>
+            </form> 
+        </section>
+
+        <div class="pr-side">
+            <!-- photo -->
+            <section class="panel pad">
+                <div class="ptitle"><h2>Photo</h2></div>
+                <div class="pr-photo">
+                    @if (!string.IsNullOrEmpty(p.ProfileImage)) { <img class="pr-avatar" src="@p.ProfileImage" alt="Your photo" /> }
+                    else { <div class="pr-avatar">@name.Substring(0, 1).ToUpper()</div> }
+
+                    <form method="post" enctype="multipart/form-data" asp-area="Student" asp-controller="Profile" asp-action="Photo" class="pr-form" style="flex:1;min-width:200px">
+                        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required aria-label="Choose a photo" />
+                        <div class="pr-hint">JPG, PNG or WEBP, up to 2 MB.</div>
+                        <div><button type="submit" class="b b-line b-sm"><i class="bi bi-upload"></i> Upload</button></div>
+                    </form>
+                </div>
+                @if (!string.IsNullOrEmpty(p.ProfileImage))
+                {
+                    <form method="post" asp-area="Student" asp-controller="Profile" asp-action="RemovePhoto">
+                        <button type="submit" class="b b-link"><i class="bi bi-trash"></i> Remove photo</button>
+                    </form>
+                }
+            </section>
+
+            <!-- password -->
+            <section class="panel pad">
+                <div class="ptitle"><h2>Change password</h2></div>
+                <form class="pr-form" method="post" asp-area="Student" asp-controller="Profile" asp-action="ChangePassword">
+                    <div>
+                        <label asp-for="Password.CurrentPassword">Current password</label>
+                        <input asp-for="Password.CurrentPassword" type="password" autocomplete="current-password" />
+                        <span class="pr-err" asp-validation-for="Password.CurrentPassword"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Password.NewPassword">New password</label>
+                        <input asp-for="Password.NewPassword" type="password" autocomplete="new-password" />
+                        <span class="pr-err" asp-validation-for="Password.NewPassword"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Password.ConfirmPassword">Confirm new password</label>
+                        <input asp-for="Password.ConfirmPassword" type="password" autocomplete="new-password" />
+                        <span class="pr-err" asp-validation-for="Password.ConfirmPassword"></span>
+                    </div>
+                    <div><button type="submit" class="b b-line"><i class="bi bi-key"></i> Update password</button></div>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>

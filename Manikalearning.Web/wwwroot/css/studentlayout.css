@@ -1244,4 +1244,28 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     .lecture-notes-html p {
         margin-bottom: 1rem;
     }
-     
+
+.sb-banner {
+    padding: .9rem 1.1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+}
+
+    .sb-banner.success {
+        background: #d9f7ea;
+        color: #065f46;
+    }
+
+    .sb-banner.failed {
+        background: #ffe4e9;
+        color: #9f1239;
+    }
+
+    .sb-banner.cancelled {
+        background: #fff4d6;
+        color: #92400e;
+    }

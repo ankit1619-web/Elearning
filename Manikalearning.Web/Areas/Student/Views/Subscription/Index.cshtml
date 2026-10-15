@@ -17,11 +17,7 @@
 }
 
 @section Styles {
-    <style>
-        .sb-banner { padding: .9rem 1.1rem; border-radius: 14px; font-weight: 700; margin-bottom: 1.2rem; display: flex; gap: .6rem; align-items: flex-start; }
-        .sb-banner.success { background: #d9f7ea; color: #065f46; }
-        .sb-banner.failed { background: #ffe4e9; color: #9f1239; }
-        .sb-banner.cancelled { background: #fff4d6; color: #92400e; }
+    <style> 
         .sb-mine { display: grid; gap: .8rem; margin-bottom: 1.5rem; }
         .sb-sub { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.1rem 1.3rem; }
         .sb-sub .grow { flex: 1; min-width: 180px; }
@@ -61,7 +57,7 @@
         @@media (max-width: 575.98px) { .sb-coupon { flex-direction: column; max-width: none; } }
     </style>
 }
-
+ 
 <div class="dash">
     <div class="head">
         <div>
@@ -97,10 +93,9 @@
             }
         </div>
     }
-
-    @* GET form = coupon preview works without JavaScript *@
+     
     <form class="sb-coupon" method="get" asp-area="Student" asp-controller="Subscription" asp-action="Index">
-        <input type="text" name="code" value="@plans.CouponCode" maxlength="50" placeholder="Have a coupon code?" autocomplete="off" aria-label="Coupon code" />
+        <input type="text" name="code" required value="@plans.CouponCode" maxlength="50" placeholder="Have a coupon code?" autocomplete="off" aria-label="Coupon code" />
         <button type="submit" class="b b-line"><i class="bi bi-tag"></i> Apply</button>
         @if (!string.IsNullOrEmpty(plans.CouponCode)) { <a class="b b-link" asp-action="Index">Remove</a> }
     </form>

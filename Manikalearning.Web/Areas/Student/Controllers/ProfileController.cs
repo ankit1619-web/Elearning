@@ -28,11 +28,11 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         { _mediator = mediator; _userManager = userManager; _signInManager = signInManager; _env = env; }
 
         [HttpGet("")]
-        public async Task<IActionResult> Index(CancellationToken ct)
+        public async Task<IActionResult> Index(string? status = null, string? type = "success", CancellationToken ct=default)
         {
             var userId = CurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
-            var vm = await BuildAsync(userId.Value, null, ct);
+            var vm = await BuildAsync(userId.Value, null,status,type, ct); 
             return vm == null ? NotFound() : View(vm);
         }
          
@@ -46,13 +46,13 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             try
             {
                 await _mediator.Send(new UpdateProfileCommand(userId.Value, input.FullName ?? "", input.Mobile, input.TargetExamId, input.TargetExamDate, input.DailyGoal), ct);
-                TempData["SuccessMessage"] = "Profile saved.";
-                return RedirectToAction(nameof(Index));
+                
+                return RedirectToAction(nameof(Index), new { status = "Profile saved!", type = "success" }); 
             }
             catch (ValidationException ex)
             {
                 foreach (var f in ex.Errors) ModelState.AddModelError($"Input.{f.PropertyName}", f.ErrorMessage);
-                return View("Index", await BuildAsync(userId.Value, input, ct));         
+                return View("Index", await BuildAsync(userId.Value, input, ex.Message, "error", ct));
             }
         }
          
@@ -103,9 +103,8 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
             var old = await _mediator.Send(new UpdateProfileImageCommand(userId.Value, null), ct);
-            DeleteOldFile(old);
-            TempData["SuccessMessage"] = "Photo removed.";
-            return RedirectToAction(nameof(Index));
+            DeleteOldFile(old); 
+            return RedirectToAction(nameof(Index), new { status = "Photo removed !", type = "success" }); 
         }
          
         [HttpPost("Password")]
@@ -127,23 +126,24 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.RefreshSignInAsync(user);    
-                    TempData["SuccessMessage"] = "Password changed.";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), new { status = "Password changed !", type = "success" }); 
                 }
                 foreach (var e in result.Errors)
                     ModelState.AddModelError(e.Code.Contains("Mismatch") ? "Password.CurrentPassword" : "Password.NewPassword", e.Description);
             }
-            return View("Index", await BuildAsync(userId.Value, null, ct));       
+            return View("Index", await BuildAsync(userId.Value, null,check.Errors.FirstOrDefault().ErrorMessage,"error", ct));       
         }
          
         private IActionResult Fail(string message) { TempData["ErrorMessage"] = message; return RedirectToAction(nameof(Index)); }
 
-        private async Task<ProfilePageVm?> BuildAsync(Guid userId, ProfileInput? input, CancellationToken ct)
+        private async Task<ProfilePageVm?> BuildAsync(Guid userId, ProfileInput? input, string? status = null, string? type = "success", CancellationToken ct=default)
         {
             var p = await _mediator.Send(new GetProfileQuery(userId), ct);
             if (p == null) return null;
             return new ProfilePageVm
             {
+                StatusMessage=status,
+                StatusType=type,
                 Profile = p,
                 Input = input ?? new ProfileInput { FullName = p.FullName, Mobile = p.Mobile, TargetExamId = p.TargetExamId, TargetExamDate = p.TargetExamDate, DailyGoal = p.DailyGoal }
             };
@@ -172,6 +172,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         public Guid? TargetExamId { get; set; }
         public DateTime? TargetExamDate { get; set; }
         public int DailyGoal { get; set; } = 30;
+
     }
 
     public class ChangePasswordInput
@@ -186,7 +187,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         public ChangePasswordInputValidator()
         {
             RuleFor(x => x.CurrentPassword).NotEmpty().WithMessage("Enter your current password.");
-            RuleFor(x => x.NewPassword).Cascade(CascadeMode.Stop)
+            RuleFor(x => x.NewPassword).Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty().WithMessage("Enter a new password.")
                 .MinimumLength(8).WithMessage("The new password must have at least 8 characters.")
                 .MaximumLength(100)
@@ -197,6 +198,8 @@ namespace Manikalearning.Web.Areas.Student.Controllers
 
     public class ProfilePageVm
     {
+        public string? StatusMessage { get; set; }
+        public string? StatusType { get; set; }
         public ProfileDto Profile { get; set; } = new();
         public ProfileInput Input { get; set; } = new();
         public ChangePasswordInput Password { get; set; } = new();

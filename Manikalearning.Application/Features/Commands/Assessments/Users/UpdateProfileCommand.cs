@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Manikalearning.Application.Comman;
+using Manikalearning.Application.DTOs;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -16,7 +18,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Users
         {
             RuleFor(x => x.UserId).NotEmpty();
 
-            RuleFor(x => x.FullName).Cascade(CascadeMode.Stop)
+            RuleFor(x => x.FullName).Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty().WithMessage("Please enter your name.")
                 .Must(n => n.Trim().Length is >= 2 and <= 150).WithMessage("Your name must be 2 to 150 letters.")
                 .Matches(@"^[\p{L}\p{M}][\p{L}\p{M} .'\-]*$").WithMessage("Your name can have only letters, spaces, . ' and -");

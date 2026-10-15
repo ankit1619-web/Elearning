@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.Users;
 using Manikalearning.Application.Interface;
@@ -34,8 +35,8 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Users
                 throw new ValidationException(new[] { new ValidationFailure("TargetExamId", "Please choose a valid exam.") });
 
             user.FullName = req.FullName.Trim();
-            if (user.Mobile != mobile) { user.Mobile = mobile; user.IsMobileVerified = false; }      // a new number must be verified again
-            user.UpdatedAt = DateTime.UtcNow;
+            if (user.Mobile != mobile) { user.Mobile = mobile; user.IsMobileVerified = false; }     
+           // user.UpdatedAt = DateTime.UtcNow;
 
             var p = await _profiles.Entity().FirstOrDefaultAsync(x => x.UserId == req.UserId, ct);
             if (p == null)
@@ -84,7 +85,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Users
                        ?? throw new ValidationException(new[] { new ValidationFailure("UserId", "User not found.") });
             var old = user.ProfileImage;
             user.ProfileImage = req.ImagePath;
-            user.UpdatedAt = DateTime.UtcNow;
+            //user.UpdatedAt = DateTime.UtcNow;
             await _users.SaveChangesAsync();
             return old;
         }

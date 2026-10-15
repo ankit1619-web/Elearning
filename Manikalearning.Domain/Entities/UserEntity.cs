@@ -38,7 +38,7 @@ namespace Manikalearning.Domain.Entities
 
     
     [Table("StudentProfiles")]
-    public class StudentProfile : IdentityUser<Guid>
+    public class StudentProfile 
     {
 
         [Key]

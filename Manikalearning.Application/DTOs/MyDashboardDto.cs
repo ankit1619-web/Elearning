@@ -7,7 +7,7 @@
          
         public string? TargetExamName { get; set; }
         public int? DaysLeft { get; set; }                
-        public int DailyGoal { get; set; } = 30;
+        public int? DailyGoal { get; set; } = 30;
          
         public int SolvedToday { get; set; }
         public int SolvedWeek { get; set; }
