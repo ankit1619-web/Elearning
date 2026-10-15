@@ -1,5 +1,7 @@
-﻿using Manikalearning.Application.DTOs;
+﻿using FluentValidation;
+using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.Bookmarks;
+using Manikalearning.Application.Features.Handlers.Students;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,46 +15,50 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     public class BookmarksController : Controller
     {
         private readonly IMediator _mediator;
-
-        public BookmarksController(IMediator mediator)
+        public BookmarksController(IMediator mediator) => _mediator = mediator;
+         
+        [HttpGet("")]
+        public async Task<IActionResult> Index(string? type, string? q, int page = 1, CancellationToken ct = default)
         {
-            _mediator = mediator;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Index(string search = "")
-        {
-            var currentUserId = CurrentUserId();
             var userId = CurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var response = await _mediator.Send(new GetStudentBookmarksQuery(Search: search, UserId: userId, PageSize: 1000));
- 
-            return View(response.Data);
+            var kind = string.Equals(type, BookmarkType.Lecture, StringComparison.OrdinalIgnoreCase) ? BookmarkType.Lecture : BookmarkType.Question;
+
+            try
+            {
+                var vm = await _mediator.Send(new GetBookmarksQuery(userId.Value, kind, q, page), ct);
+                 
+                if (vm.Items.Count == 0 && page > 1 && vm.TotalCount > 0)
+                    return RedirectToAction(nameof(Index), new { type = kind, q, page = vm.TotalPages });
+
+                return View(vm);
+            }
+            catch (ValidationException)
+            {
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        [HttpGet("Details/{id}")]
-        public async Task<IActionResult> Details(Guid id)
-        {
-            var response = await _mediator.Send(new GetBookmarkByIdQuery(id));
-
-            if (!response.IsSuccess || response.Data == null)
-                return BadRequest(response.Message);
-
-            return PartialView("_BookmarkDetailsPartial", response.Data);
-        }
-
-        [HttpPost("Delete/{id}")]
+        [HttpPost("Remove/{id:guid}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Remove(Guid id, string? type, string? q, int page = 1, CancellationToken ct = default)
         {
             var userId = CurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var response = await _mediator.Send(new DeleteBookmarkCommand(id, userId));
-            return Json(response);
+            try
+            {
+                var removed = await _mediator.Send(new RemoveBookmarkCommand(userId.Value, id), ct);
+                TempData[removed ? "SuccessMessage" : "ErrorMessage"] = removed ? "Removed from Saved." : "Item not found.";
+            }
+            catch (ValidationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid request.";
+            }
+            return RedirectToAction(nameof(Index), new { type, q, page });
         }
-        
+
         private Guid? CurrentUserId() =>
             Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
     }

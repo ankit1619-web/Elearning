@@ -26,9 +26,25 @@
         public List<CourseSectionDto> Sections { get; set; } = new();
         public List<CourseLectureDto> Lectures { get; set; } = new();
     }
+    public static class PlanFeatureCodes
+    {
+        public const string Pyq = "Pyq";                  
+        public const string MockTests = "MockTests";
+        public const string Doubts = "Doubts";      
+
+        public static string Label(string code) => code switch
+        {
+            Pyq => "Save PYQ results and Mistake Book",
+            MockTests => "Mock tests",
+            Doubts => "Doubt forum",
+            _ => code
+        };
+    }
+
     public class CourseAccessDto
     {
         public bool HasAccess { get; set; }
-        public string Reason { get; set; } = "";     // Free | Subscription | NoSubscription | NotFound
+        public string Reason { get; set; } = "";     // Free | Subscription | Enrolled | NoSubscription | NotFound
+        public Guid? CourseId { get; set; }
     }
 }

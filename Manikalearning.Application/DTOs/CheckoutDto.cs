@@ -2,10 +2,10 @@
 {
     public static class SubStatus { public const string Pending = "Pending", Active = "Active", Expired = "Expired"; }
     public static class PayStatus { public const string Created = "Created", Success = "Success", Failed = "Failed"; }
-     
+
     public class CheckoutDto
     {
-        public bool IsFree { get; set; }                
+        public bool IsFree { get; set; } // 100% coupon / free plan: already activated, no payment page
         public Guid PaymentId { get; set; }
         public string OrderId { get; set; } = "";
         public string KeyId { get; set; } = "";

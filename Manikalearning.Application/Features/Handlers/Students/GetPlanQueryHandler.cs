@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Assessments.Plans;
 using Manikalearning.Application.Interface;
 using Manikalearning.Application.Services;
 using Manikalearning.Domain.Entities;
@@ -10,23 +11,25 @@ namespace Manikalearning.Application.Features.Handlers.Students
 {
     public record GetPlanQuery(string? CouponCode = null) : IRequest<PlansResultDto>;
 
-    public class GetPlansQueryValidator : AbstractValidator<GetPlanQuery>
+    public class GetPlanQueryValidator : AbstractValidator<GetPlanQuery>
     {
-        public GetPlansQueryValidator()
+        public GetPlanQueryValidator()
         {
             RuleFor(x => x.CouponCode).MaximumLength(50)
                 .Matches("^[A-Za-z0-9_-]*$").WithMessage("Coupon code can only have letters, numbers, - and _.");
         }
     }
-    public class GetPlansQueryHandler : IRequestHandler<GetPlanQuery, PlansResultDto>
+    public class GetPlanQueryHandler : IRequestHandler<GetPlanQuery, PlansResultDto>
     {
         private readonly IRepository<Plan> _plans;
         private readonly IRepository<PlanCourse> _planCourses;
         private readonly IRepository<Course> _courses;
         private readonly IRepository<Coupon> _coupons;
+        private readonly IRepository<PlanFeature> _planFeatures;
 
-        public GetPlansQueryHandler(IRepository<Plan> plans, IRepository<PlanCourse> planCourses, IRepository<Course> courses, IRepository<Coupon> coupons)
-        { _plans = plans; _planCourses = planCourses; _courses = courses; _coupons = coupons; }
+        public GetPlanQueryHandler(IRepository<Plan> plans, IRepository<PlanCourse> planCourses, IRepository<Course> courses,
+                                    IRepository<Coupon> coupons, IRepository<PlanFeature> planFeatures)
+        { _plans = plans; _planCourses = planCourses; _courses = courses; _coupons = coupons; _planFeatures = planFeatures; }
 
         public async Task<PlansResultDto> Handle(GetPlanQuery req, CancellationToken ct)
         {
@@ -40,6 +43,11 @@ namespace Manikalearning.Application.Features.Handlers.Students
                                     select new { pc.PlanId, c.CourseName }).ToListAsync(ct);
             var coursesByPlan = courseRows.GroupBy(x => x.PlanId).ToDictionary(g => g.Key, g => g.Select(x => x.CourseName).ToList());
 
+            var featureRows = await _planFeatures.Entity().AsNoTracking().Where(f => ids.Contains(f.PlanId))
+                .Select(f => new { f.PlanId, f.FeatureCode }).ToListAsync(ct);
+            var featuresByPlan = featureRows.GroupBy(x => x.PlanId)
+                .ToDictionary(g => g.Key, g => g.Select(x => PlanFeatureCodes.Label(x.FeatureCode)).ToList());
+             
             var code = req.CouponCode?.Trim();
             Coupon? coupon = null;
             var result = new PlansResultDto { CouponCode = code };
@@ -48,7 +56,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             {
                 coupon = await _coupons.Entity().AsNoTracking().FirstOrDefaultAsync(c => c.CouponCode == code, ct);
                 var usable = coupon != null && CouponCalculator.IsUsable(coupon, DateTime.UtcNow);
-                result.CouponValid = usable;
+                result.CouponValid = usable; 
                 result.CouponMessage = usable ? null : "This coupon is not valid.";
                 if (!usable) coupon = null;
             }
@@ -65,7 +73,8 @@ namespace Manikalearning.Application.Features.Handlers.Students
                     Price = p.Price,
                     Discount = discount,
                     FinalPrice = p.Price - discount,
-                    Courses = coursesByPlan.TryGetValue(p.PlanId, out var list) ? list : new List<string>()
+                    Courses = coursesByPlan.TryGetValue(p.PlanId, out var list) ? list : new List<string>(),
+                    Features = featuresByPlan.TryGetValue(p.PlanId, out var fl) ? fl : new List<string>()
                 };
             }).ToList();
 
@@ -82,3 +91,4 @@ namespace Manikalearning.Application.Features.Handlers.Students
         }
     }
 }
+ 

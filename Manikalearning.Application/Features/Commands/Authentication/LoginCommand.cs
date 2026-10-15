@@ -18,8 +18,7 @@ namespace Manikalearning.Application.Features.Commands.Authentication
     public record ForgotPasswordCommand(string Email) : IRequest<ResponseDto<bool>>;
     public record ResetPasswordCommand(string Email, string Token, string NewPassword, string ConfirmPassword) : IRequest<ResponseDto<bool>>;
     public record ChangePasswordCommand(string CurrentPassword, string NewPassword, string ConfirmPassword) : IRequest<ResponseDto<bool>>;
-
-    // 2. FluentValidators 
+      
     public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
     {
         public RegisterCommandValidator()

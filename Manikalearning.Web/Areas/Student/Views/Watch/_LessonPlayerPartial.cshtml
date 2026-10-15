@@ -1,6 +1,7 @@
 ﻿@model Manikalearning.Application.DTOs.LessonPlayerViewModel
 
-@{ 
+@{  
+    var here = Context.Request.Path + Context.Request.QueryString;
     string videoUrl = Model.VideoUrl ?? string.Empty;
     bool isYouTube = videoUrl.Contains("youtube.com") || videoUrl.Contains("youtu.be");
     bool isDirectVideoFile = videoUrl.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
@@ -79,11 +80,11 @@
                 onclick="Toast.openModal('/Student/Watch/AskDoubtPartial/@Model.LessonId', 'modal-md')">
             <i class="bi bi-question-circle me-1 text-primary"></i> Ask Doubt
         </button>
-        <button type="button"
-                class="btn btn-pyq-blue btn-sm px-3 py-1.5 fw-semibold"
-                onclick="Toast.openModal('/Student/Watch/TopicPyqsTestPartial/@Model?.LessonId', 'modal-xl')">
-            <i class="bi bi-journal-text me-1"></i> Topic-wise PYQs
-        </button>
+       
+         <a  class="btn btn-pyq-blue btn-sm px-3 py-1.5 fw-semibold" asp-area="Student" asp-controller="PyqTest" asp-action="Start"
+            asp-route-kind="topic" asp-route-key="@Model.LessonId" asp-route-back="@here">
+             <span>Start Practice</span> <i class="bi bi-arrow-right"></i>
+         </a>
         <button type="button"
                 id="btn-bookmark-@Model?.LessonId"
                 class="btn btn-bookmark btn-sm px-2.5 py-1.5 @(Model?.IsBookmarked == true ? "active text-warning" : "text-secondary")"

@@ -1,4 +1,4 @@
-﻿@* Views/PYQPractice/Test.cshtml *@
+﻿ 
 @model Manikalearning.Application.DTOs.PyqQuestionVm
 @{
     Layout = "_CbtLayout";
@@ -8,21 +8,21 @@
     var opts = new[] { q.OptionA, q.OptionB, q.OptionC, q.OptionD };
     var counts = new int[4];
     foreach (var s in Model.Statuses) counts[s]++;
-
-    // countdown start values (CSS animates from here)
+     
     var m0 = Model.SecondsLeft / 60;
     var s0 = Model.SecondsLeft % 60;
     var qid = q.QuestionId.ToString() ?? "";
     if (qid.Length > 8) qid = qid.Substring(0, 8);
+     
+    var exitUrl = string.IsNullOrEmpty(Model.ExitUrl) ? (Url.Action("Index", Model.Controller, new { area = "Student" }) ?? "/") : Model.ExitUrl;
 }
 
-@section Head {
-    @* When time ends the browser reloads this page; the server then auto-submits. *@
-    <meta http-equiv="refresh" content="@(Model.SecondsLeft + 1);url=@Url.Action("Question", "PYQPractice", new { area = "Student", q = Model.Index })" />
+@section Head { 
+    <meta http-equiv="refresh" content="@(Model.SecondsLeft + 1);url=@Url.Action("Question", Model.Controller, new { area = "Student", q = Model.Index })" />
 }
 
 <header class="cbt-top">
-    <a class="cbt-brand" asp-area="Student" asp-controller="PYQPractice" asp-action="Index"><i class="bi bi-mortarboard-fill"></i> Manika<em>Learning</em></a>
+    <a class="cbt-brand" href="@exitUrl"><i class="bi bi-mortarboard-fill"></i><span>Manika<em>Learning</em></span></a>
     <span class="cbt-title">PYQ Practice</span>
     <span class="cbt-spacer"></span>
     <span class="cd-pill" title="Time left">
@@ -31,18 +31,18 @@
               style="--m:@m0;--m0:@m0;--dm:@(s0 + 1)s;--ds:-@(59 - s0)s"></span>
         <span class="sr-only">@m0 minutes @s0 seconds left when this page loaded</span>
     </span>
-    <a class="b b-line b-sm" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">Exit</a>
+    <a class="b b-line b-sm" href="@exitUrl">Exit</a>
 </header>
 
 @if (Model.IsPreviewOnly)
 {
     <div class="cbt-banner">
         <i class="bi bi-exclamation-triangle-fill"></i> @Model.BannerMessage
-        <a href="/Student/Subscription">Upgrade now</a>
+        <a href="@(Model.BannerLink ?? "/Student/Subscription")">@(Model.BannerLinkText ?? "Upgrade now")</a>
     </div>
 }
 
-<form method="post" asp-area="Student" asp-controller="PYQPractice" asp-action="Question">
+<form method="post" asp-area="Student" asp-controller="@Model.Controller" asp-action="Question">
     <input type="hidden" name="q" value="@Model.Index" />
 
     <div class="cbt-grid">
@@ -50,7 +50,7 @@
             <div class="q-head">
                 <span class="q-no">Q. @(Model.Index + 1) / @Model.Total</span>
                 <span class="chip">PYQ: @(string.IsNullOrWhiteSpace(q.ExamName) ? "Topic" : q.ExamName)</span>
-                <button type="submit" name="nav" value="bookmark" class="b b-line b-icon b-sm" style="margin-left:auto" aria-label="Bookmark question">
+                <button type="submit" name="nav" value="bookmark" class="b b-line b-icon b-sm" style="margin-left:auto" aria-label="Bookmark question" disabled="@(!Model.CanBookmark)" title="@(Model.CanBookmark ? "Save this question" : "Log in with a plan to save questions")">
                     <i class="bi @(Model.Bookmarked ? "bi-bookmark-fill" : "bi-bookmark")"></i>
                 </button>
             </div>

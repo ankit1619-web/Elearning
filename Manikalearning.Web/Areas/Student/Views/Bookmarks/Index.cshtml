@@ -1,5 +1,5 @@
 ﻿@using Manikalearning.Application.DTOs
-@model BookmarkPagedResultDto
+@model BookmarkListDto
 @{
     ViewData["Title"] = "Saved";
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
@@ -59,7 +59,7 @@
         }
     </form>
 
-    @if (Model.Bookmarks.Count == 0)
+    @if (Model.Items.Count == 0)
     {
         <section class="panel bm-empty">
             <i class="bi bi-bookmark-star"></i>
@@ -75,7 +75,7 @@
     else
     {
         <div class="bm-list">
-            @foreach (var b in Model.Bookmarks)
+            @foreach (var b in Model.Items)
             {
                 <article class="panel bm-card">
                     <div class="bm-top">
@@ -89,7 +89,7 @@
                          </button> 
                     </div>
 
-                    <h2 class="bm-q">@b.QuestionTitle</h2>
+                    <h2 class="bm-q">@b.QuestionText</h2>
 
                     @if (!string.IsNullOrWhiteSpace(b.CorrectAnswer))
                     {

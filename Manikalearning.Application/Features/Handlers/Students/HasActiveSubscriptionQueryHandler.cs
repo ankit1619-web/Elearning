@@ -9,12 +9,11 @@ namespace Manikalearning.Application.Features.Handlers.Students
     public class HasActiveSubscriptionQueryValidator : AbstractValidator<HasActiveSubscriptionQuery>
     {
         public HasActiveSubscriptionQueryValidator() => RuleFor(x => x.UserId).NotEmpty();
-    }
-
+    } 
     public class HasActiveSubscriptionQueryHandler : IRequestHandler<HasActiveSubscriptionQuery, bool>
     {
-        private readonly ISubscriptionChecker _checker;
-        public HasActiveSubscriptionQueryHandler(ISubscriptionChecker checker) => _checker = checker;
-        public Task<bool> Handle(HasActiveSubscriptionQuery req, CancellationToken ct) => _checker.HasActiveAsync(req.UserId, ct);
+        private readonly ISubscriptionChecker _c;
+        public HasActiveSubscriptionQueryHandler(ISubscriptionChecker c) => _c = c;
+        public Task<bool> Handle(HasActiveSubscriptionQuery r, CancellationToken ct) => _c.HasActiveAsync(r.UserId, ct);
     }
 }

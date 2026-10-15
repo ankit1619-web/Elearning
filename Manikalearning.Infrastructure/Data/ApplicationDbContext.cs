@@ -19,6 +19,7 @@ namespace Manikalearning.Infrastructure.Data
 
         // Domain Sets
         public DbSet<Exam> Exams { get; set; }
+        public DbSet<StudentProfile> StudentProfiles { get; set; }
         public DbSet<Paper> Papers { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Section> Sections { get; set; }
@@ -32,6 +33,7 @@ namespace Manikalearning.Infrastructure.Data
         public DbSet<StudentLectureProgress> StudentLectureProgresses { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Plan> Plans { get; set; }
+        public DbSet<PlanFeature> PlanFeatures { get; set; }
         public DbSet<PlanCourse> PlanCourses { get; set; }
         public DbSet<StudentSubscription> StudentSubscriptions { get; set; }
         public DbSet<Manikalearning.Domain.Entities.Payment> Payments { get; set; }

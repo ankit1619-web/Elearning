@@ -1,4 +1,5 @@
-﻿using Manikalearning.Application.Features.Commands.Students;
+﻿using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Students;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +19,17 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         [HttpGet("")]
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var mistakes = await _mediator.Send(new GetStudentMistakesQuery(userId), ct);
-            return View(mistakes);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var userId = Guid.Parse(userIdClaim);
+            var response = await _mediator.Send(new GetStudentMistakesQuery(userId), ct);
+              
+            return View(response);
+            
         }
 
         [HttpPost("Remove/{mistakeId}")]

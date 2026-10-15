@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Comman\" />
     <Folder Include="Features\Commands\Curriculum\" />
     <Folder Include="Features\Commands\Subscriptions\" />
     <Folder Include="Features\Commands\Questions\" />

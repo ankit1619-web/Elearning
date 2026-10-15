@@ -28,9 +28,13 @@ namespace Manikalearning.Application.Features.Handlers.Students
         private readonly IRepository<Coupon> _coupons;
         private readonly IRazorpayClient _razorpay;
 
+        private readonly IRepository<PlanCourse> _planCourses;
+        private readonly IRepository<StudentCourse> _enrollments;
+
         public ConfirmPaymentCommandHandler(IRepository<Payment> payments, IRepository<StudentSubscription> subs,
-                                            IRepository<Plan> plans, IRepository<Coupon> coupons, IRazorpayClient razorpay)
-        { _payments = payments; _subs = subs; _plans = plans; _coupons = coupons; _razorpay = razorpay; }
+                                            IRepository<Plan> plans, IRepository<Coupon> coupons, IRazorpayClient razorpay,
+                                            IRepository<PlanCourse> planCourses, IRepository<StudentCourse> enrollments)
+        { _payments = payments; _subs = subs; _plans = plans; _coupons = coupons; _razorpay = razorpay; _planCourses = planCourses; _enrollments = enrollments; }
 
         private static ConfirmPaymentResultDto Fail(string m) => new() { Success = false, Message = m };
 
@@ -40,7 +44,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 .FirstOrDefaultAsync(p => p.GatewayOrderId == req.OrderId && p.PaymentGateway == "Razorpay", ct);
             if (payment == null) return Fail("Payment not found.");
 
-            if (payment.Status == PayStatus.Success)                 
+            if (payment.Status == PayStatus.Success)                   
                 return new ConfirmPaymentResultDto { Success = true, Message = "Payment already confirmed." };
              
             if (!req.FromWebhook && !_razorpay.VerifySignature(req.OrderId, req.PaymentId, req.Signature))
@@ -60,6 +64,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             {
                 var plan = await _plans.Entity().AsNoTracking().FirstAsync(p => p.PlanId == sub.PlanId, ct);
                 await SubscriptionActivator.ActivateAsync(_subs, sub, plan.DurationDays, now, ct);
+                await EnrollmentActivator.EnrollAsync(_planCourses, _enrollments, sub.UserId, sub.PlanId, sub.StartDate, sub.EndDate, now, ct);
             }
              
             if (order.Notes.TryGetValue("coupon", out var code) && !string.IsNullOrWhiteSpace(code))
@@ -68,7 +73,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 if (coupon != null) coupon.UsedCount++;
             }
 
-            await _payments.SaveChangesAsync();                    
+            await _payments.SaveChangesAsync();                        
             return new ConfirmPaymentResultDto { Success = true, Message = "Payment successful." };
         }
     }

@@ -8,18 +8,19 @@ using System.Security.Claims;
 namespace Manikalearning.Web.Filters
 {
     public class RequireCourseAccessAttribute : TypeFilterAttribute
-    {
-        public RequireCourseAccessAttribute(string parameterName = "courseId") : base(typeof(RequireCourseAccessFilter))
-            => Arguments = new object[] { parameterName };
+    { 
+        public RequireCourseAccessAttribute(string parameterName = "courseId", string? skipIfPresent = null) : base(typeof(RequireCourseAccessFilter))
+            => Arguments = new object[] { parameterName, skipIfPresent! };
 
         private class RequireCourseAccessFilter : IAsyncActionFilter
         {
             private readonly IMediator _mediator;
             private readonly ITempDataDictionaryFactory _tempData;
             private readonly string _parameterName;
+            private readonly string? _skipIfPresent;
 
-            public RequireCourseAccessFilter(IMediator mediator, ITempDataDictionaryFactory tempData, string parameterName)
-            { _mediator = mediator; _tempData = tempData; _parameterName = parameterName; }
+            public RequireCourseAccessFilter(IMediator mediator, ITempDataDictionaryFactory tempData, string parameterName, string? skipIfPresent)
+            { _mediator = mediator; _tempData = tempData; _parameterName = parameterName; _skipIfPresent = skipIfPresent; }
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
@@ -28,6 +29,10 @@ namespace Manikalearning.Web.Filters
                     context.Result = new ChallengeResult();
                     return;
                 }
+
+                if (_skipIfPresent != null && context.ActionArguments.TryGetValue(_skipIfPresent, out var lesson) &&
+                    ((lesson is Guid lg && lg != Guid.Empty) || (lesson is Guid? && ((Guid?)lesson).GetValueOrDefault() != Guid.Empty)))
+                { await next(); return; }                      
                  
                 Guid courseId = Guid.Empty;
                 if (context.ActionArguments.TryGetValue(_parameterName, out var arg))
@@ -42,7 +47,7 @@ namespace Manikalearning.Web.Filters
                 }
                 if (courseId == Guid.Empty)
                 {
-                    context.Result = new BadRequestResult();       
+                    context.Result = new BadRequestResult();        
                     return;
                 }
 

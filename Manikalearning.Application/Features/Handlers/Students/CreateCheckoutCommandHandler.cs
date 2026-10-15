@@ -29,9 +29,13 @@ namespace Manikalearning.Application.Features.Handlers.Students
         private readonly IRepository<StudentSubscription> _subs;
         private readonly IRazorpayClient _razorpay;
 
+        private readonly IRepository<PlanCourse> _planCourses;
+        private readonly IRepository<StudentCourse> _enrollments;
+
         public CreateCheckoutCommandHandler(IRepository<Plan> plans, IRepository<Coupon> coupons, IRepository<Payment> payments,
-                                            IRepository<StudentSubscription> subs, IRazorpayClient razorpay)
-        { _plans = plans; _coupons = coupons; _payments = payments; _subs = subs; _razorpay = razorpay; }
+                                            IRepository<StudentSubscription> subs, IRazorpayClient razorpay,
+                                            IRepository<PlanCourse> planCourses, IRepository<StudentCourse> enrollments)
+        { _plans = plans; _coupons = coupons; _payments = payments; _subs = subs; _razorpay = razorpay; _planCourses = planCourses; _enrollments = enrollments; }
 
         public async Task<CheckoutDto> Handle(CreateCheckoutCommand req, CancellationToken ct)
         { 
@@ -81,6 +85,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             if (final <= 0)
             {
                 await SubscriptionActivator.ActivateAsync(_subs, sub, plan.DurationDays, now, ct);
+                await EnrollmentActivator.EnrollAsync(_planCourses, _enrollments, req.UserId, plan.PlanId, sub.StartDate, sub.EndDate, now, ct);
                 if (coupon != null) coupon.UsedCount++;
 
                 await _payments.AddAsync(new Payment
@@ -124,7 +129,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 PaidAt = null,
                 CreatedAt = now
             });
-            await _subs.AddAsync(sub); //   "Pending" until the payment is confirmed
+            await _subs.AddAsync(sub);                    
             await _payments.SaveChangesAsync();
 
             dto.OrderId = order.Id;

@@ -1,4 +1,5 @@
-﻿using Manikalearning.Application.Features.Commands.Students; 
+﻿using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Students; 
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +13,25 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     public class DashboardController : Controller
     {
         private readonly IMediator _mediator;
-
-        public DashboardController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public DashboardController(IMediator mediator) => _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+                return RedirectToAction("Login", "Account", new { area = "" });
 
-            var query = new GetStudentDashboardQuery { UserId = Guid.Parse(userId) };
-            var viewModel = await _mediator.Send(query);
-
-            return View(viewModel);
+            return View(new DashboardPageVm
+            {
+                Data = await _mediator.Send(new GetMyDashboardQuery(userId), ct), 
+                Courses = await _mediator.Send(new GetUserCoursesQuery(userId, "InProgress", ""), ct)
+            });
         }
+    }
+
+    public class DashboardPageVm
+    {
+        public MyDashboardDto Data { get; set; } = new();
+        public MyCoursesViewModel Courses { get; set; } = new();
     }
 }

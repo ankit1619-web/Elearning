@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Manikalearning.Application.Features.Handlers.Students
 {
-    public class GetStudentDashboardQueryHandler : IRequestHandler<GetStudentDashboardQuery, StudentDashboardViewModel>
+    public class GetMyDashboardQueryHandler : IRequestHandler<GetMyDashboardQuery, MyDashboardDto>
     {
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<Course> _courseRepo;
@@ -16,7 +16,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
         private readonly IRepository<Payment> _transactionRepo;
         private readonly UserManager<User> _userManager;
 
-        public GetStudentDashboardQueryHandler(
+        public GetMyDashboardQueryHandler(
             IRepository<User> userRepo,
             IRepository<Course> courseRepo,
             IRepository<TestAttempt> attemptRepo,
@@ -30,13 +30,13 @@ namespace Manikalearning.Application.Features.Handlers.Students
             _userManager = userManager;
         }
 
-        public async Task<StudentDashboardViewModel> Handle(GetStudentDashboardQuery request, CancellationToken cancellationToken)
+        public async Task<MyDashboardDto> Handle(GetMyDashboardQuery request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByIdAsync(request.UserId.ToString())
                        ?? await _userRepo.Entity().FirstOrDefaultAsync(x => x.Id == request.UserId);
 
             if (user == null)
-                return new StudentDashboardViewModel();
+                return new MyDashboardDto();
              
             var attempts = await _attemptRepo.Entity()
                 .AsNoTracking()
@@ -78,7 +78,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
      })
      .ToList();
 
-            return new StudentDashboardViewModel
+            return new MyDashboardDto
             {
                 StudentName = user.FullName ?? user.UserName ?? "Student",
                 TargetExam = "UGC NET Paper 1",

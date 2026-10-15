@@ -30,7 +30,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             var total = await q.CountAsync(ct);
             var items = await q.OrderByDescending(p => p.CreatedAt)
                 .Skip((req.Page - 1) * req.PageSize).Take(req.PageSize)
-                .Select(p => new PaymentDto   
+                .Select(p => new PaymentDto    
                 {
                     PaymentId = p.PaymentId,
                     Amount = p.Amount,

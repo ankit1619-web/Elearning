@@ -1,4 +1,4 @@
-﻿@* Views/PYQPractice/TestResult.cshtml *@
+﻿ 
 @model Manikalearning.Application.DTOs.PyqResultVm
 @{
     Layout = "_CbtLayout";
@@ -21,9 +21,17 @@
 
         <div class="score">Score: @Model.Score / @Model.TotalMarks &nbsp;|&nbsp; Accuracy: @Model.Accuracy%</div>
 
+        @if (!Model.Saved && !string.IsNullOrEmpty(Model.SaveNotice))
+        {
+            <div style="margin:0 auto 1.4rem;max-width:520px;padding:1rem 1.2rem;border-radius:14px;background:var(--mk-soft);color:var(--cb-text);text-align:left;font-size:.92rem">
+                <strong>Result not saved.</strong> @Model.SaveNotice
+                @if (!string.IsNullOrEmpty(Model.SaveLink)) { <div style="margin-top:.7rem"><a class="b b-solid b-sm" href="@Model.SaveLink">@Model.SaveLinkText</a></div> }
+            </div>
+        }
+
         <div class="b-group b-group-stack" style="justify-content:center">
-            <a class="b b-line" asp-area="Student" asp-controller="MistakeBook" asp-action="Index">Review mistakes</a>
-            <a class="b b-solid" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">Back to PYQ Bank</a>
+            @if (Model.Saved) { <a class="b b-line" asp-area="Student" asp-controller="MistakeBook" asp-action="Index">Review mistakes</a> }
+            <a class="b b-solid" href="@(string.IsNullOrEmpty(Model.ExitUrl) ? Url.Action("Index", "PYQPractice", new { area = "Student" }) : Model.ExitUrl)">@Model.ExitLabel</a>
         </div>
     </div>
 </div>

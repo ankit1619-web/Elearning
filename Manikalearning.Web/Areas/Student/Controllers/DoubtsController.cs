@@ -3,6 +3,7 @@ using Manikalearning.Application.DTOs;
 using Manikalearning.Application.Features.Commands.Assessments.Doubts;
 using Manikalearning.Application.Features.Handlers.Assessments.Dropdowns;
 using Manikalearning.Application.Features.Handlers.Students;
+using Manikalearning.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         }
 
         [HttpPost("Ask")]
+        [RequireFeature(PlanFeatureCodes.Doubts)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Ask([Bind(Prefix = "Input")] AskDoubtInput input, CancellationToken ct)
         {
@@ -58,19 +60,20 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             var ok = await _mediator.Send(new DeleteDoubtCommand(userId.Value, id), ct);
             TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Doubt deleted." : "Only unanswered doubts can be deleted.";
             return RedirectToAction(nameof(Index), new { status, page });
-        } 
-
+        }
+         
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> Thread(Guid id, CancellationToken ct)
         {
             var userId = CurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var vm = await _mediator.Send(new GetDoubtThreadQuery(userId.Value, id), ct);  
+            var vm = await _mediator.Send(new GetDoubtThreadQuery(userId.Value, id), ct);   
             return vm == null ? NotFound() : View(vm);
         }
 
         [HttpPost("{id:guid}/Reply")]
+        [RequireFeature(PlanFeatureCodes.Doubts)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reply(Guid id, string? text, CancellationToken ct)
         {

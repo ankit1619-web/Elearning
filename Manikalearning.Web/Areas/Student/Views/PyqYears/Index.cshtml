@@ -1,0 +1,382 @@
+﻿@using Manikalearning.Application.DTOs
+@model PyqYearsDto
+@{
+    Layout = "_CbtLayout";
+    ViewData["Title"] = "PYQ by year";
+    var loggedIn = User.Identity?.IsAuthenticated == true;
+    var here = Context.Request.Path + Context.Request.QueryString;
+    var loginUrl = Url.Action("Login", "Account", new { area = "", returnUrl = here }) ?? "/";
+}
+
+@section Head {
+    <style>
+        .yr-container {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            color: #0f172a;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 3rem;
+        }
+
+        /* Top Header Navigation */
+        .cbt-top {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+        }
+
+        .cbt-brand {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cbt-brand em {
+            color: #818cf8;
+            font-style: normal;
+        }
+
+        .cbt-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Hero Banner */
+        .yr-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+            border-radius: 20px;
+            padding: 2.2rem 2rem;
+            color: #ffffff;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .yr-hero h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.4rem;
+        }
+
+        .yr-hero p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin: 0;
+            max-width: 600px;
+        }
+
+        /* Filter Form Panel */
+        .yr-filter-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+
+        .yr-filter-card label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 0.4rem;
+        }
+
+        .yr-filter-card select {
+            min-width: 220px;
+            padding: 0.65rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .yr-filter-card select:focus {
+            border-color: #6366f1;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Grid & Cards */
+        .yr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .yr-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+            transition: all 0.25s ease;
+        }
+
+        .yr-card:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .yr-year {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .yr-count {
+            color: #64748b;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-top: 0.2rem;
+        }
+
+        .yr-cut {
+            font-size: 0.78rem;
+            color: #b45309;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .yr-sess {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+        }
+
+        .yr-sess-btn {
+            background: #f1f5f9;
+            color: #334155 !important;
+            border: 1px solid #e2e8f0;
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .yr-sess-btn:hover {
+            background: #e0e7ff;
+            color: #3730a3 !important;
+            border-color: #c7d2fe;
+        }
+
+        .yr-start-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #ffffff !important;
+            text-align: center;
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .yr-start-btn:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        }
+
+        .yr-empty {
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+            background: #ffffff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 20px;
+            color: #64748b;
+        }
+
+        .yr-note {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .yr-note i {
+            color: #4f46e5;
+            font-size: 1.1rem;
+        }
+
+        @@media (max-width: 575.98px) {
+            .yr-filter-card select { min-width: 0; width: 100%; }
+            .yr-filter-card > div { flex: 1 1 100%; }
+        }
+    </style>
+}
+
+<!-- Top Header Navigation -->
+<header class="cbt-top">
+    <a class="cbt-brand" href="/">
+        <i class="bi bi-mortarboard-fill"></i>
+        <span>Manika<em>Learning</em></span>
+    </a>
+    <span class="cbt-title d-none d-sm-inline-block">PYQ Examination Bank</span>
+    <span class="cbt-spacer"></span>
+    <div>
+        @if (loggedIn) 
+        { 
+            <a class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3" href="/Student/Dashboard">
+                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a> 
+        }
+        else 
+        { 
+            <a class="btn btn-light btn-sm fw-bold text-indigo rounded-pill px-4" href="@loginUrl">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Log In
+            </a> 
+        }
+    </div>
+</header>
+
+<div class="yr-container">
+    <!-- Hero Banner -->
+    <div class="yr-hero shadow-sm">
+        <h1>Previous Year Questions</h1>
+        <p>Pick a year and practise with real CBT exam mode. No login required to test yourself.</p>
+    </div>
+
+    <!-- Filter Form Panel -->
+    <div class="yr-filter-card">
+        <form class="d-flex flex-wrap align-items-end gap-3" method="get" asp-area="Student" asp-controller="PyqYears" asp-action="Index">
+            <div>
+                <label for="examId">Target Exam</label>
+                <select id="examId" name="examId">
+                    <option value="">All Exams</option>
+                    @foreach (var e in Model.Exams) 
+                    { 
+                        <option value="@e.ExamId" selected="@(Model.ExamId == e.ExamId)">@e.ExamName</option> 
+                    }
+                </select>
+            </div>
+            <div>
+                <label for="paperId">Paper</label>
+                <select id="paperId" name="paperId">
+                    <option value="">All Papers</option>
+                    @foreach (var g in Model.Papers.GroupBy(p => p.ExamName))
+                    {
+                        <optgroup label="@g.Key">
+                            @foreach (var p in g) 
+                            { 
+                                <option value="@p.PaperId" selected="@(Model.PaperId == p.PaperId)">@p.PaperName</option> 
+                            }
+                        </optgroup>
+                    }
+                </select>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary fw-bold rounded-3 px-4 py-2" style="background: #4f46e5; border: none;">
+                    <i class="bi bi-funnel me-1"></i> Filter
+                </button>
+                @if (Model.ExamId != null || Model.PaperId != null) 
+                { 
+                    <a class="btn btn-outline-secondary rounded-3 px-3 py-2 fw-semibold" asp-action="Index">Clear</a> 
+                }
+            </div>
+        </form>
+    </div>
+
+    @if (Model.Years.Count == 0)
+    {
+        <div class="yr-empty">
+            <i class="bi bi-calendar-x text-indigo display-5 mb-2"></i>
+            <h5 class="fw-bold text-dark mb-1">No PYQs Found</h5>
+            <p class="small mb-0">No previous year questions match your selected exam or paper filter.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Years Grid -->
+        <div class="yr-grid">
+            @foreach (var y in Model.Years)
+            {
+                <article class="yr-card">
+                    <div>
+                        <div class="yr-year">@y.Year</div>
+                        <div class="yr-count">
+                            <i class="bi bi-journal-check me-1"></i>@y.Total @(y.Total == 1 ? "question" : "questions")
+                        </div>
+                    </div>
+
+                    <a class="yr-start-btn" asp-area="Student" asp-controller="PyqTest" asp-action="Start"
+                       asp-route-kind="year" asp-route-key="@y.Year"
+                       asp-route-examId="@Model.ExamId" asp-route-paperId="@Model.PaperId" asp-route-back="@here">
+                        <i class="bi bi-play-fill fs-5"></i> Start @y.Year Test
+                    </a>
+
+                    @if (y.IsCut)
+                    {
+                        <div class="yr-cut">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Large set: contains the first @PyqYearRules.MaxQuestionsPerTest questions. Select a paper or session below to get a full single paper.
+                        </div>
+                    }
+
+                    @if (y.Sessions.Count > 0)
+                    {
+                        <div class="yr-sess">
+                            @foreach (var s in y.Sessions)
+                            {
+                                <a class="yr-sess-btn" asp-area="Student" asp-controller="PyqTest" asp-action="Start"
+                                   asp-route-kind="year" asp-route-key="@y.Year" asp-route-session="@s.Session"
+                                   asp-route-examId="@Model.ExamId" asp-route-paperId="@Model.PaperId" asp-route-back="@here">
+                                    @s.Session (@s.Count)
+                                </a>
+                            }
+                        </div>
+                    }
+                </article>
+            }
+        </div>
+    }
+
+    <div class="yr-note">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>You can practise without logging in, but your scores and history are saved only for students with an active PYQ plan.</span>
+    </div>
+</div>

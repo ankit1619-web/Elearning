@@ -14,5 +14,6 @@
         public decimal FinalPrice { get; set; }
         public bool CouponApplied => Discount > 0;
         public List<string> Courses { get; set; } = new();
+        public List<string> Features { get; set; } = new();
     }
 }

@@ -43,7 +43,7 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Bookmarks
                     StudentName = bookmark.User?.FullName ?? "N/A",
                     StudentEmail = bookmark.User?.Email ?? "N/A",
                     QuestionId = bookmark.QuestionId,
-                    QuestionTitle = bookmark.Question?.QuestionText ?? "N/A",
+                    QuestionText = bookmark.Question?.QuestionText ?? "N/A",
                     Explanation = bookmark.Question?.Explanation ?? "N/A",
                     SavedAt = bookmark.CreatedAt,
                     CorrectAnswer = bookmark.Question?.Options.FirstOrDefault(x => x.IsCorrect)?.OptionText ?? "N/A",

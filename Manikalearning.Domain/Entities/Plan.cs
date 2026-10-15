@@ -20,7 +20,13 @@ namespace Manikalearning.Domain.Entities
         public ICollection<PlanCourse> PlanCourses { get; set; }
         public ICollection<StudentSubscription> StudentSubscriptions { get; set; }
     }
-
+    public class PlanFeature
+    {
+        [Key]
+        public Guid PlanId { get; set; }
+        
+        public string FeatureCode { get; set; } = "";
+    }
 
     [Table("PlanCourses")]
     public class PlanCourse

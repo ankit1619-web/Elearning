@@ -15,7 +15,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Pyq
     public record SubmitTopicPyqTestCommand(
         Guid LectureId,
         Guid UserId,
-        Guid? TestId, // Mandatory FK in DB
+        Guid? TestId, 
         int TimeTakenSeconds,
         List<UserAnswerDto> Answers
     ) : IRequest<ResponseDto<TopicTestResultDto>>;

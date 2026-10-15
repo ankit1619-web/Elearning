@@ -35,6 +35,21 @@ namespace Manikalearning.Domain.Entities
         public ICollection<StudentSubscription> StudentSubscriptions { get; set; } = new List<StudentSubscription>();
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
+
+    
+    [Table("StudentProfiles")]
+    public class StudentProfile : IdentityUser<Guid>
+    {
+
+        [Key]
+        public Guid UserId { get; set; } 
+        public Guid? TargetExamId { get; set; } 
+        public DateTime? TargetExamDate { get; set; } 
+        public int? DailyGoal { get; set; }  
+        public DateTime UpdatedAt { get; set; }  
+    }
+
+
     [Table("Roles")]
     public class Role : IdentityRole<Guid>
     {

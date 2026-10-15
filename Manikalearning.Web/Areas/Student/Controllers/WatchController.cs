@@ -1,7 +1,7 @@
-﻿using Manikalearning.Application.DTOs;
+﻿ using Manikalearning.Application.DTOs; 
 using Manikalearning.Application.Features.Commands.Assessments.Bookmarks;
-using Manikalearning.Application.Features.Commands.Assessments.Pyq;
 using Manikalearning.Application.Features.Commands.Students;
+using Manikalearning.Application.Features.Handlers.Students;
 using Manikalearning.Application.Interface;
 using Manikalearning.Web.Filters;
 using MediatR;
@@ -13,8 +13,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
 {
     [Area("Student")]
     [Authorize(Roles = "Student")]
-    [Route("Student/[controller]")]
-    [RequireCourseAccess]
+    [Route("Student/[controller]")] 
     public class WatchController : Controller
     {
         private readonly IFileStorageService _fileService;
@@ -26,20 +25,24 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             _fileService = fileService;
         }
 
+        private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+         
         [HttpGet("Index/{courseId}/{lessonId?}")]
+        [RequireCourseAccess("courseId", "lessonId")]      
+        [RequireLectureAccess("lessonId", true)]
         public async Task<IActionResult> Index(Guid courseId, Guid? lessonId, CancellationToken cancellationToken)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-             
+            var userId = UserId;
+
             var overview = await _mediator.Send(new GetWatchOverviewQuery(userId, courseId), cancellationToken);
-             
+
             var activeLessonId = lessonId ?? overview.Modules.FirstOrDefault()?.Lessons.FirstOrDefault()?.LessonId;
 
             LessonPlayerViewModel? currentLesson = null;
             if (activeLessonId.HasValue && activeLessonId.Value != Guid.Empty)
             {
                 currentLesson = await _mediator.Send(new GetLessonPlayerQuery(userId, courseId, activeLessonId.Value), cancellationToken);
-            } 
+            }
             var viewModel = new WatchIndexViewModel
             {
                 CourseOverview = overview,
@@ -50,38 +53,40 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         }
 
         [HttpGet("GetLesson")]
+        [RequireLectureAccess("lessonId")]              
         public async Task<IActionResult> GetLesson(Guid courseId, Guid lessonId, CancellationToken cancellationToken)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var lessonModel = await _mediator.Send(new GetLessonPlayerQuery(userId, courseId, lessonId), cancellationToken);
-
+            var lessonModel = await _mediator.Send(new GetLessonPlayerQuery(UserId, courseId, lessonId), cancellationToken);
             return PartialView("_LessonPlayerPartial", lessonModel);
         }
 
-        [HttpGet("AskDoubtPartial/{lessonId:guid}")] 
-        public async Task<IActionResult> AskDoubtPartial(Guid lessonId, CancellationToken cancellationToken)
+        [HttpGet("AskDoubtPartial/{lessonId:guid}")]
+        [RequireLectureAccess("lessonId")]
+        public IActionResult AskDoubtPartial(Guid lessonId)
         {
-            var model = new AskDoubtViewModel
-            {
-                LessonId = lessonId
-            };
-            return PartialView("_AskDoubtPartial", model);
+            return PartialView("_AskDoubtPartial", new AskDoubtViewModel { LessonId = lessonId });
         }
-         
+
         [HttpGet("GetMedia")]
         [Authorize]
-        public IActionResult GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs")
+        public async Task<IActionResult> GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs", CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrEmpty(fileName)) return BadRequest("File name is required.");
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+             
+            if (!string.Equals(Path.GetFileName(fileName), fileName, StringComparison.Ordinal)) return BadRequest("Invalid file name.");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(mediaType ?? "", "^[A-Za-z]{1,20}$")) return BadRequest("Invalid media type.");
+             
+            var access = await _mediator.Send(new CheckMediaAccessQuery(UserId, fileName), cancellationToken);
+            if (!access.HasAccess) return StatusCode(StatusCodes.Status403Forbidden);
 
-            var filePath = _fileService.GetFilePath(fileName, mediaType);
+            var filePath = _fileService.GetFilePath(fileName, mediaType!);
 
             if (!System.IO.File.Exists(filePath))
             {
                 return NotFound("Requested media file does not exist.");
             }
 
-            var contentType = mediaType.Equals("pdfs", StringComparison.OrdinalIgnoreCase)
+            var contentType = mediaType!.Equals("pdfs", StringComparison.OrdinalIgnoreCase)
                 ? "application/pdf"
                 : "video/mp4";
 
@@ -89,7 +94,6 @@ namespace Manikalearning.Web.Areas.Student.Controllers
 
             return PhysicalFile(filePath, contentType, enableRangeProcessing: true);
         }
-
 
         [HttpPost("AskDoubt")]
         [ValidateAntiForgeryToken]
@@ -100,13 +104,18 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 return PartialView("_AskDoubtPartial", model);
             }
 
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = UserId;
              
+            var access = await _mediator.Send(new CheckLectureAccessQuery(userId, model.LessonId), cancellationToken);
+            if (!access.HasAccess) return Forbid();
+             
+            if (!await _mediator.Send(new HasFeatureQuery(userId, PlanFeatureCodes.Doubts), cancellationToken)) return Forbid();
+
             var response = await _mediator.Send(
                 new SaveAskDoubtCommand(userId, model.LessonId, model.DoubtText),
                 cancellationToken
-            ); 
-            return Json(response); 
+            );
+            return Json(response);
         }
 
         [HttpPost("ToggleBookmark")]
@@ -119,6 +128,12 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 return Unauthorized();
             }
 
+            if (lectureId.HasValue)                                  
+            {
+                var access = await _mediator.Send(new CheckLectureAccessQuery(userId, lectureId.Value), cancellationToken);
+                if (!access.HasAccess) return Forbid();
+            }
+
             var command = new ToggleBookmarkCommand(userId, lectureId, questionId);
             var result = await _mediator.Send(command, cancellationToken);
             return Json(new
@@ -126,52 +141,8 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 success = result.IsSuccess,
                 isBookmarked = result.Data,
                 message = result.Message
-            }); 
+            });
         }
-
-        [AllowAnonymous]
-        [HttpGet("TopicPyqsTestPartial/{lectureId}")]
-        public async Task<IActionResult> TopicPyqsTestPartial(Guid lectureId, CancellationToken cancellationToken)
-        {
-            Guid? userId = null;
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var parsedId))
-            {
-                userId = parsedId;
-            }
-
-            var query = new GetTopicPyqsTestQuery(lectureId, userId);
-            var result = await _mediator.Send(query, cancellationToken);
-
-            return PartialView("_TopicPyqsTestPartial", result.Data ?? new TopicPyqListDto());
-        }
-
-        [HttpPost("SubmitTopicPyqTest")]
-        public async Task<IActionResult> SubmitTopicPyqTest([FromBody] SubmitTopicPyqTestCommand command, CancellationToken cancellationToken)
-        {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
-            {
-                return Ok(new
-                {
-                    success = true,
-                    isGuest = true,
-                    message = "Guest mode: Result calculated locally without saving to database."
-                });
-            }
-
-            var authenticatedCommand = new SubmitTopicPyqTestCommand(
-                command.LectureId,
-                userId,
-                command.TestId,
-                command.TimeTakenSeconds,
-                command.Answers
-            );
-
-            var result = await _mediator.Send(authenticatedCommand, cancellationToken);
-
-            return Json(result);
-        }
+         
     }
 }
