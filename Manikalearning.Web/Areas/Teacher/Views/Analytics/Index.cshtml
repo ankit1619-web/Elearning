@@ -1,0 +1,229 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@using System.Globalization
+@model TeacherAnalyticsDto
+
+@{
+    ViewData["Title"] = "Analytics";
+    ViewData["HeaderTitle"] = "Analytics";
+
+    string W(decimal p) => Math.Clamp(p, 0, 100).ToString("0.#", CultureInfo.InvariantCulture);
+    string Pc(decimal? p) => p.HasValue ? p.Value.ToString("0.#", CultureInfo.InvariantCulture) + "%" : "-";
+    const decimal WeakBelow = 40m;
+}
+
+@section Styles {
+    <style>
+        .viz-root { --viz-bar: #2a78d6; --viz-axis: #c3c2b7; --viz-ink: #0b0b0b; --viz-ink2: #52514e; --viz-warn: #ec835a; }
+        .viz-bar { display: flex; align-items: center; gap: 10px; min-width: 190px; }
+        .viz-bar .track { flex: 1; height: 14px; border-left: 1px solid var(--viz-axis); display: flex; align-items: center; }
+        .viz-bar .fill { height: 14px; background: var(--viz-bar); border-radius: 0 4px 4px 0; min-width: 2px; }
+        .viz-bar .val { min-width: 52px; text-align: right; font-weight: 600; color: var(--viz-ink); }
+        .viz-tile-value { font-size: 1.75rem; font-weight: 600; color: var(--viz-ink); line-height: 1.1; }
+        .viz-num { font-variant-numeric: tabular-nums; }
+        .viz-flag { color: var(--viz-ink2); font-size: .8rem; }
+        .viz-flag i { color: var(--viz-warn); }
+    </style>
+}
+
+<div class="viz-root">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold text-dark mb-0">Analytics</h5>
+            <p class="text-muted small mb-0">See how students perform on your tests and which topics need more attention.</p>
+        </div>
+        <form method="get" style="min-width:260px">
+            <select name="testId" class="form-select form-select-sm shadow-none" onchange="this.form.submit()" aria-label="Filter by test">
+                <option value="">All tests</option>
+                @foreach (var t in Model.TestOptions)
+                {
+                    <option value="@t.Id" selected="@(Model.SelectedTestId == t.Id)">@t.Name</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+                <div class="card-body">
+                    <div class="small text-muted mb-1">Students enrolled</div>
+                    <div class="viz-tile-value">@Model.Students.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+                <div class="card-body">
+                    <div class="small text-muted mb-1">Published tests</div>
+                    <div class="viz-tile-value">@Model.PublishedTests.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+                <div class="card-body">
+                    <div class="small text-muted mb-1">Test attempts</div>
+                    <div class="viz-tile-value">@Model.Attempts.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+                <div class="card-body">
+                    <div class="small text-muted mb-1">Average score</div>
+                    <div class="viz-tile-value">@Pc(Model.AvgPercent)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.TestOptions.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
+            <i class="bi bi-graph-up-arrow fs-1 opacity-50 mb-2"></i>
+            <h6 class="fw-semibold mb-1">No tests yet</h6>
+            <p class="small mb-0">Create a test and share it with your students to see analytics here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+            <div class="card-header bg-white border-bottom py-3 rounded-top-4">
+                <div class="fw-bold text-dark">Average score by test</div>
+                <div class="small text-muted">Percentage of total marks, across all attempts. Shows all tests regardless of the filter.</div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-muted fw-semibold border-0 ps-3">Test</th>
+                            <th class="text-muted fw-semibold border-0">Attempts</th>
+                            <th class="text-muted fw-semibold border-0" style="width:34%">Average score</th>
+                            <th class="text-muted fw-semibold border-0">Highest</th>
+                            <th class="text-muted fw-semibold border-0">Lowest</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.Tests)
+                        {
+                            <tr>
+                                <td class="ps-3 fw-medium text-dark">@t.TestName</td>
+                                <td class="viz-num small">@t.Attempts</td>
+                                <td>
+                                    @if (t.AvgPercent.HasValue)
+                                    {
+                                        <div class="viz-bar" title="@t.TestName: average @Pc(t.AvgPercent) across @t.Attempts attempts">
+                                            <div class="track"><div class="fill" style="width:@W(t.AvgPercent.Value)%"></div></div>
+                                            <span class="val viz-num">@Pc(t.AvgPercent)</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">No attempts yet</span>
+                                    }
+                                </td>
+                                <td class="viz-num small">@Pc(t.HighPercent)</td>
+                                <td class="viz-num small">@Pc(t.LowPercent)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+            <div class="card-header bg-white border-bottom py-3 rounded-top-4">
+                <div class="fw-bold text-dark">Topic accuracy</div>
+                <div class="small text-muted">Share of answered questions that were correct. Weakest topics first (up to 15).</div>
+            </div>
+            @if (!Model.Topics.Any())
+            {
+                <div class="text-center text-muted small py-4">No answered questions with a topic yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-muted fw-semibold border-0 ps-3">Topic</th>
+                                <th class="text-muted fw-semibold border-0" style="width:38%">Accuracy</th>
+                                <th class="text-muted fw-semibold border-0">Correct / Answered</th>
+                                <th class="text-muted fw-semibold border-0">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.Topics)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-medium text-dark">@t.TopicName</td>
+                                    <td>
+                                        <div class="viz-bar" title="@t.TopicName: @Pc(t.AccuracyPercent) accuracy (@t.Correct of @t.Answered answers correct)">
+                                            <div class="track"><div class="fill" style="width:@W(t.AccuracyPercent)%"></div></div>
+                                            <span class="val viz-num">@Pc(t.AccuracyPercent)</span>
+                                        </div>
+                                    </td>
+                                    <td class="viz-num small">@t.Correct / @t.Answered</td>
+                                    <td>
+                                        @if (t.AccuracyPercent < WeakBelow)
+                                        {
+                                            <span class="viz-flag"><i class="bi bi-exclamation-triangle-fill me-1"></i>Needs attention</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">-</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white">
+            <div class="card-header bg-white border-bottom py-3 rounded-top-4">
+                <div class="fw-bold text-dark">Hardest questions</div>
+                <div class="small text-muted">Lowest accuracy first. Only questions with at least 5 answers are listed.</div>
+            </div>
+            @if (!Model.HardQuestions.Any())
+            {
+                <div class="text-center text-muted small py-4">Not enough answers yet. Questions appear here once at least 5 students have answered them.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-muted fw-semibold border-0 ps-3" style="width:50%">Question</th>
+                                <th class="text-muted fw-semibold border-0">Topic</th>
+                                <th class="text-muted fw-semibold border-0">Answered</th>
+                                <th class="text-muted fw-semibold border-0" style="width:22%">Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var q in Model.HardQuestions)
+                            {
+                                var text = q.QuestionText.Length > 130 ? q.QuestionText.Substring(0, 130) + "..." : q.QuestionText;
+                                <tr>
+                                    <td class="ps-3 fw-medium text-dark">@text</td>
+                                    <td class="small text-muted">@(q.TopicName ?? "-")</td>
+                                    <td class="viz-num small">@q.Answered</td>
+                                    <td>
+                                        <div class="viz-bar" title="@Pc(q.AccuracyPercent) of @q.Answered answers were correct">
+                                            <div class="track"><div class="fill" style="width:@W(q.AccuracyPercent)%"></div></div>
+                                            <span class="val viz-num">@Pc(q.AccuracyPercent)</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+</div>

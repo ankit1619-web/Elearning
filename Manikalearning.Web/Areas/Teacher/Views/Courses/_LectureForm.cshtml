@@ -5,13 +5,57 @@
     var isEdit = f.LectureId != null && f.LectureId != Guid.Empty;
 }
 
-<div class="modal-header border-bottom pb-2">
+<style>
+    .nav-pills-custom .nav-link {
+        color: #6c757d;
+        border-radius: 8px;
+        padding: 6px 18px;
+        font-weight: 600;
+        font-size: .875rem;
+        transition: all .2s ease;
+    }
+
+        .nav-pills-custom .nav-link.active {
+            background-color: #0d6efd;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(13,110,253,.25);
+        }
+
+    .note-editor.note-frame {
+        border-radius: 10px !important;
+        border: 1px solid #dee2e6 !important;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,.02);
+    }
+
+    .note-toolbar {
+        background: #f8f9fa !important;
+        border-bottom: 1px solid #e9ecef !important;
+    }
+</style>
+
+<div class="modal-header border-bottom-0 pb-0">
     <h5 class="modal-title fw-bold text-dark">@(isEdit ? "Edit Lecture" : "Add Lecture")</h5>
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<form asp-area="Teacher" asp-controller="Courses" asp-action="SaveLecture" method="post" enctype="multipart/form-data"
-      onsubmit="return Toast.submitModalForm(this);">
+<div class="px-4 pt-3 bg-light border-bottom">
+    <ul class="nav nav-pills nav-pills-custom gap-2 pb-2" id="lectureModalTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-details-btn" data-bs-toggle="pill" data-bs-target="#tab-details-pane" type="button" role="tab" aria-controls="tab-details-pane" aria-selected="true">
+                <i class="bi bi-info-circle me-1"></i> Lecture Details
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-editor-btn" data-bs-toggle="pill" data-bs-target="#tab-editor-pane" type="button" role="tab" aria-controls="tab-editor-pane" aria-selected="false">
+                <i class="bi bi-journal-richtext me-1"></i> Lecture Notes (Editor)
+            </button>
+        </li>
+    </ul>
+</div>
+
+<form id="teacherLectureForm" asp-area="Teacher" asp-controller="Courses" asp-action="SaveLecture" method="post" enctype="multipart/form-data"
+      onsubmit="syncLectureNotes(); return Toast.submitModalForm(this);">
     @Html.AntiForgeryToken()
     <input type="hidden" name="CourseSectionId" value="@f.CourseSectionId" />
     @if (isEdit)
@@ -19,100 +63,206 @@
         <input type="hidden" name="LectureId" value="@f.LectureId" />
     }
 
-    <div class="modal-body py-3">
-        <div class="row g-3">
-            <div class="col-lg-7">
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold text-muted">Lecture Title *</label>
-                    <input name="LectureTitle" value="@f.LectureTitle" maxlength="250" required
-                           class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Introduction to Preamble" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold text-muted">Description</label>
-                    <textarea name="Description" rows="3" class="form-control form-control-sm rounded-2 shadow-none" placeholder="Brief explanation of the lecture content...">@f.Description</textarea>
-                </div>
+    <div class="modal-body p-4 bg-light-subtle">
+        <div class="tab-content">
 
-                <div class="p-2 bg-light rounded-2 border mb-3">
-                    <label class="form-label small fw-semibold text-muted mb-1"><i class="bi bi-camera-video me-1"></i>Video</label>
-                    <input name="VideoUrl" value="@f.VideoUrl" maxlength="1000"
-                           class="form-control form-control-sm rounded-2 shadow-none mb-2"
-                           placeholder="Video URL (YouTube / Vimeo / Bunny / S3)" />
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="file" name="videoFile" accept=".mp4,.webm" class="form-control form-control-sm shadow-none" />
-                        <input type="number" min="0" max="1000" name="VideoDurationMinutes" value="@f.VideoDurationMinutes"
-                               class="form-control form-control-sm shadow-none" style="max-width:130px" placeholder="Minutes" />
+            <div class="tab-pane fade show active" id="tab-details-pane" role="tabpanel" aria-labelledby="tab-details-btn">
+                <div class="row g-3">
+                    <div class="col-lg-7">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Lecture Title *</label>
+                            <input name="LectureTitle" value="@f.LectureTitle" maxlength="250" required
+                                   class="form-control rounded-3 shadow-none" placeholder="e.g. 1.1 Introduction to the Preamble" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Description</label>
+                            <textarea name="Description" rows="3" class="form-control rounded-3 shadow-none" placeholder="Brief explanation of the lecture content...">@f.Description</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Video Source (URL or Upload File)</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-link-45deg"></i></span>
+                                <input name="VideoUrl" id="txtVideoUrl" value="@f.VideoUrl" maxlength="1000"
+                                       class="form-control shadow-none border-start-0" placeholder="e.g. YouTube / Vimeo / Bunny / S3 link" />
+                                <button type="button" id="btnVideoPreview" class="btn btn-outline-primary d-none" onclick="previewLectureMedia('videos')">
+                                    <i class="bi bi-eye-fill me-1"></i> Preview Video
+                                </button>
+                            </div>
+                            <div class="d-flex align-items-center my-1 text-muted small">
+                                <hr class="flex-grow-1 my-0"><span class="px-2">OR Upload MP4 / WebM</span><hr class="flex-grow-1 my-0">
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="file" name="videoFile" accept=".mp4,.webm" class="form-control rounded-3 shadow-none" />
+                                <input type="number" min="0" max="1000" name="VideoDurationMinutes" value="@f.VideoDurationMinutes"
+                                       class="form-control shadow-none" style="max-width:130px" placeholder="Minutes" />
+                            </div>
+                            <div class="form-text">Max 500 MB. An uploaded file overrides the URL. Direct video URLs are recommended for large files.</div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label small fw-semibold text-muted">PDF Notes (URL or Upload File)</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-file-earmark-pdf"></i></span>
+                                <input name="NotesUrl" id="txtPdfUrl" value="@f.NotesUrl" maxlength="1000"
+                                       class="form-control shadow-none border-start-0" placeholder="e.g. External PDF link" />
+                                <button type="button" id="btnPdfPreview" class="btn btn-outline-danger d-none" onclick="previewLectureMedia('pdfs')">
+                                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Preview PDF
+                                </button>
+                            </div>
+                            <div class="d-flex align-items-center my-1 text-muted small">
+                                <hr class="flex-grow-1 my-0"><span class="px-2">OR Upload PDF</span><hr class="flex-grow-1 my-0">
+                            </div>
+                            <input type="file" name="notesFile" accept="application/pdf,.pdf" class="form-control rounded-3 shadow-none" />
+                            <div class="form-text">PDF max size: 25 MB.</div>
+                        </div>
                     </div>
-                    <div class="form-text">Provide a URL or upload a file (mp4/webm, max 500 MB). Uploading a file will override the URL. Using direct video URLs is recommended for large files.</div>
-                </div>
 
-                <div class="p-2 bg-light rounded-2 border">
-                    <label class="form-label small fw-semibold text-muted mb-1"><i class="bi bi-file-earmark-pdf me-1"></i>Notes</label>
-                    <input name="NotesUrl" value="@f.NotesUrl" maxlength="1000"
-                           class="form-control form-control-sm rounded-2 shadow-none mb-2" placeholder="Notes PDF URL" />
-                    <input type="file" name="notesFile" accept=".pdf" class="form-control form-control-sm shadow-none mb-2" />
-                    <textarea name="Notes" rows="3" class="form-control form-control-sm rounded-2 shadow-none"
-                              placeholder="Or write short notes directly here...">@f.Notes</textarea>
-                    <div class="form-text">PDF max size: 25 MB.</div>
+                    <div class="col-lg-5">
+                        <div class="p-2 bg-white rounded-3 border mb-3">
+                            <label class="form-label small fw-semibold text-muted mb-1">Related Topic (optional)</label>
+                            <select id="ddlSubject" class="form-select rounded-3 shadow-none mb-2">
+                                <option value="">-- Subject --</option>
+                                @foreach (var s in Model.Subjects)
+                                {
+                                    <option value="@s.Id" selected="@(f.PickSubjectId == s.Id)">@s.Name</option>
+                                }
+                            </select>
+                            <select id="ddlSection" class="form-select rounded-3 shadow-none mb-2">
+                                <option value="">-- Section --</option>
+                                @foreach (var s in Model.Sections)
+                                {
+                                    <option value="@s.Id" selected="@(f.PickSectionId == s.Id)">@s.Name</option>
+                                }
+                            </select>
+                            <select id="ddlTopic" name="TopicId" class="form-select rounded-3 shadow-none">
+                                <option value="">-- Topic --</option>
+                                @foreach (var t in Model.Topics)
+                                {
+                                    <option value="@t.Id" selected="@(f.TopicId == t.Id)">@t.Name</option>
+                                }
+                            </select>
+                            <div class="form-text">Linking a topic connects this lecture to the question bank and student analytics.</div>
+                        </div>
+
+                        <div class="p-2 bg-white rounded-3 border">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted">Display Order</label>
+                                <input type="number" min="0" name="DisplayOrder" value="@(f.DisplayOrder > 0 ? f.DisplayOrder.ToString() : "")"
+                                       class="form-control rounded-3 shadow-none" placeholder="Auto (at the end)" />
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input shadow-none" type="checkbox" name="IsFreePreview" value="true" id="chkFreePrev" @(f.IsFreePreview ? "checked" : "") />
+                                <label class="form-check-label small fw-medium text-dark" for="chkFreePrev">Free Preview (visible without purchase)</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input shadow-none" type="checkbox" name="IsPublished" value="true" id="chkLecPub" @(f.IsPublished ? "checked" : "") />
+                                <label class="form-check-label small fw-medium text-dark" for="chkLecPub">Publish Status</label>
+                            </div>
+                            <div class="form-text">At least video content or notes are required to publish a lecture.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-lg-5">
-                <div class="p-2 bg-light rounded-2 border mb-3">
-                    <label class="form-label small fw-semibold text-muted mb-1">Curriculum Topic (optional)</label>
-                    <select id="ddlSubject" class="form-select form-select-sm rounded-2 shadow-none mb-2">
-                        <option value="">-- Subject --</option>
-                        @foreach (var s in Model.Subjects)
-                        {
-                            <option value="@s.Id" selected="@(f.PickSubjectId == s.Id)">@s.Name</option>
-                        }
-                    </select>
-                    <select id="ddlSection" class="form-select form-select-sm rounded-2 shadow-none mb-2">
-                        <option value="">-- Section --</option>
-                        @foreach (var s in Model.Sections)
-                        {
-                            <option value="@s.Id" selected="@(f.PickSectionId == s.Id)">@s.Name</option>
-                        }
-                    </select>
-                    <select id="ddlTopic" name="TopicId" class="form-select form-select-sm rounded-2 shadow-none">
-                        <option value="">-- Topic --</option>
-                        @foreach (var t in Model.Topics)
-                        {
-                            <option value="@t.Id" selected="@(f.TopicId == t.Id)">@t.Name</option>
-                        }
-                    </select>
-                    <div class="form-text">Linking a topic connects this lecture to the question bank and student analytics.</div>
+            <div class="tab-pane fade" id="tab-editor-pane" role="tabpanel" aria-labelledby="tab-editor-btn">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small fw-semibold">Lecture Notes / Study Material</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-2" onclick="clearLectureNotesEditor()">
+                        <i class="bi bi-eraser-fill me-1"></i> Clear Editor
+                    </button>
                 </div>
-
-                <div class="p-2 bg-light rounded-2 border">
-                    <div class="mb-2">
-                        <label class="form-label small fw-semibold text-muted">Display Order</label>
-                        <input type="number" min="0" name="DisplayOrder" value="@(f.DisplayOrder > 0 ? f.DisplayOrder.ToString() : "")"
-                               class="form-control form-control-sm rounded-2 shadow-none" placeholder="Auto (at the end)" />
-                    </div>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input shadow-none" type="checkbox" name="IsFreePreview" value="true" id="chkFreePrev" @(f.IsFreePreview ? "checked" : "") />
-                        <label class="form-check-label small fw-semibold text-dark" for="chkFreePrev">Free preview (visible without purchase)</label>
-                    </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input shadow-none" type="checkbox" name="IsPublished" value="true" id="chkLecPub" @(f.IsPublished ? "checked" : "") />
-                        <label class="form-check-label small fw-semibold text-dark" for="chkLecPub">Published</label>
-                    </div>
-                    <div class="form-text">At least video content or notes are required to publish a lecture.</div>
-                </div>
+                <textarea name="Notes" id="txtLectureNotes" class="form-control rich-editor-lecture">@f.Notes</textarea>
             </div>
+
         </div>
     </div>
 
-    <div class="modal-footer border-top pt-2">
-        <button type="button" class="btn btn-sm btn-light rounded-2 px-3" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm"><i class="bi bi-check-lg me-1"></i> Save Lecture</button>
+    <div class="modal-footer bg-light border-top px-4 py-3">
+        <button type="button" class="btn btn-outline-secondary rounded-2 px-4 fw-medium" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Close
+        </button>
+        <button type="submit" class="btn btn-primary rounded-2 px-4 shadow-sm fw-semibold">
+            <i class="bi bi-check-lg me-1"></i> Save Lecture
+        </button>
     </div>
 </form>
+
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 
 <script>
     (function() {
         TeacherLookup.link('#ddlSubject', '#ddlSection', 'Sections', '-- Section --',
             [{ sel: '#ddlTopic', placeholder: '-- Topic --' }]);
         TeacherLookup.link('#ddlSection', '#ddlTopic', 'Topics', '-- Topic --');
+
+        // ---- rich text notes editor ----
+        setTimeout(function() {
+            if (typeof $.fn.summernote === 'undefined') { console.error('Summernote library not loaded.'); return; }
+            $('#txtLectureNotes').summernote({
+                height: 320,
+                placeholder: 'Add detailed reading notes, theory, code snippets or images here...',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                callbacks: {
+                    onImageUpload: function(files) {
+                        var $ed = $(this);
+                        Array.prototype.forEach.call(files, function(file) {
+                            var reader = new FileReader();
+                            reader.onload = function(e) { $ed.summernote('insertImage', e.target.result); };
+                            reader.readAsDataURL(file);
+                        });
+                    }
+                }
+            });
+        }, 150);
+
+        $('#lectureModalTabs button[data-bs-toggle="pill"]').on('shown.bs.tab', function(e) {
+            if (e.target.id === 'tab-editor-btn') $('#txtLectureNotes').summernote('refresh');
+        });
+
+        window.clearLectureNotesEditor = function() {
+            if ($('#txtLectureNotes').data('summernote')) $('#txtLectureNotes').summernote('code', '');
+        };
+
+        window.syncLectureNotes = function() {
+            if ($('#txtLectureNotes').data('summernote')) {
+                var html = $('#txtLectureNotes').summernote('code');
+                $('#txtLectureNotes').val($('#txtLectureNotes').summernote('isEmpty') ? '' : html);
+            }
+        };
+         
+        window.previewLectureMedia = async function(mediaType) {
+            var raw = (mediaType === 'pdfs' ? $('#txtPdfUrl').val() : $('#txtVideoUrl').val()).trim();
+            if (!raw) return;
+            if (raw.startsWith('http://') || raw.startsWith('https://')) { window.open(raw, '_blank'); return; }
+
+            var url = '/Teacher/Courses/GetMedia?fileName=' + encodeURIComponent(raw) + '&mediaType=' + mediaType;
+            try {
+                var res = await fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) { alert('Unable to load the file.'); return; }
+                var blobUrl = URL.createObjectURL(await res.blob());
+                window.open(blobUrl, '_blank');
+                setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 60000);
+            } catch (err) { console.error('Preview failed:', err); }
+        };
+
+        function togglePreview(inputSel, btnSel) {
+            var $i = $(inputSel), $b = $(btnSel);
+            function upd() { $b.toggleClass('d-none', $i.val().trim().length === 0); }
+            $i.on('input change blur', upd); upd();
+        }
+        togglePreview('#txtPdfUrl', '#btnPdfPreview');
+        togglePreview('#txtVideoUrl', '#btnVideoPreview');
     })();
 </script>
