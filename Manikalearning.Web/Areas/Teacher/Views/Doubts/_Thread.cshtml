@@ -1,0 +1,52 @@
+@model DoubtThreadDto
+
+<div class="modal-header border-bottom pb-2">
+    <div>
+        <h5 class="modal-title fw-bold text-dark mb-0">@Model.Doubt.StudentName</h5>
+        <small class="text-muted">@Model.Doubt.CourseName</small>
+    </div>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body" style="max-height:60vh; overflow-y:auto;">
+    <div class="p-3 rounded-3 bg-light border mb-3">
+        <div class="small text-muted mb-1">Student ka sawal · @Model.Doubt.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt")</div>
+        <div class="text-dark" style="white-space:pre-wrap">@Model.Doubt.QuestionText</div>
+    </div>
+
+    @foreach (var r in Model.Replies)
+    {
+        <div class="d-flex mb-2 @(r.IsFromStaff ? "justify-content-end" : "")">
+            <div class="p-2 px-3 rounded-3 @(r.IsFromStaff ? "bg-primary bg-opacity-10" : "bg-light border")" style="max-width:80%">
+                <div class="small text-muted">@(r.IsFromStaff ? "Aap" : "Student") · @r.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt")</div>
+                <div style="white-space:pre-wrap">@r.Text</div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.Doubt.Status != DoubtStatus.Closed)
+{
+    <form asp-area="Teacher" asp-controller="Doubts" asp-action="Reply" method="post"
+          onsubmit="return Toast.submitModalForm(this);">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="doubtId" value="@Model.Doubt.DoubtId" />
+        <div class="px-3 pb-2">
+            <textarea name="replyText" class="form-control shadow-none" rows="3" maxlength="2000" required
+                      placeholder="Apna jawab likhein..."></textarea>
+        </div>
+        <div class="modal-footer border-top pt-2 d-flex justify-content-between">
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-2"
+                    onclick="TeacherAjax.post('/Teacher/Doubts/Close/@Model.Doubt.DoubtId')">
+                <i class="bi bi-lock me-1"></i> Close Doubt
+            </button>
+            <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm">
+                <i class="bi bi-send me-1"></i> Send Reply
+            </button>
+        </div>
+    </form>
+}
+else
+{
+    <div class="modal-footer"><span class="text-muted small me-auto">Ye doubt closed hai.</span></div>
+}

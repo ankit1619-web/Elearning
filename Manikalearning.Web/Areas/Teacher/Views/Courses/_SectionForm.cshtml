@@ -1,0 +1,50 @@
+@model TeacherSectionForm
+@{
+    var isEdit = Model.CourseSectionId != null && Model.CourseSectionId != Guid.Empty;
+}
+
+<div class="modal-header border-bottom pb-2">
+    <h5 class="modal-title fw-bold text-dark">@(isEdit ? "Edit Section" : "Add Section")</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-area="Teacher" asp-controller="Courses" asp-action="SaveSection" method="post"
+      onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="CourseId" value="@Model.CourseId" />
+    @if (isEdit)
+    {
+        <input type="hidden" name="CourseSectionId" value="@Model.CourseSectionId" />
+    }
+
+    <div class="modal-body py-3">
+        <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Section Name *</label>
+            <input name="SectionName" value="@Model.SectionName" maxlength="250" required
+                   class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Chapter 1: Constitution" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Description</label>
+            <textarea name="Description" rows="2" class="form-control form-control-sm rounded-2 shadow-none">@Model.Description</textarea>
+        </div>
+        <div class="row g-2">
+            <div class="col-6">
+                <label class="form-label small fw-semibold text-muted">Order</label>
+                <input type="number" min="0" name="DisplayOrder" value="@(Model.DisplayOrder > 0 ? Model.DisplayOrder.ToString() : "")"
+                       class="form-control form-control-sm rounded-2 shadow-none" placeholder="Auto" />
+                <div class="form-text">Khaali chhodo to last me judega. Baad me up/down se badal sakte ho.</div>
+            </div>
+            <div class="col-6 d-flex align-items-center">
+                <div class="form-check form-switch mt-3">
+                    <input class="form-check-input shadow-none" type="checkbox" name="IsActive" value="true" id="chkSecActive" @(Model.IsActive ? "checked" : "") />
+                    <label class="form-check-label small fw-semibold text-dark" for="chkSecActive">Active</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer border-top pt-2">
+        <button type="button" class="btn btn-sm btn-light rounded-2 px-3" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm"><i class="bi bi-check-lg me-1"></i> Save Section</button>
+    </div>
+</form>

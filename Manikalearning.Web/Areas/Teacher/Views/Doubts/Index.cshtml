@@ -1,0 +1,105 @@
+@model StaffDoubtListDto
+
+@{
+    ViewData["Title"] = "Doubts";
+    ViewData["HeaderTitle"] = "Student Doubts";
+    var tabs = new[] { ("Open", "Open"), ("Answered", "Answered"), ("Closed", "Closed"), ("", "All") };
+    var courses = ViewData["Courses"] as List<LookupItem> ?? new();
+    var courseId = ViewData["CourseId"] as Guid?;
+}
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h5 class="fw-bold text-dark mb-0">
+                Doubts
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.TotalCount Total</span>
+            </h5>
+            <p class="text-muted small mb-0">Aapke courses ke students ke sawal. Sabse purana Open doubt sabse upar.</p>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <form method="get" class="d-flex gap-2">
+                <input type="hidden" name="status" value="@Model.Status" />
+                <select name="courseId" class="form-select form-select-sm shadow-none" onchange="this.form.submit()">
+                    <option value="">All courses</option>
+                    @foreach (var c in courses)
+                    {
+                        <option value="@c.Id" selected="@(courseId == c.Id)">@c.Name</option>
+                    }
+                </select>
+            </form>
+            <ul class="nav nav-pills gap-1">
+                @foreach (var (value, label) in tabs)
+                {
+                    var active = (Model.Status ?? "") == value ? "active" : "";
+                    <li class="nav-item">
+                        <a class="nav-link btn-sm py-1 px-3 @active" asp-action="Index" asp-route-status="@value" asp-route-courseId="@courseId">@label</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-muted fw-semibold border-0 py-3 ps-3" style="width:45%">Doubt</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Student</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Course</th>
+                    <th class="text-muted fw-semibold border-0 py-3">Status</th>
+                    <th class="text-muted fw-semibold border-0 py-3 text-end pe-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Any())
+                {
+                    foreach (var d in Model.Items)
+                    {
+                        <tr>
+                            <td class="ps-3">
+                                <span class="fw-medium text-dark d-block" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">@d.QuestionText</span>
+                                <small class="text-muted">@d.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt") · @d.ReplyCount replies</small>
+                            </td>
+                            <td>@d.StudentName</td>
+                            <td><small class="text-muted">@d.CourseName</small></td>
+                            <td>
+                                @if (d.Status == DoubtStatus.Open)
+                                {
+                                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2.5 py-1">Open</span>
+                                }
+                                else if (d.Status == DoubtStatus.Answered)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2.5 py-1">Answered</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2.5 py-1">Closed</span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <button type="button" class="btn btn-sm btn-light text-primary shadow-none rounded-2"
+                                        onclick="Toast.openModal('/Teacher/Doubts/Thread/@d.DoubtId', 'modal-lg')">
+                                    <i class="bi bi-chat-dots me-1"></i> @(d.Status == DoubtStatus.Open ? "Reply" : "View")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-chat-square-text fs-1 d-block mb-2 opacity-50"></i>
+                            <h6 class="fw-semibold mb-1">Koi doubt nahi mila</h6>
+                            <p class="small mb-0">Doosre tab ya course filter try karein.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_Pager" model="(Model.Page, Model.TotalPages)" />
+</div>
