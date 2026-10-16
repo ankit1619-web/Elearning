@@ -1,0 +1,84 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@model TeacherStudentDetailDto
+@{
+    string Cls(decimal p) => p >= 60 ? "success" : p >= 40 ? "warning" : "danger";
+}
+
+<div class="modal-header border-bottom pb-2">
+    <div>
+        <h5 class="modal-title fw-bold text-dark mb-0">@Model.FullName</h5>
+        @if (!string.IsNullOrWhiteSpace(Model.Email))
+        {
+            <div class="small text-muted">@Model.Email</div>
+        }
+    </div>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body py-3">
+    <div class="row g-2 mb-3">
+        <div class="col-12 col-md-6">
+            <div class="p-2 bg-light rounded-2 border h-100">
+                <div class="small fw-semibold text-muted mb-1">Enrolled courses</div>
+                @foreach (var c in Model.Courses)
+                {
+                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill me-1 mb-1">@c</span>
+                }
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-2 bg-light rounded-2 border h-100">
+                <div class="small fw-semibold text-muted mb-1">Tests attempted</div>
+                <div class="fs-5 fw-bold text-dark">@Model.Attempts.Count</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-2 bg-light rounded-2 border h-100">
+                <div class="small fw-semibold text-muted mb-1">Average score</div>
+                <div class="fs-5 fw-bold text-dark">@(Model.AvgPercent.HasValue ? Model.AvgPercent.Value.ToString("0.#") + "%" : "-")</div>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="fw-bold text-dark small mb-2">Test attempts (your tests)</h6>
+    @if (!Model.Attempts.Any())
+    {
+        <div class="text-center text-muted small py-4 border rounded-2">This student has not attempted any of your tests yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-muted fw-semibold border-0 ps-2">Test</th>
+                        <th class="text-muted fw-semibold border-0">Date</th>
+                        <th class="text-muted fw-semibold border-0">Score</th>
+                        <th class="text-muted fw-semibold border-0">%</th>
+                        <th class="text-muted fw-semibold border-0 text-success">Correct</th>
+                        <th class="text-muted fw-semibold border-0 text-danger">Wrong</th>
+                        <th class="text-muted fw-semibold border-0">Skipped</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.Attempts)
+                    {
+                        <tr>
+                            <td class="ps-2 fw-medium text-dark">@a.TestName</td>
+                            <td class="small text-muted">@(a.StartedAt?.ToString("dd MMM yyyy, hh:mm tt") ?? "-")</td>
+                            <td class="small">@a.MarksObtained.ToString("0.##") / @a.TotalMarks.ToString("0.##")</td>
+                            <td><span class="badge bg-@Cls(a.Percent) bg-opacity-10 text-@Cls(a.Percent) rounded-pill">@a.Percent.ToString("0.#")%</span></td>
+                            <td class="small">@a.Correct</td>
+                            <td class="small">@a.Wrong</td>
+                            <td class="small">@a.Unattempted</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="modal-footer border-top pt-2">
+    <button type="button" class="btn btn-sm btn-light rounded-2 px-3" data-bs-dismiss="modal">Close</button>
+</div>

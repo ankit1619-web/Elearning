@@ -1,0 +1,114 @@
+﻿@using Manikalearning.Web.Areas.Teacher.ViewModels
+@model TestFormViewModel
+@{
+    var f = Model.Form;
+    var isEdit = f.TestId != null && f.TestId != Guid.Empty;
+}
+
+<div class="modal-header border-bottom pb-2">
+    <h5 class="modal-title fw-bold text-dark">@(isEdit ? "Edit Test" : "New Test")</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-area="Teacher" asp-controller="Tests" asp-action="Save" method="post"
+      onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+    @if (isEdit)
+    {
+        <input type="hidden" name="TestId" value="@f.TestId" />
+    }
+
+    <div class="modal-body py-3">
+        <div class="row g-3">
+            <div class="col-lg-7">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Test Name *</label>
+                    <input name="TestName" value="@f.TestName" maxlength="250" required
+                           class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Polity Mock Test 1" />
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold text-muted">Test Type *</label>
+                        <input name="TestType" value="@f.TestType" maxlength="30" required list="testTypeList"
+                               class="form-control form-control-sm rounded-2 shadow-none" />
+                        <datalist id="testTypeList">
+                            <option value="Mock"></option>
+                            <option value="Practice"></option>
+                            <option value="Subject"></option>
+                            <option value="Section"></option>
+                            <option value="Topic"></option>
+                        </datalist>
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label small fw-semibold text-muted">Minutes</label>
+                        <input type="number" min="1" max="600" name="DurationMinutes" value="@f.DurationMinutes"
+                               class="form-control form-control-sm rounded-2 shadow-none" placeholder="No limit" />
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label small fw-semibold text-muted">Negative</label>
+                        <input type="number" step="0.25" min="0" max="100" name="NegativeMarking" value="@f.NegativeMarking.ToString("0.##")"
+                               class="form-control form-control-sm rounded-2 shadow-none" />
+                    </div>
+                </div>
+                <div class="form-text mb-3">Leave duration blank for no time limit. Negative marking applies to each question.</div>
+
+                <div class="p-2 bg-light rounded-2 border">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input shadow-none" type="checkbox" name="IsRandom" value="true" id="chkRandom" @(f.IsRandom ? "checked" : "") />
+                        <label class="form-check-label small fw-semibold text-dark" for="chkRandom">Randomize question order</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input shadow-none" type="checkbox" name="ShowResultImmediately" value="true" id="chkShowResult" @(f.ShowResultImmediately ? "checked" : "") />
+                        <input type="hidden" name="ShowResultImmediately" value="false" />
+                        <label class="form-check-label small fw-semibold text-dark" for="chkShowResult">Show results immediately after submission</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="p-2 bg-light rounded-2 border">
+                    <label class="form-label small fw-semibold text-muted mb-1">Curriculum scope (optional)</label>
+                    <select id="ddlExam" name="ExamId" class="form-select form-select-sm rounded-2 shadow-none mb-2">
+                        <option value="">-- Exam --</option>
+                        @foreach (var x in Model.Exams) { <option value="@x.Id" selected="@(f.ExamId == x.Id)">@x.Name</option> }
+                    </select>
+                    <select id="ddlPaper" name="PaperId" class="form-select form-select-sm rounded-2 shadow-none mb-2">
+                        <option value="">-- Paper --</option>
+                        @foreach (var x in Model.Papers) { <option value="@x.Id" selected="@(f.PaperId == x.Id)">@x.Name</option> }
+                    </select>
+                    <select id="ddlSubject" name="SubjectId" class="form-select form-select-sm rounded-2 shadow-none mb-2">
+                        <option value="">-- Subject --</option>
+                        @foreach (var x in Model.Subjects) { <option value="@x.Id" selected="@(f.SubjectId == x.Id)">@x.Name</option> }
+                    </select>
+                    <select id="ddlSection" name="SectionId" class="form-select form-select-sm rounded-2 shadow-none mb-2">
+                        <option value="">-- Section --</option>
+                        @foreach (var x in Model.Sections) { <option value="@x.Id" selected="@(f.SectionId == x.Id)">@x.Name</option> }
+                    </select>
+                    <select id="ddlTopic" name="TopicId" class="form-select form-select-sm rounded-2 shadow-none">
+                        <option value="">-- Topic --</option>
+                        @foreach (var x in Model.Topics) { <option value="@x.Id" selected="@(f.TopicId == x.Id)">@x.Name</option> }
+                    </select>
+                    <div class="form-text">Optional association with an exam, subject, or topic.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer border-top pt-2">
+        <button type="button" class="btn btn-sm btn-light rounded-2 px-3" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm"><i class="bi bi-check-lg me-1"></i> Save Test</button>
+    </div>
+</form>
+
+<script>
+(function () {
+    TeacherLookup.link('#ddlExam', '#ddlPaper', 'Papers', '-- Paper --',
+        [{ sel: '#ddlSubject', placeholder: '-- Subject --' }, { sel: '#ddlSection', placeholder: '-- Section --' }, { sel: '#ddlTopic', placeholder: '-- Topic --' }]);
+    TeacherLookup.link('#ddlPaper', '#ddlSubject', 'Subjects', '-- Subject --',
+        [{ sel: '#ddlSection', placeholder: '-- Section --' }, { sel: '#ddlTopic', placeholder: '-- Topic --' }]);
+    TeacherLookup.link('#ddlSubject', '#ddlSection', 'Sections', '-- Section --',
+        [{ sel: '#ddlTopic', placeholder: '-- Topic --' }]);
+    TeacherLookup.link('#ddlSection', '#ddlTopic', 'Topics', '-- Topic --');
+})();
+</script>

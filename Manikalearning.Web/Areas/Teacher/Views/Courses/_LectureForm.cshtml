@@ -25,11 +25,11 @@
                 <div class="mb-3">
                     <label class="form-label small fw-semibold text-muted">Lecture Title *</label>
                     <input name="LectureTitle" value="@f.LectureTitle" maxlength="250" required
-                           class="form-control form-control-sm rounded-2 shadow-none" />
+                           class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Introduction to Preamble" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label small fw-semibold text-muted">Description</label>
-                    <textarea name="Description" rows="3" class="form-control form-control-sm rounded-2 shadow-none">@f.Description</textarea>
+                    <textarea name="Description" rows="3" class="form-control form-control-sm rounded-2 shadow-none" placeholder="Brief explanation of the lecture content...">@f.Description</textarea>
                 </div>
 
                 <div class="p-2 bg-light rounded-2 border mb-3">
@@ -42,7 +42,7 @@
                         <input type="number" min="0" max="1000" name="VideoDurationMinutes" value="@f.VideoDurationMinutes"
                                class="form-control form-control-sm shadow-none" style="max-width:130px" placeholder="Minutes" />
                     </div>
-                    <div class="form-text">URL ya file (mp4/webm, max 500 MB). File upload karoge to URL ki jagah wahi use hogi. Badi videos ke liye URL behtar hai.</div>
+                    <div class="form-text">Provide a URL or upload a file (mp4/webm, max 500 MB). Uploading a file will override the URL. Using direct video URLs is recommended for large files.</div>
                 </div>
 
                 <div class="p-2 bg-light rounded-2 border">
@@ -51,8 +51,8 @@
                            class="form-control form-control-sm rounded-2 shadow-none mb-2" placeholder="Notes PDF URL" />
                     <input type="file" name="notesFile" accept=".pdf" class="form-control form-control-sm shadow-none mb-2" />
                     <textarea name="Notes" rows="3" class="form-control form-control-sm rounded-2 shadow-none"
-                              placeholder="Ya yahin short notes likhein...">@f.Notes</textarea>
-                    <div class="form-text">PDF max 25 MB.</div>
+                              placeholder="Or write short notes directly here...">@f.Notes</textarea>
+                    <div class="form-text">PDF max size: 25 MB.</div>
                 </div>
             </div>
 
@@ -80,24 +80,24 @@
                             <option value="@t.Id" selected="@(f.TopicId == t.Id)">@t.Name</option>
                         }
                     </select>
-                    <div class="form-text">Topic se lecture ko question bank/analytics se jod sakte hain.</div>
+                    <div class="form-text">Linking a topic connects this lecture to the question bank and student analytics.</div>
                 </div>
 
                 <div class="p-2 bg-light rounded-2 border">
                     <div class="mb-2">
-                        <label class="form-label small fw-semibold text-muted">Order</label>
+                        <label class="form-label small fw-semibold text-muted">Display Order</label>
                         <input type="number" min="0" name="DisplayOrder" value="@(f.DisplayOrder > 0 ? f.DisplayOrder.ToString() : "")"
-                               class="form-control form-control-sm rounded-2 shadow-none" placeholder="Auto (last)" />
+                               class="form-control form-control-sm rounded-2 shadow-none" placeholder="Auto (at the end)" />
                     </div>
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input shadow-none" type="checkbox" name="IsFreePreview" value="true" id="chkFreePrev" @(f.IsFreePreview ? "checked" : "") />
-                        <label class="form-check-label small fw-semibold text-dark" for="chkFreePrev">Free preview (bina kharide dikhega)</label>
+                        <label class="form-check-label small fw-semibold text-dark" for="chkFreePrev">Free preview (visible without purchase)</label>
                     </div>
                     <div class="form-check form-switch">
                         <input class="form-check-input shadow-none" type="checkbox" name="IsPublished" value="true" id="chkLecPub" @(f.IsPublished ? "checked" : "") />
                         <label class="form-check-label small fw-semibold text-dark" for="chkLecPub">Published</label>
                     </div>
-                    <div class="form-text">Published ke liye video ya notes zaroori hain.</div>
+                    <div class="form-text">At least video content or notes are required to publish a lecture.</div>
                 </div>
             </div>
         </div>
@@ -110,9 +110,9 @@
 </form>
 
 <script>
-(function () {
-    TeacherLookup.link('#ddlSubject', '#ddlSection', 'Sections', '-- Section --',
-        [{ sel: '#ddlTopic', placeholder: '-- Topic --' }]);
-    TeacherLookup.link('#ddlSection', '#ddlTopic', 'Topics', '-- Topic --');
-})();
+    (function() {
+        TeacherLookup.link('#ddlSubject', '#ddlSection', 'Sections', '-- Section --',
+            [{ sel: '#ddlTopic', placeholder: '-- Topic --' }]);
+        TeacherLookup.link('#ddlSection', '#ddlTopic', 'Topics', '-- Topic --');
+    })();
 </script>

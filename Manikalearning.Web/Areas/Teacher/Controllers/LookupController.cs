@@ -1,10 +1,9 @@
-using Manikalearning.Application.Features.Handlers.Teachers;
+using Manikalearning.Application.Features.Handlers.Teacher;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Areas.Teacher.Controllers
-{
-    /// <summary>Cascading dropdowns ke liye: GET /Teacher/Lookup/{Exams|Papers|Subjects|Sections|Topics|SubTopics|Passages}?parentId=</summary>
+{ 
     [Route("Teacher/Lookup")]
     public class LookupController : TeacherBaseController
     {

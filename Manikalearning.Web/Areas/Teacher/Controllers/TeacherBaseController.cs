@@ -1,7 +1,8 @@
-using System.Security.Claims;
+using Manikalearning.Application.Interface;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Manikalearning.Web.Areas.Teacher.Controllers
 {
@@ -16,7 +17,10 @@ namespace Manikalearning.Web.Areas.Teacher.Controllers
     public abstract class TeacherBaseController : Controller
     {
         protected readonly IMediator Mediator;
-        protected TeacherBaseController(IMediator mediator) { Mediator = mediator; }
+        protected TeacherBaseController(IMediator mediator)
+        {
+            Mediator = mediator;
+        }
 
         protected Guid TeacherId =>
             Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id)

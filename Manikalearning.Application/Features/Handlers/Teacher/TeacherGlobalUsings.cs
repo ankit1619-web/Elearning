@@ -7,6 +7,7 @@ global using TPassage = Manikalearning.Domain.Entities.QuestionPassage;
 global using TTest = Manikalearning.Domain.Entities.Test;
 global using TTestQuestion = Manikalearning.Domain.Entities.TestQuestion;
 global using TTestAttempt = Manikalearning.Domain.Entities.TestAttempt;
+global using TTestAttemptAnswer = Manikalearning.Domain.Entities.TestAttemptAnswer;
 global using TStudentCourse = Manikalearning.Domain.Entities.StudentCourse;
 global using TExam = Manikalearning.Domain.Entities.Exam;
 global using TPaper = Manikalearning.Domain.Entities.Paper;

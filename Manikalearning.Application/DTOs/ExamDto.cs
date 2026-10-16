@@ -112,7 +112,7 @@
 
         public int TotalQuestions { get; set; }
 
-        public int DurationMinutes { get; set; }
+        public int? DurationMinutes { get; set; }
 
         public decimal TotalMarks { get; set; }
 

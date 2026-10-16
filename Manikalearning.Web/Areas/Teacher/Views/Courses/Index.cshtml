@@ -1,3 +1,4 @@
+@using Manikalearning.Application.Features.Handlers.Teacher
 @model List<TeacherCourseListItem>
 
 @{
@@ -11,7 +12,7 @@
             My Courses
             <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.Count</span>
         </h5>
-        <p class="text-muted small mb-0">Course banayein, sections aur lectures add karein, phir publish karein.</p>
+        <p class="text-muted small mb-0">Create courses, add sections and lectures, then publish them for students.</p>
     </div>
     <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm"
             onclick="Toast.openModal('/Teacher/Courses/CreatePartial', 'modal-lg')">
@@ -23,8 +24,8 @@
 {
     <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
         <i class="bi bi-journal-bookmark fs-1 opacity-50 mb-2"></i>
-        <h6 class="fw-semibold mb-1">Abhi koi course nahi hai</h6>
-        <p class="small mb-0">"New Course" se shuru karein.</p>
+        <h6 class="fw-semibold mb-1">No courses found</h6>
+        <p class="small mb-0">Get started by clicking "New Course".</p>
     </div>
 }
 else
@@ -65,7 +66,7 @@ else
                             }
                             else if (c.DiscountPrice > 0 && c.DiscountPrice < c.Price)
                             {
-                                <span class="fw-semibold text-dark">₹@c.DiscountPrice.ToString("0.##")</span>
+                                <span class="fw-semibold text-dark">₹@c.DiscountPrice.ToString() </span>
                                 <span class="text-muted text-decoration-line-through ms-1">₹@c.Price.ToString("0.##")</span>
                             }
                             else
@@ -93,7 +94,7 @@ else
                                 @(c.IsPublished ? "Unpublish" : "Publish")
                             </button>
                             <button type="button" class="btn btn-sm btn-light text-danger ms-auto" title="Delete"
-                                    onclick="TeacherAjax.confirmPost('Delete course?', 'Course aur uske sections/lectures hat jayenge.', '/Teacher/Courses/Delete/@c.CourseId')">
+                                    onclick="TeacherAjax.confirmPost('Delete course?', 'The course along with its sections and lectures will be removed.', '/Teacher/Courses/Delete/@c.CourseId')">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>

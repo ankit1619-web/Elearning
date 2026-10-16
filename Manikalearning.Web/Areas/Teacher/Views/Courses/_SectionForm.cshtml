@@ -21,18 +21,18 @@
         <div class="mb-3">
             <label class="form-label small fw-semibold text-muted">Section Name *</label>
             <input name="SectionName" value="@Model.SectionName" maxlength="250" required
-                   class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Chapter 1: Constitution" />
+                   class="form-control form-control-sm rounded-2 shadow-none" placeholder="e.g. Chapter 1: Indian Constitution" />
         </div>
         <div class="mb-3">
             <label class="form-label small fw-semibold text-muted">Description</label>
-            <textarea name="Description" rows="2" class="form-control form-control-sm rounded-2 shadow-none">@Model.Description</textarea>
+            <textarea name="Description" rows="2" class="form-control form-control-sm rounded-2 shadow-none" placeholder="Brief details about this section...">@Model.Description</textarea>
         </div>
         <div class="row g-2">
             <div class="col-6">
-                <label class="form-label small fw-semibold text-muted">Order</label>
+                <label class="form-label small fw-semibold text-muted">Display Order</label>
                 <input type="number" min="0" name="DisplayOrder" value="@(Model.DisplayOrder > 0 ? Model.DisplayOrder.ToString() : "")"
-                       class="form-control form-control-sm rounded-2 shadow-none" placeholder="Auto" />
-                <div class="form-text">Khaali chhodo to last me judega. Baad me up/down se badal sakte ho.</div>
+                       class="form-control form-control-sm rounded-2 shadow-none" placeholder="Auto (at the end)" />
+                <div class="form-text">Leave blank to add at the end. Order can be changed later using move controls.</div>
             </div>
             <div class="col-6 d-flex align-items-center">
                 <div class="form-check form-switch mt-3">

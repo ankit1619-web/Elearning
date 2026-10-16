@@ -91,6 +91,10 @@ namespace Manikalearning.Web.Controllers
                     {
                         return RedirectToAction("Index", "Dashboard", new { area = "Student" });
                     }
+                    if (User.IsInRole("Teacher"))
+                    {
+                        return RedirectToAction("Index", "Courses", new { area = "Teacher" });
+                    }
                     return RedirectToAction("Index", "Home");
                 }
 

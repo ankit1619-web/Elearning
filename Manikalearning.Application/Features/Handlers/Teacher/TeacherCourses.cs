@@ -1,11 +1,6 @@
 ﻿using Manikalearning.Application.Interface;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Manikalearning.Application.Features.Handlers.Teacher
 {
@@ -101,7 +96,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
 
     public enum LectureFlag { Publish, FreePreview }
 
-     
+
     public static class CourseAccess
     {
         public static async Task<TCourseSection?> OwnedSection(this IRepository<TCourseSection> sections,
@@ -115,7 +110,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
         public static async Task<TLecture?> OwnedLecture(this IRepository<TLecture> lectures,
             IRepository<TCourseSection> sections, IRepository<TCourse> courses, Guid lectureId, Guid teacherId, CancellationToken ct)
         {
-            var l = await lectures.Entity().FirstOrDefaultAsync(x => x.LectureId == lectureId, ct);  
+            var l = await lectures.Entity().FirstOrDefaultAsync(x => x.LectureId == lectureId, ct);
             if (l == null) return null;
             return await sections.OwnedSection(courses, l.CourseSectionId, teacherId, ct) != null ? l : null;
         }
@@ -123,7 +118,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
         public static bool HasContent(string? videoUrl, string? notesUrl, string? notes)
             => !string.IsNullOrWhiteSpace(videoUrl) || !string.IsNullOrWhiteSpace(notesUrl) || !string.IsNullOrWhiteSpace(notes);
     }
-     
+
     public record GetTeacherCoursesQuery(Guid TeacherId) : IRequest<List<TeacherCourseListItem>>;
 
     public class GetTeacherCoursesQueryHandler : IRequestHandler<GetTeacherCoursesQuery, List<TeacherCourseListItem>>
@@ -183,7 +178,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
             return list;
         }
     }
-     
+
     public record GetTeacherCourseFormQuery(Guid TeacherId, Guid CourseId) : IRequest<TeacherCourseForm?>;
 
     public class GetTeacherCourseFormQueryHandler : IRequestHandler<GetTeacherCourseFormQuery, TeacherCourseForm?>
@@ -216,15 +211,15 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
         public async Task<TeacherActionResult> Handle(SaveTeacherCourseCommand r, CancellationToken ct)
         {
             var f = r.Form;
-            if (string.IsNullOrWhiteSpace(f.CourseName)) return TeacherActionResult.Fail("Course name zaroori hai.");
-            if (f.CourseName.Trim().Length > 250) return TeacherActionResult.Fail("Course name 250 characters se chhota rakhein.");
+            if (string.IsNullOrWhiteSpace(f.CourseName)) return TeacherActionResult.Fail("Course name is required.");
+            if (f.CourseName.Trim().Length > 250) return TeacherActionResult.Fail("Please keep the course name under 250 characters.");
 
             if (f.IsFree) { f.Price = 0; f.DiscountPrice = 0; }
             else
             {
-                if (f.Price <= 0) return TeacherActionResult.Fail("Price 0 se zyada rakho, ya course ko Free mark karo.");
+                if (f.Price <= 0) return TeacherActionResult.Fail("Price must be greater than 0, or mark the course as Free.");
                 if (f.DiscountPrice < 0 || f.DiscountPrice > f.Price)
-                    return TeacherActionResult.Fail("Discount price, price se zyada ya negative nahi ho sakta.");
+                    return TeacherActionResult.Fail("Discount price cannot be negative or greater than the actual price.");
             }
 
             var isNew = f.CourseId == null || f.CourseId == Guid.Empty;
@@ -239,12 +234,12 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
                     Price = f.Price,
                     DiscountPrice = f.DiscountPrice,
                     IsFree = f.IsFree,
-                    IsPublished = false,               
+                    IsPublished = false,
                     CreatedBy = r.TeacherId,
                     CreatedAt = DateTime.UtcNow
                 };
                 await _courses.AddRow(c);
-                return TeacherActionResult.Ok("Course created. Ab sections aur lectures add karein.", c.CourseId);
+                return TeacherActionResult.Ok("Course created. You can now add sections and lectures.", c.CourseId);
             }
 
             var id = f.CourseId!.Value;
@@ -285,7 +280,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
                                               && s.IsActive && l.IsPublished
                                         select l.LectureId).AnyAsync(ct);
                 if (!hasLecture)
-                    return TeacherActionResult.Fail("Publish karne se pehle kam se kam ek active section me ek published lecture chahiye.");
+                    return TeacherActionResult.Fail("Before publishing, at least one published lecture is required in an active section.");
             }
 
             course.IsPublished = !course.IsPublished;
@@ -314,7 +309,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
 
             var courseId = course.CourseId;
             if (await _studentCourses.Entity().AsNoTracking().AnyAsync(x => x.CourseId == courseId, ct))
-                return TeacherActionResult.Fail("Is course me students enrolled hain, isliye delete nahi ho sakta. Unpublish kar dein.");
+                return TeacherActionResult.Fail("Students are enrolled in this course, so it cannot be deleted. Please unpublish it instead.");
 
             var sections = await _sections.Entity().Where(s => s.CourseId == courseId).ToListAsync(ct);
             var sectionIds = sections.Select(s => s.CourseSectionId).ToList();
@@ -328,12 +323,12 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
             }
             catch (DbUpdateException)
             {
-                return TeacherActionResult.Fail("Course delete nahi ho paya, isse jude records maujood hain (plan/doubts). Unpublish kar dein.");
+                return TeacherActionResult.Fail("Could not delete the course as related records exist (plans/doubts). Please unpublish it instead.");
             }
             return TeacherActionResult.Ok("Course deleted.");
         }
     }
-     
+
     public record GetCourseManageQuery(Guid TeacherId, Guid CourseId) : IRequest<CourseManageDto?>;
 
     public class GetCourseManageQueryHandler : IRequestHandler<GetCourseManageQuery, CourseManageDto?>
@@ -398,9 +393,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
         }
     }
 
-    // =====================================================================
-    //  SECTIONS
-    // =====================================================================
+    //  SECTIONS 
     public record GetTeacherSectionFormQuery(Guid TeacherId, Guid SectionId) : IRequest<TeacherSectionForm?>;
 
     public class GetTeacherSectionFormQueryHandler : IRequestHandler<GetTeacherSectionFormQuery, TeacherSectionForm?>
@@ -436,8 +429,8 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
         public async Task<TeacherActionResult> Handle(SaveTeacherSectionCommand r, CancellationToken ct)
         {
             var f = r.Form;
-            if (string.IsNullOrWhiteSpace(f.SectionName)) return TeacherActionResult.Fail("Section name zaroori hai.");
-            if (f.SectionName.Trim().Length > 250) return TeacherActionResult.Fail("Section name 250 characters se chhota rakhein.");
+            if (string.IsNullOrWhiteSpace(f.SectionName)) return TeacherActionResult.Fail("Section name is required.");
+            if (f.SectionName.Trim().Length > 250) return TeacherActionResult.Fail("Please keep the section name under 250 characters.");
 
             var isNew = f.CourseSectionId == null || f.CourseSectionId == Guid.Empty;
             if (isNew)
@@ -490,11 +483,11 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
 
             var sid = r.SectionId;
             if (await _lectures.Entity().AsNoTracking().AnyAsync(l => l.CourseSectionId == sid, ct))
-                return TeacherActionResult.Fail("Is section me lectures hain. Pehle lectures hatao.");
+                return TeacherActionResult.Fail("This section contains lectures. Please remove the lectures first.");
 
             var section = await _sections.Entity().FirstAsync(s => s.CourseSectionId == sid, ct);
             try { await _sections.DeleteRow(section); }
-            catch (DbUpdateException) { return TeacherActionResult.Fail("Section delete nahi ho paya. Isse jude records maujood hain."); }
+            catch (DbUpdateException) { return TeacherActionResult.Fail("Could not delete the section as related records exist."); }
             return TeacherActionResult.Ok("Section deleted.");
         }
     }
@@ -521,16 +514,14 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
             if (i < 0 || j < 0 || j >= sibs.Count) return TeacherActionResult.Ok("Already at the edge.");
 
             (sibs[i], sibs[j]) = (sibs[j], sibs[i]);
-            for (var k = 0; k < sibs.Count; k++)          // duplicate orders ko bhi theek karta hai
+            for (var k = 0; k < sibs.Count; k++)
                 if (sibs[k].DisplayOrder != k + 1) { sibs[k].DisplayOrder = k + 1; await _sections.UpdateRow(sibs[k]); }
 
             return TeacherActionResult.Ok("Order updated.");
         }
     }
 
-    // =====================================================================
-    //  LECTURES
-    // =====================================================================
+    //  LECTURES 
     public record GetTeacherLectureFormQuery(Guid TeacherId, Guid LectureId) : IRequest<TeacherLectureForm?>;
 
     public class GetTeacherLectureFormQueryHandler : IRequestHandler<GetTeacherLectureFormQuery, TeacherLectureForm?>
@@ -595,18 +586,18 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
         public async Task<TeacherActionResult> Handle(SaveTeacherLectureCommand r, CancellationToken ct)
         {
             var f = r.Form;
-            if (string.IsNullOrWhiteSpace(f.LectureTitle)) return TeacherActionResult.Fail("Lecture title zaroori hai.");
-            if (f.LectureTitle.Trim().Length > 250) return TeacherActionResult.Fail("Lecture title 250 characters se chhota rakhein.");
-            if (f.VideoUrl?.Length > 1000 || f.NotesUrl?.Length > 1000) return TeacherActionResult.Fail("URL 1000 characters se chhota rakhein.");
-            if (f.VideoDurationMinutes is < 0 or > 1000) return TeacherActionResult.Fail("Duration 0 se 1000 minutes ke beech rakhein.");
+            if (string.IsNullOrWhiteSpace(f.LectureTitle)) return TeacherActionResult.Fail("Lecture title is required.");
+            if (f.LectureTitle.Trim().Length > 250) return TeacherActionResult.Fail("Please keep the lecture title under 250 characters.");
+            if (f.VideoUrl?.Length > 1000 || f.NotesUrl?.Length > 1000) return TeacherActionResult.Fail("Please keep the URL under 1000 characters.");
+            if (f.VideoDurationMinutes is < 0 or > 1000) return TeacherActionResult.Fail("Duration must be between 0 and 1000 minutes.");
             if (f.IsPublished && !CourseAccess.HasContent(f.VideoUrl, f.NotesUrl, f.Notes))
-                return TeacherActionResult.Fail("Published lecture me video ya notes me se kuch to hona chahiye.");
+                return TeacherActionResult.Fail("A published lecture must contain either video content or notes.");
 
             if (f.TopicId != null)
             {
                 var tid = f.TopicId;
                 if (!await _topics.Entity().AsNoTracking().AnyAsync(t => t.TopicId == tid, ct))
-                    return TeacherActionResult.Fail("Selected topic valid nahi hai.");
+                    return TeacherActionResult.Fail("The selected topic is invalid.");
             }
 
             var video = string.IsNullOrWhiteSpace(f.VideoUrl) ? null : f.VideoUrl.Trim();
@@ -673,7 +664,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
             try { await _lectures.DeleteRow(l); }
             catch (DbUpdateException)
             {
-                return TeacherActionResult.Fail("Is lecture se students ki progress/doubts jude hain, delete nahi ho sakta. Unpublish kar dein.");
+                return TeacherActionResult.Fail("This lecture cannot be deleted because student progress or doubts are linked to it. Please unpublish it instead.");
             }
             return TeacherActionResult.Ok("Lecture deleted.");
         }
@@ -698,7 +689,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
             if (r.Flag == LectureFlag.Publish)
             {
                 if (!l.IsPublished && !CourseAccess.HasContent(l.VideoUrl, l.NotesUrl, l.Notes))
-                    return TeacherActionResult.Fail("Publish karne se pehle video ya notes add karein.");
+                    return TeacherActionResult.Fail("Please add video content or notes before publishing.");
                 l.IsPublished = !l.IsPublished;
                 msg = l.IsPublished ? "Lecture published." : "Lecture unpublished.";
             }

@@ -1,0 +1,502 @@
+﻿@using Manikalearning.Web.Areas.Teacher.ViewModels
+@using Manikalearning.Domain.Enums
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model QuestionFormViewModels
+@{
+    var f = Model.Form;
+    var isEdit = f.QuestionId != null && f.QuestionId != Guid.Empty;
+
+    var typeName = (Enum.ToObject(typeof(QuestionType), f.QuestionType).ToString() ?? "").ToUpperInvariant();
+    var isMsq = typeName.Contains("MULTIPLE") || typeName.Contains("MSQ");
+    var isNum = typeName.Contains("NUMERICAL") || typeName.Contains("NAT") || typeName.Contains("SUBJECTIVE");
+
+    var typeItems = Html.GetEnumSelectList<QuestionType>()
+        .Select(i => new SelectListItem(i.Text, i.Value, i.Value == f.QuestionType.ToString())).ToList();
+    var diffItems = Html.GetEnumSelectList<DifficultyLevel>()
+        .Select(i => new SelectListItem(i.Text, i.Value, i.Value == f.Difficulty.ToString())).ToList();
+}
+
+<div class="modal-header border-bottom pb-2">
+    <h5 class="modal-title fw-bold text-dark">@(isEdit ? "Edit Question" : "Create Question")</h5>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form id="questionForm" asp-area="Teacher" asp-controller="Questions" asp-action="Save" method="post"
+      onsubmit="return Toast.submitModalForm(this);">
+    @Html.AntiForgeryToken()
+    @if (isEdit)
+    {
+        <input type="hidden" name="QuestionId" value="@f.QuestionId" />
+    }
+
+    <ul class="nav nav-tabs px-3 pt-2 bg-light border-bottom" id="questionTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active py-2 small fw-semibold" id="category-tab" data-bs-toggle="tab" data-bs-target="#tabCategory" type="button">
+                1. Category &amp; Type
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link py-2 small fw-semibold" id="question-tab" data-bs-toggle="tab" data-bs-target="#tabQuestion" type="button">
+                2. Question &amp; Options
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link py-2 small fw-semibold" id="settings-tab" data-bs-toggle="tab" data-bs-target="#tabSettings" type="button">
+                3. Settings &amp; Solution
+            </button>
+        </li>
+    </ul>
+
+    <div class="modal-body py-3">
+        <div class="tab-content" id="questionTabsContent">
+
+            <div class="tab-pane fade show active" id="tabCategory" role="tabpanel">
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Subject *</label>
+                        <select id="ddlSubject" class="form-select form-select-sm rounded-2 shadow-none" required>
+                            <option value="">-- Select Subject --</option>
+                            @foreach (var s in Model.Subjects)
+                            {
+                                <option value="@s.Id" selected="@(f.PickSubjectId == s.Id)">@s.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Section *</label>
+                        <select id="ddlSection" class="form-select form-select-sm rounded-2 shadow-none" required>
+                            <option value="">-- Select Section --</option>
+                            @foreach (var s in Model.Sections)
+                            {
+                                <option value="@s.Id" selected="@(f.PickSectionId == s.Id)">@s.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Topic *</label>
+                        <select id="ddlTopic" name="TopicId" class="form-select form-select-sm rounded-2 shadow-none" required>
+                            <option value="">-- Select Topic --</option>
+                            @foreach (var t in Model.Topics)
+                            {
+                                <option value="@t.Id" selected="@(f.TopicId == t.Id)">@t.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">SubTopic</label>
+                        <select id="ddlSubTopic" name="SubTopicId" class="form-select form-select-sm rounded-2 shadow-none">
+                            <option value="">-- Select SubTopic --</option>
+                            @foreach (var t in Model.SubTopics)
+                            {
+                                <option value="@t.Id" selected="@(f.SubTopicId == t.Id)">@t.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <hr class="my-2 text-muted" />
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Question Type *</label>
+                        <select name="QuestionType" id="ddlQuestionType" asp-items="typeItems" class="form-select form-select-sm rounded-2 shadow-none" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Passage (Comprehension)</label>
+                        <select name="PassageId" id="ddlPassage" class="form-select form-select-sm rounded-2 shadow-none">
+                            <option value="">-- None --</option>
+                            @foreach (var p in Model.Passages)
+                            {
+                                <option value="@p.Id" selected="@(f.PassageId == p.Id)">@p.Name</option>
+                            }
+                        </select>
+                        <div class="form-text">Latest 200 passages dikhte hain.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabQuestion" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2 bg-light p-2 rounded border">
+                    <ul class="nav nav-pills nav-fill gap-2" id="langTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active btn-sm py-1 px-3 fw-bold" id="btn-lang-en" data-bs-toggle="pill" data-bs-target="#lang-en" type="button">English</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm py-1 px-3 fw-bold" id="btn-lang-hi" data-bs-toggle="pill" data-bs-target="#lang-hi" type="button">हिंदी (Hindi)</button>
+                        </li>
+                    </ul>
+                    <button type="button" class="btn btn-sm btn-outline-success rounded-2 py-1" id="btnAutoTranslate" title="Auto translate English fields to Hindi">
+                        <i class="bi bi-translate me-1"></i> Auto Translate (EN ➔ HI)
+                    </button>
+                </div>
+
+                <div class="tab-content" id="langTabsContent">
+                    <div class="tab-pane fade show active" id="lang-en">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Question Text (English) *</label>
+                            <textarea name="QuestionText" id="txtQuestionEn" class="form-control rounded-2 shadow-none" rows="3" maxlength="4000"
+                                      placeholder="Enter question in English..." required>@f.QuestionText</textarea>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="lang-hi">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">प्रश्न (हिंदी)</label>
+                            <textarea name="QuestionTextHindi" id="txtQuestionHi" class="form-control rounded-2 shadow-none" rows="3" maxlength="4000"
+                                      placeholder="हिंदी में प्रश्न दर्ज करें...">@f.QuestionTextHindi</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="optionsWrapper" class="mb-2 @(isNum ? "d-none" : "")">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label small fw-semibold text-muted mb-0">Question Options</label>
+                            <span id="optionTypeHint" class="badge bg-soft-info text-info border ms-1 fs-7">Select correct option</span>
+                        </div>
+                        <button type="button" class="btn btn-xs btn-outline-primary rounded-2 py-0 px-2 fs-7" id="btnAddOption">
+                            <i class="bi bi-plus-lg me-1"></i>Add Option
+                        </button>
+                    </div>
+
+                    <div id="optionsContainer">
+                        @for (var i = 0; i < f.Options.Count; i++)
+                        {
+                            var o = f.Options[i];
+                            <div class="card mb-2 border shadow-none option-row" data-index="@i">
+                                <div class="card-body p-2">
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text bg-light fw-bold text-dark px-3 option-label-text">@o.OptionLabel</span>
+                                        <input type="hidden" class="option-id" name="Options[@i].OptionId" value="@o.OptionId" />
+                                        <input type="hidden" class="option-label" name="Options[@i].OptionLabel" value="@o.OptionLabel" />
+                                        <input type="hidden" class="option-display-order" name="Options[@i].DisplayOrder" value="@(i + 1)" />
+
+                                        <input type="text" name="Options[@i].OptionText" value="@o.OptionText" maxlength="1000"
+                                               class="form-control shadow-none option-text-input option-text-en" placeholder="Option Text (English)" @(isNum ? "" : "required") />
+
+                                        <div class="input-group-text bg-light option-selector-container">
+                                            @if (isMsq)
+                                            {
+                                                <input class="form-check-input mt-0 option-correct-input" type="checkbox" name="Options[@i].IsCorrect" value="true" @(o.IsCorrect ? "checked" : "") />
+                                            }
+                                            else
+                                            {
+                                                <input class="form-check-input mt-0 option-correct-input" type="radio" name="CorrectOptionIndex" value="@i" @(f.CorrectOptionIndex == i ? "checked" : "") @(isNum ? "" : "required") />
+                                            }
+                                            <span class="ms-1 small text-muted fs-7">Correct</span>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger btn-remove-option px-2" title="Remove Option">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light text-muted px-2 fs-7">हिंदी</span>
+                                        <input type="text" name="Options[@i].OptionTextHindi" value="@o.OptionTextHindi" maxlength="1000"
+                                               class="form-control shadow-none option-text-hi" placeholder="विकल्प पाठ (हिंदी)" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabSettings" role="tabpanel">
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-muted">Difficulty</label>
+                        <select name="Difficulty" asp-items="diffItems" class="form-select form-select-sm rounded-2 shadow-none"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-muted">Marks *</label>
+                        <input type="number" name="Marks" step="0.25" min="0.25" max="100" value="@f.Marks.ToString("0.##")"
+                               class="form-control form-control-sm rounded-2 shadow-none" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-muted">Negative Marks *</label>
+                        <input type="number" name="NegativeMarks" step="0.05" min="0" max="100" value="@f.NegativeMarks.ToString("0.##")"
+                               class="form-control form-control-sm rounded-2 shadow-none" required />
+                    </div>
+                </div>
+
+                <div class="p-2 bg-light rounded-2 mb-2 border">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input shadow-none" type="checkbox" name="IsPYQ" value="true" id="pyqSwitch" @(f.IsPYQ ? "checked" : "") />
+                                <input type="hidden" name="IsPYQ" value="false" />
+                                <label class="form-check-label fw-semibold text-dark small" for="pyqSwitch">Is PYQ?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <input name="SourceName" value="@f.SourceName" maxlength="200" placeholder="Source (e.g. NCERT Class 11)"
+                                   class="form-control form-control-sm rounded-2 shadow-none" />
+                        </div>
+                    </div>
+
+                    <div id="pyqFields" class="row g-2 mt-1 @(f.IsPYQ ? "" : "d-none")">
+                        <div class="col-6">
+                            <input name="PYQYear" type="number" min="1950" max="2100" value="@f.PYQYear" placeholder="Year e.g. 2024"
+                                   class="form-control form-control-sm rounded-2 shadow-none" />
+                        </div>
+                        <div class="col-6">
+                            <input name="PYQSession" value="@f.PYQSession" maxlength="100" placeholder="Shift 1 / June"
+                                   class="form-control form-control-sm rounded-2 shadow-none" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted">Short Hint</label>
+                    <input name="ShortExplanation" value="@f.ShortExplanation" maxlength="500"
+                           class="form-control form-control-sm rounded-2 shadow-none" placeholder="Brief hint..." />
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted">Detailed Solution</label>
+                    <textarea name="Explanation" class="form-control form-control-sm rounded-2 shadow-none" rows="2" maxlength="4000"
+                              placeholder="Detailed explanation...">@f.Explanation</textarea>
+                </div>
+
+                <div class="d-flex gap-4 mt-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input shadow-none" type="checkbox" name="IsActive" value="true" id="chkQActive" @(f.IsActive ? "checked" : "") />
+                        <input type="hidden" name="IsActive" value="false" />
+                        <label class="form-check-label small fw-semibold text-dark" for="chkQActive">Active</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer border-top pt-2">
+        <button type="button" class="btn btn-sm btn-light rounded-2 px-3" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> Save Question
+        </button>
+    </div>
+</form>
+
+<script>
+(function () {
+    'use strict';
+
+    const TRANSLATE_URL = '/Teacher/Questions/AutoTranslate';
+    const optionLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    const form = document.getElementById('questionForm');
+
+    const pyqSwitch = document.getElementById('pyqSwitch');
+    const pyqFields = document.getElementById('pyqFields');
+    if (pyqSwitch && pyqFields) {
+        pyqSwitch.addEventListener('change', function () {
+            pyqFields.classList.toggle('d-none', !this.checked);
+        });
+    }
+
+    function getSelectedQuestionType() {
+        const select = document.getElementById('ddlQuestionType');
+        if (!select) return "MCQ";
+        const selectedOption = select.options[select.selectedIndex];
+        const selectedText = selectedOption ? selectedOption.text.toUpperCase().replace(/\s+/g, '') : '';
+        const selectedVal = select.value;
+
+        if (selectedText.includes("MULTIPLE") || selectedText.includes("MSQ") || selectedVal === "2") return "MSQ";
+        if (selectedText.includes("NUMERICAL") || selectedText.includes("NAT") || selectedText.includes("SUBJECTIVE") || selectedVal === "3" || selectedVal === "5") return "NUMERICAL";
+        return "MCQ";
+    }
+
+    function reindexOptions() {
+        const selectedType = getSelectedQuestionType();
+        const rows = document.querySelectorAll('#optionsContainer .option-row');
+
+        rows.forEach((row, index) => {
+            const labelText = optionLabels[index] || `Opt ${index + 1}`;
+            row.setAttribute('data-index', index);
+
+            const labelTextEl = row.querySelector('.option-label-text');
+            if (labelTextEl) labelTextEl.textContent = labelText;
+
+            const idEl = row.querySelector('.option-id');
+            if (idEl) idEl.setAttribute('name', `Options[${index}].OptionId`);
+
+            const labelEl = row.querySelector('.option-label');
+            if (labelEl) { labelEl.setAttribute('name', `Options[${index}].OptionLabel`); labelEl.value = labelText; }
+
+            const orderEl = row.querySelector('.option-display-order');
+            if (orderEl) { orderEl.setAttribute('name', `Options[${index}].DisplayOrder`); orderEl.value = index + 1; }
+
+            const textEnEl = row.querySelector('.option-text-input');
+            if (textEnEl) textEnEl.setAttribute('name', `Options[${index}].OptionText`);
+
+            const textHiEl = row.querySelector('.option-text-hi');
+            if (textHiEl) textHiEl.setAttribute('name', `Options[${index}].OptionTextHindi`);
+
+            const selectorDiv = row.querySelector('.option-selector-container');
+            if (selectorDiv) {
+                const existingInput = selectorDiv.querySelector('input');
+                const isChecked = existingInput && existingInput.checked ? 'checked' : '';
+
+                if (selectedType === "MSQ") {
+                    selectorDiv.innerHTML = `
+                        <input class="form-check-input mt-0 option-correct-input" type="checkbox" name="Options[${index}].IsCorrect" value="true" ${isChecked} />
+                        <span class="ms-1 small text-muted fs-7">Correct</span>`;
+                } else {
+                    selectorDiv.innerHTML = `
+                        <input class="form-check-input mt-0 option-correct-input" type="radio" name="CorrectOptionIndex" value="${index}" ${isChecked} required />
+                        <span class="ms-1 small text-muted fs-7">Correct</span>`;
+                }
+            }
+        });
+
+        document.querySelectorAll('.btn-remove-option').forEach(btn => { btn.disabled = (rows.length <= 2); });
+    }
+
+    function handleQuestionTypeChange() {
+        const type = getSelectedQuestionType();
+        const optionsWrapper = document.getElementById('optionsWrapper');
+        const hintEl = document.getElementById('optionTypeHint');
+
+        if (type === "NUMERICAL") {
+            if (optionsWrapper) optionsWrapper.classList.add('d-none');
+            document.querySelectorAll('#optionsContainer .option-text-input, #optionsContainer input[type=radio]')
+                .forEach(i => i.required = false);
+        } else {
+            if (optionsWrapper) optionsWrapper.classList.remove('d-none');
+            document.querySelectorAll('#optionsContainer .option-text-input').forEach(i => i.required = true);
+            if (hintEl) {
+                hintEl.textContent = type === "MSQ" ? "Select one or more correct options" : "Select radio button for single correct option";
+            }
+            reindexOptions();
+        }
+    }
+
+    function addOptionRow() {
+        const container = document.getElementById('optionsContainer');
+        if (!container) return;
+
+        const index = container.querySelectorAll('.option-row').length;
+        if (index >= 10) return;
+
+        const labelText = optionLabels[index] || `Opt ${index + 1}`;
+        container.insertAdjacentHTML('beforeend', `
+            <div class="card mb-2 border shadow-none option-row" data-index="${index}">
+                <div class="card-body p-2">
+                    <div class="input-group input-group-sm mb-1">
+                        <span class="input-group-text bg-light fw-bold text-dark px-3 option-label-text">${labelText}</span>
+                        <input type="hidden" class="option-id" name="Options[${index}].OptionId" value="00000000-0000-0000-0000-000000000000" />
+                        <input type="hidden" class="option-label" name="Options[${index}].OptionLabel" value="${labelText}" />
+                        <input type="hidden" class="option-display-order" name="Options[${index}].DisplayOrder" value="${index + 1}" />
+                        <input type="text" name="Options[${index}].OptionText" value="" maxlength="1000" class="form-control shadow-none option-text-input option-text-en" placeholder="Option Text (English)" required />
+                        <div class="input-group-text bg-light option-selector-container">
+                            <input class="form-check-input mt-0 option-correct-input" type="radio" name="CorrectOptionIndex" value="${index}" required />
+                            <span class="ms-1 small text-muted fs-7">Correct</span>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-remove-option px-2" title="Remove Option">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light text-muted px-2 fs-7">हिंदी</span>
+                        <input type="text" name="Options[${index}].OptionTextHindi" value="" maxlength="1000" class="form-control shadow-none option-text-hi" placeholder="विकल्प पाठ (हिंदी)" />
+                    </div>
+                </div>
+            </div>`);
+        reindexOptions();
+    }
+
+    const container = document.getElementById('optionsContainer');
+    if (container) {
+        if (container.querySelectorAll('.option-row').length === 0) {
+            for (let i = 0; i < 4; i++) addOptionRow();
+        } else {
+            reindexOptions();
+        }
+        container.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-remove-option');
+            if (!btn) return;
+            e.preventDefault();
+            if (container.querySelectorAll('.option-row').length > 2) {
+                btn.closest('.option-row').remove();
+                reindexOptions();
+            }
+        });
+    }
+
+    const btnAddOption = document.getElementById('btnAddOption');
+    if (btnAddOption) btnAddOption.addEventListener('click', function (e) { e.preventDefault(); addOptionRow(); });
+
+    const ddlQuestionType = document.getElementById('ddlQuestionType');
+    if (ddlQuestionType) ddlQuestionType.addEventListener('change', handleQuestionTypeChange);
+    handleQuestionTypeChange();
+
+    TeacherLookup.link('#ddlSubject', '#ddlSection', 'Sections', '-- Select Section --',
+        [{ sel: '#ddlTopic', placeholder: '-- Select Topic --' }, { sel: '#ddlSubTopic', placeholder: '-- Select SubTopic --' }]);
+    TeacherLookup.link('#ddlSection', '#ddlTopic', 'Topics', '-- Select Topic --',
+        [{ sel: '#ddlSubTopic', placeholder: '-- Select SubTopic --' }]);
+    TeacherLookup.link('#ddlTopic', '#ddlSubTopic', 'SubTopics', '-- Select SubTopic --');
+
+    if (form) {
+        form.addEventListener('invalid', function (e) {
+            const pane = e.target.closest('#questionTabsContent > .tab-pane');
+            if (pane) {
+                const btn = document.querySelector(`#questionTabs [data-bs-target="#${pane.id}"]`);
+                if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+            }
+            const lang = e.target.closest('#langTabsContent > .tab-pane');
+            if (lang) {
+                const lbtn = document.querySelector(`#langTabs [data-bs-target="#${lang.id}"]`);
+                if (lbtn) bootstrap.Tab.getOrCreateInstance(lbtn).show();
+            }
+        }, true);
+    }
+
+    async function translateApi(text, targetLang = 'hi') {
+        if (!text) return '';
+        const body = new URLSearchParams({ text: text, targetLang: targetLang });
+        const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+        const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+        if (tokenEl) headers['RequestVerificationToken'] = tokenEl.value;
+
+        const response = await fetch(TRANSLATE_URL, { method: 'POST', headers: headers, body: body.toString() });
+        if (!response.ok) return '';
+        const data = await response.json();
+        return data && data.translatedText ? data.translatedText : '';
+    }
+
+    const btnAutoTranslate = document.getElementById('btnAutoTranslate');
+    if (btnAutoTranslate) {
+        btnAutoTranslate.addEventListener('click', async function () {
+            const originalHtml = btnAutoTranslate.innerHTML;
+            btnAutoTranslate.disabled = true;
+            btnAutoTranslate.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Translating...';
+
+            try {
+                const jobs = [];
+                const qEn = document.getElementById('txtQuestionEn');
+                const qHi = document.getElementById('txtQuestionHi');
+                if (qEn && qEn.value.trim() && qHi) {
+                    jobs.push(translateApi(qEn.value.trim()).then(t => { if (t) qHi.value = t; }));
+                }
+
+                const enInputs = document.querySelectorAll('.option-text-en');
+                const hiInputs = document.querySelectorAll('.option-text-hi');
+                enInputs.forEach((enInput, index) => {
+                    const hiInput = hiInputs[index];
+                    if (enInput.value.trim() && hiInput) {
+                        jobs.push(translateApi(enInput.value.trim()).then(t => { if (t) hiInput.value = t; }));
+                    }
+                });
+
+                await Promise.all(jobs);
+                if (typeof Toast !== 'undefined' && Toast.success) Toast.success("Question and Options translated successfully!");
+            } catch (err) {
+                console.error("Translation error:", err);
+                if (typeof Toast !== 'undefined' && Toast.error) Toast.error("Translation failed. Please try again.");
+            } finally {
+                btnAutoTranslate.disabled = false;
+                btnAutoTranslate.innerHTML = originalHtml;
+            }
+        });
+    }
+})();
+</script>

@@ -1,0 +1,118 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@model TestManageDto
+
+@{
+    ViewData["Title"] = Model.TestName;
+    ViewData["HeaderTitle"] = "Test Questions";
+
+    string Diff(DifficultyLevel d) => d switch
+    {
+        DifficultyLevel.Easy => "Easy",
+        DifficultyLevel.Medium => "Medium",
+        DifficultyLevel.Hard => "Hard",
+        _ => "-"
+    };
+
+    string DiffCls(DifficultyLevel d) => d switch
+    {
+        DifficultyLevel.Easy => "success",
+        DifficultyLevel.Medium => "warning",
+        DifficultyLevel.Hard => "danger",
+        _ => "secondary"
+    };
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <a href="/Teacher/Tests" class="small text-decoration-none text-muted"><i class="bi bi-arrow-left me-1"></i>Tests</a>
+        <h5 class="fw-bold text-dark mb-0 mt-1">
+            @Model.TestName
+            @if (Model.IsPublished)
+            {
+                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2.5 py-1 ms-1">Published</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2.5 py-1 ms-1">Draft</span>
+            }
+        </h5>
+        <p class="text-muted small mb-0">@Model.Questions.Count questions · @Model.TotalMarks.ToString("0.##") marks · @(Model.DurationMinutes.HasValue ? Model.DurationMinutes + " min" : "No time limit")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-sm @(Model.IsPublished ? "btn-outline-secondary" : "btn-outline-success") rounded-3 px-3"
+                onclick="TeacherAjax.post('/Teacher/Tests/TogglePublish/@Model.TestId')">
+            @(Model.IsPublished ? "Unpublish" : "Publish")
+        </button>
+        @if (!Model.HasAttempts)
+        {
+            <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm"
+                    onclick="Toast.openModal('/Teacher/Tests/PickPartial/@Model.TestId', 'modal-xl')">
+                <i class="bi bi-plus-lg me-1"></i> Add Questions
+            </button>
+        }
+    </div>
+</div>
+
+@if (Model.HasAttempts)
+{
+    <div class="alert alert-warning small py-2">Is test ke attempts ho chuke hain, isliye questions add/remove nahi ho sakte.</div>
+}
+
+@if (!Model.Questions.Any())
+{
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
+        <i class="bi bi-list-check fs-1 opacity-50 mb-2"></i>
+        <h6 class="fw-semibold mb-1">Abhi koi question nahi hai</h6>
+        <p class="small mb-0">"Add Questions" se Question Bank se questions chunein.</p>
+    </div>
+}
+else
+{
+    <div class="card border-0 shadow-sm rounded-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-muted fw-semibold border-0 ps-3" style="width:60px">#</th>
+                        <th class="text-muted fw-semibold border-0">Question</th>
+                        <th class="text-muted fw-semibold border-0">Level</th>
+                        <th class="text-muted fw-semibold border-0">Marks</th>
+                        @if (!Model.HasAttempts)
+                        {
+                            <th class="text-muted fw-semibold border-0 text-end pe-3">Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var n = 0;
+                    }
+                    @foreach (var q in Model.Questions)
+                    {
+                        n++;
+                        var text = q.QuestionText.Length > 140 ? q.QuestionText.Substring(0, 140) + "..." : q.QuestionText;
+                        <tr>
+                            <td class="ps-3 text-muted">@n</td>
+                            <td class="fw-medium text-dark">@text</td>
+                            <td><span class="badge bg-@DiffCls(q.Difficulty) bg-opacity-10 text-@DiffCls(q.Difficulty) rounded-pill">@Diff(q.Difficulty)</span></td>
+                            <td class="small">@q.Marks.ToString("0.##")</td>
+                            @if (!Model.HasAttempts)
+                            {
+                                <td class="text-end pe-3">
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-sm btn-light" title="Move up" onclick="TeacherAjax.post('/Teacher/Tests/MoveQuestion/@Model.TestId', { questionId: '@q.QuestionId', up: true })"><i class="bi bi-arrow-up"></i></button>
+                                        <button class="btn btn-sm btn-light" title="Move down" onclick="TeacherAjax.post('/Teacher/Tests/MoveQuestion/@Model.TestId', { questionId: '@q.QuestionId', up: false })"><i class="bi bi-arrow-down"></i></button>
+                                        <button class="btn btn-sm btn-light text-danger" title="Remove from test"
+                                                onclick="TeacherAjax.post('/Teacher/Tests/RemoveQuestion/@Model.TestId', { questionId: '@q.QuestionId' })">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

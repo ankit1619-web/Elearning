@@ -7,7 +7,7 @@ namespace Manikalearning.Application.Features.Commands.Students
         public Guid TestId { get; set; }
         public string Title { get; set; } = string.Empty;
         public int TotalQuestions { get; set; }
-        public int DurationMinutes { get; set; }
+        public int? DurationMinutes { get; set; }
         public decimal TotalMarks { get; set; }
         public bool IsAttempted { get; set; }
         public int? LastScore { get; set; }
@@ -16,7 +16,7 @@ namespace Manikalearning.Application.Features.Commands.Students
     {
         public Guid TestId { get; set; }
         public string Title { get; set; } = string.Empty;
-        public int DurationMinutes { get; set; }
+        public int? DurationMinutes { get; set; }
         public decimal TotalMarks { get; set; }
 
         // Explicitly using Application.DTOs.QuestionDto

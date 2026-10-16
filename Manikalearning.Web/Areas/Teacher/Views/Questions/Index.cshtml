@@ -1,0 +1,116 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@using Manikalearning.Domain.Enums
+@model PagedResult<TeacherQuestionListItem>
+
+@{
+    ViewData["Title"] = "Question Bank";
+    ViewData["HeaderTitle"] = "Question Bank";
+    var search = ViewData["Search"] as string;
+
+    string Diff(DifficultyLevel d) => d switch
+    {
+        DifficultyLevel.Easy => "Easy",
+        DifficultyLevel.Medium => "Medium",
+        DifficultyLevel.Hard => "Hard",
+        _ => "-"
+    };
+
+    string DiffCls(DifficultyLevel d) => d switch
+    {
+        DifficultyLevel.Easy => "success",
+        DifficultyLevel.Medium => "warning",
+        DifficultyLevel.Hard => "danger",
+        _ => "secondary"
+    };
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold text-dark mb-0">
+            Question Bank
+            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.TotalCount</span>
+        </h5>
+        <p class="text-muted small mb-0">Create your questions, link them to topics, and use them in tests.</p>
+    </div>
+    <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm"
+            onclick="Toast.openModal('/Teacher/Questions/CreatePartial', 'modal-xl')">
+        <i class="bi bi-plus-lg me-1"></i> New Question
+    </button>
+</div>
+
+<form method="get" class="mb-3">
+    <div class="input-group input-group-sm" style="max-width:420px">
+        <input type="text" name="search" value="@search" class="form-control shadow-none" placeholder="Search question text..." />
+        <button class="btn btn-light border" type="submit"><i class="bi bi-search"></i></button>
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <a class="btn btn-light border" href="/Teacher/Questions" title="Clear"><i class="bi bi-x-lg"></i></a>
+        }
+    </div>
+</form>
+
+@if (!Model.Items.Any())
+{
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
+        <i class="bi bi-database fs-1 opacity-50 mb-2"></i>
+        <h6 class="fw-semibold mb-1">No questions found</h6>
+        <p class="small mb-0">Get started by clicking "New Question".</p>
+    </div>
+}
+else
+{
+    <div class="card border-0 shadow-sm rounded-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-muted fw-semibold border-0 ps-3" style="width:45%">Question</th>
+                        <th class="text-muted fw-semibold border-0">Topic</th>
+                        <th class="text-muted fw-semibold border-0">Level</th>
+                        <th class="text-muted fw-semibold border-0">Marks</th>
+                        <th class="text-muted fw-semibold border-0">Options</th>
+                        <th class="text-muted fw-semibold border-0">Status</th>
+                        <th class="text-muted fw-semibold border-0 text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var q in Model.Items)
+                    {
+                        var text = q.QuestionText.Length > 120 ? q.QuestionText.Substring(0, 120) + "..." : q.QuestionText;
+                        <tr>
+                            <td class="ps-3 fw-medium text-dark">@text</td>
+                            <td class="small text-muted">@(q.TopicName ?? "-")</td>
+                            <td><span class="badge bg-@DiffCls(q.Difficulty) bg-opacity-10 text-@DiffCls(q.Difficulty) rounded-pill">@Diff(q.Difficulty)</span></td>
+                            <td class="small">@q.Marks.ToString("0.##")</td>
+                            <td class="small">@q.OptionCount</td>
+                            <td>
+                                @if (q.IsActive)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">Inactive</span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <button class="btn btn-sm btn-light text-primary" title="Edit"
+                                            onclick="Toast.openModal('/Teacher/Questions/EditPartial/@q.QuestionId', 'modal-xl')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-light text-danger" title="Delete"
+                                            onclick="TeacherAjax.confirmPost('Delete question?', 'The question and its options will be permanently removed.', '/Teacher/Questions/Delete/@q.QuestionId')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <partial name="_Pager" model="(Model.Page, Model.TotalPages)" />
+}

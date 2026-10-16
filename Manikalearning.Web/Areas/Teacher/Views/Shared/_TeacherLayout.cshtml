@@ -8,12 +8,195 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@(ViewData["Title"] ?? "Teacher") - Manika Learning Teacher</title>
+    <title>@(ViewData["Title"] ?? "Teacher") - Manika Learning Studio</title>
 
+    <!-- Bootstrap 5.3.2 & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/adminlayout.css" asp-append-version="true" />
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Elite SaaS Theme Styles -->
+    <style>
+            :root {
+                --bs-font-sans-serif: 'Plus Jakarta Sans', sans-serif;
+                --sidebar-width: 270px;
+                --primary-indigo: #6366f1;
+                --primary-indigo-hover: #4f46e5;
+                --bg-body: #f8fafc;
+                --border-color: #e2e8f0;
+            }
+
+            body {
+                font-family: var(--bs-font-sans-serif);
+                background-color: var(--bg-body);
+                color: #1e293b;
+                overflow-x: hidden;
+            }
+
+            /* --- Sidebar Styling --- */
+            #sidebar {
+                width: var(--sidebar-width);
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 1040;
+                background: #ffffff;
+                border-right: 1px solid var(--border-color);
+                transition: transform 0.3s ease-in-out;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar-brand {
+                padding: 1.5rem 1.25rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .brand-icon {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, var(--primary-indigo), #818cf8);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                font-size: 1.2rem;
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+            }
+
+            .sidebar-scroll {
+                flex: 1;
+                overflow-y: auto;
+                padding: 1.25rem 0.75rem;
+            }
+
+                .sidebar-scroll::-webkit-scrollbar {
+                    width: 5px;
+                }
+
+                .sidebar-scroll::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 10px;
+                }
+
+            /* Navigation Links */
+            .nav-sidebar .nav-item {
+                margin-bottom: 0.35rem;
+            }
+
+            .nav-sidebar .nav-link {
+                display: flex;
+                align-items: center;
+                gap: 0.85rem;
+                padding: 0.75rem 1rem;
+                color: #64748b;
+                font-weight: 500;
+                font-size: 0.925rem;
+                border-radius: 10px;
+                transition: all 0.2s ease;
+            }
+
+                .nav-sidebar .nav-link i {
+                    font-size: 1.1rem;
+                    color: #94a3b8;
+                    transition: color 0.2s ease;
+                }
+
+                .nav-sidebar .nav-link:hover {
+                    color: var(--primary-indigo);
+                    background-color: #f1f5f9;
+                }
+
+                    .nav-sidebar .nav-link:hover i {
+                        color: var(--primary-indigo);
+                    }
+
+                .nav-sidebar .nav-link.active {
+                    color: #ffffff !important;
+                    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-indigo-hover));
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                    font-weight: 600;
+                }
+
+                    .nav-sidebar .nav-link.active i {
+                        color: #ffffff !important;
+                    }
+
+            /* --- Main Content Layout --- */
+            #content {
+                margin-left: var(--sidebar-width);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                transition: margin-left 0.3s ease-in-out;
+            }
+
+            /* Top Navbar */
+            .admin-navbar {
+                background: #ffffff;
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.85rem 1.75rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 1030;
+            }
+
+            .avatar-circle {
+                width: 36px;
+                height: 36px;
+                background: #e0e7ff;
+                color: var(--primary-indigo);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                font-weight: 600;
+            }
+
+            /* Backdrop for mobile sidebar */
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(15, 23, 42, 0.4);
+                backdrop-filter: blur(2px);
+                z-index: 1035;
+                display: none;
+            }
+
+            /* Responsive adjustments */
+            @@media (max-width: 991.98px) {
+                #sidebar {
+                    transform: translateX(-100%);
+                }
+
+                    #sidebar.show {
+                        transform: translateX(0);
+                    }
+
+                .sidebar-backdrop.show {
+                    display: block;
+                }
+
+                #content {
+                    margin-left: 0;
+                }
+            }
+    </style>
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -21,20 +204,21 @@
 
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
+    <!-- Sidebar Navigation -->
     <nav id="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-icon"><i class="bi bi-person-video3"></i></div>
+            <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
             <div class="brand-text">
-                <span class="fw-bold fs-6">Manika Teacher</span>
-                <small class="d-block text-muted" style="font-size: 11px;">Teaching Studio</small>
+                <span class="fw-bold text-dark fs-6 d-block lh-1 mb-1">Manika Teacher</span>
+                <small class="text-muted" style="font-size: 11px; letter-spacing: 0.3px;">Teaching Studio</small>
             </div>
-            <button type="button" class="btn btn-sm btn-light border-0 d-lg-none ms-auto" id="sidebarCloseBtn" aria-label="Close Sidebar">
+            <button type="button" class="btn btn-sm btn-light border-0 d-lg-none ms-auto rounded-circle p-2" id="sidebarCloseBtn" aria-label="Close Sidebar">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
 
         <div class="sidebar-scroll">
-            <ul class="nav flex-column" id="teacherSidebarMenu">
+            <ul class="nav flex-column nav-sidebar" id="teacherSidebarMenu">
                 <li class="nav-item">
                     <a class="nav-link @Active("Dashboard")" asp-area="Teacher" asp-controller="Dashboard" asp-action="Index">
                         <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
@@ -79,11 +263,12 @@
         </div>
     </nav>
 
+    <!-- Content Section -->
     <div id="content">
         <header class="admin-navbar">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light border-0 shadow-none d-lg-none" id="sidebarToggle" type="button" aria-label="Toggle Navigation">
-                    <i class="bi bi-list fs-4"></i>
+                <button class="btn btn-light border-0 shadow-none d-lg-none p-2 rounded-3" id="sidebarToggle" type="button" aria-label="Toggle Navigation">
+                    <i class="bi bi-list fs-5"></i>
                 </button>
                 <h5 class="fw-bold mb-0 text-dark">@(ViewData["HeaderTitle"] ?? ViewData["Title"] ?? "Teacher Panel")</h5>
             </div>
@@ -91,16 +276,16 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark fw-medium" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="avatar-circle me-2"><i class="bi bi-person-fill"></i></div>
-                        <span class="d-none d-sm-inline">@(User.Identity?.Name ?? "Teacher")</span>
+                        <div class="avatar-circle me-2 shadow-sm"><i class="bi bi-person-fill"></i></div>
+                        <span class="d-none d-sm-inline small">@(User.Identity?.Name ?? "Teacher")</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                        <li><a class="dropdown-item py-2" asp-area="Teacher" asp-controller="Profile" asp-action="Index"><i class="bi bi-person me-2"></i> My Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2 p-2">
+                        <li><a class="dropdown-item py-2 rounded-2" asp-area="Teacher" asp-controller="Profile" asp-action="Index"><i class="bi bi-person me-2 text-muted"></i> My Profile</a></li>
+                        <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="dropdown-item text-danger fw-medium d-flex align-items-center gap-2">
+                                <button type="submit" class="dropdown-item text-danger py-2 rounded-2 fw-medium d-flex align-items-center gap-2">
                                     <i class="bi bi-box-arrow-right"></i> Sign Out
                                 </button>
                             </form>
@@ -110,27 +295,26 @@
             </div>
         </header>
 
-        <main class="container-fluid p-3 p-md-4 w-100">
+        <main class="container-fluid p-4 w-100">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
 
-            @* Page-level AJAX actions (delete, publish, reply...) ke liye ek token *@
             @Html.AntiForgeryToken()
 
             <div id="globalLoader" class="d-none position-fixed top-50 start-50 translate-middle" style="z-index: 1060;">
-                <div class="spinner-border text-primary shadow-sm" style="width: 3.5rem; height: 3.5rem; border-width: 0.35em;" role="status">
+                <div class="spinner-border text-primary shadow-sm" style="width: 3rem; height: 3rem; border-width: 0.3em;" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
@@ -163,16 +347,17 @@
         </main>
     </div>
 
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/admin-ui.js" asp-append-version="true"></script>
     <script src="~/js/teacher-ui.js" asp-append-version="true"></script>
     <script>
-        $(document).ready(function () {
-            $('#sidebarToggle, #sidebarCloseBtn, #sidebarBackdrop').on('click', function () {
-                $('#sidebar, #sidebarBackdrop').toggleClass('show');
+            $(document).ready(function() {
+                $('#sidebarToggle, #sidebarCloseBtn, #sidebarBackdrop').on('click', function() {
+                    $('#sidebar, #sidebarBackdrop').toggleClass('show');
+                });
             });
-        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

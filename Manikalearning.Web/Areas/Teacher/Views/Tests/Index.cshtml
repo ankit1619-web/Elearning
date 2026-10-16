@@ -1,0 +1,91 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@model List<TeacherTestListItem>
+
+@{
+    ViewData["Title"] = "Tests";
+    ViewData["HeaderTitle"] = "Tests";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold text-dark mb-0">
+            Tests
+            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.Count</span>
+        </h5>
+        <p class="text-muted small mb-0">Test banayein, Question Bank se questions jodein, phir publish karein.</p>
+    </div>
+    <button class="btn btn-primary-custom btn-sm text-nowrap rounded-3 px-3 shadow-sm"
+            onclick="Toast.openModal('/Teacher/Tests/CreatePartial', 'modal-xl')">
+        <i class="bi bi-plus-lg me-1"></i> New Test
+    </button>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
+        <i class="bi bi-ui-checks fs-1 opacity-50 mb-2"></i>
+        <h6 class="fw-semibold mb-1">Abhi koi test nahi hai</h6>
+        <p class="small mb-0">"New Test" se shuru karein.</p>
+    </div>
+}
+else
+{
+    <div class="card border-0 shadow-sm rounded-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-muted fw-semibold border-0 ps-3" style="width:28%">Test</th>
+                        <th class="text-muted fw-semibold border-0">Type</th>
+                        <th class="text-muted fw-semibold border-0">Questions</th>
+                        <th class="text-muted fw-semibold border-0">Marks</th>
+                        <th class="text-muted fw-semibold border-0">Time</th>
+                        <th class="text-muted fw-semibold border-0">Attempts</th>
+                        <th class="text-muted fw-semibold border-0">Status</th>
+                        <th class="text-muted fw-semibold border-0 text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td class="ps-3 fw-medium text-dark">@t.TestName</td>
+                            <td><span class="badge bg-info bg-opacity-10 text-info rounded-pill">@t.TestType</span></td>
+                            <td class="small">@t.QuestionCount</td>
+                            <td class="small">@t.TotalMarks.ToString("0.##")</td>
+                            <td class="small">@(t.DurationMinutes.HasValue ? t.DurationMinutes + " min" : "No limit")</td>
+                            <td class="small">@t.AttemptCount</td>
+                            <td>
+                                @if (t.IsPublished)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Published</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">Draft</span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-inline-flex gap-1">
+                                    <a class="btn btn-sm btn-primary px-3" href="/Teacher/Tests/Manage/@t.TestId"><i class="bi bi-list-check me-1"></i> Questions</a>
+                                    <button class="btn btn-sm btn-light text-primary" title="Edit"
+                                            onclick="Toast.openModal('/Teacher/Tests/EditPartial/@t.TestId', 'modal-xl')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-sm @(t.IsPublished ? "btn-outline-secondary" : "btn-outline-success")"
+                                            onclick="TeacherAjax.post('/Teacher/Tests/TogglePublish/@t.TestId')">
+                                        @(t.IsPublished ? "Unpublish" : "Publish")
+                                    </button>
+                                    <button class="btn btn-sm btn-light text-danger" title="Delete"
+                                            onclick="TeacherAjax.confirmPost('Delete test?', 'Test hat jayega. Attempts ho chuke hon to delete nahi hoga.', '/Teacher/Tests/Delete/@t.TestId')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

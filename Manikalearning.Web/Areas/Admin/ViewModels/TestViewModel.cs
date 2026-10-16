@@ -23,7 +23,7 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
         public string  TestType { get; set; }
 
         [Range(1, 600, ErrorMessage = "Duration must be between 1 and 600 minutes.")]
-        public int DurationMinutes { get; set; } = 60;
+        public int? DurationMinutes { get; set; } = 60;
 
         [Range(0, 1000, ErrorMessage = "Total questions cannot be negative.")]
         public int TotalQuestions { get; set; }

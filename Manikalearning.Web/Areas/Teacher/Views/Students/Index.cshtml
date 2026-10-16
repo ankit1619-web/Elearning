@@ -1,0 +1,114 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@model PagedResult<TeacherStudentListItem>
+
+@{
+    ViewData["Title"] = "Students";
+    ViewData["HeaderTitle"] = "Students";
+    var search = ViewData["Search"] as string;
+    var courseId = ViewData["CourseId"] as Guid?;
+    var courses = ViewData["Courses"] as List<LookupItem> ?? new List<LookupItem>();
+
+    string Cls(decimal p) => p >= 60 ? "success" : p >= 40 ? "warning" : "danger";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h5 class="fw-bold text-dark mb-0">
+            Students
+            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1">@Model.TotalCount</span>
+        </h5>
+        <p class="text-muted small mb-0">Enrolled students in your courses and their test results.</p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-12 col-md-4">
+        <select name="courseId" class="form-select form-select-sm shadow-none" onchange="this.form.submit()">
+            <option value="">All courses</option>
+            @foreach (var c in courses)
+            {
+                <option value="@c.Id" selected="@(courseId == c.Id)">@c.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-12 col-md-5">
+        <div class="input-group input-group-sm">
+            <input type="text" name="search" value="@search" class="form-control shadow-none" placeholder="Search by name or email..." />
+            <button class="btn btn-light border" type="submit"><i class="bi bi-search"></i></button>
+            @if (!string.IsNullOrWhiteSpace(search) || courseId != null)
+            {
+                <a class="btn btn-light border" href="/Teacher/Students" title="Clear"><i class="bi bi-x-lg"></i></a>
+            }
+        </div>
+    </div>
+</form>
+
+@if (!Model.Items.Any())
+{
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
+        <i class="bi bi-people fs-1 opacity-50 mb-2"></i>
+        <h6 class="fw-semibold mb-1">No students found</h6>
+        <p class="small mb-0">Students will appear here once they enroll in your courses.</p>
+    </div>
+}
+else
+{
+    <div class="card border-0 shadow-sm rounded-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-muted fw-semibold border-0 ps-3" style="width:28%">Student</th>
+                        <th class="text-muted fw-semibold border-0">Courses</th>
+                        <th class="text-muted fw-semibold border-0">Tests attempted</th>
+                        <th class="text-muted fw-semibold border-0">Avg score</th>
+                        <th class="text-muted fw-semibold border-0 text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.Items)
+                    {
+                        <tr>
+                            <td class="ps-3">
+                                <div class="fw-medium text-dark">@s.FullName</div>
+                                @if (!string.IsNullOrWhiteSpace(s.Email))
+                                {
+                                    <div class="small text-muted">@s.Email</div>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var cn in s.Courses.Take(2))
+                                {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill me-1">@cn</span>
+                                }
+                                @if (s.Courses.Count > 2)
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">+@(s.Courses.Count - 2)</span>
+                                }
+                            </td>
+                            <td class="small">@s.TestsAttempted</td>
+                            <td>
+                                @if (s.AvgPercent.HasValue)
+                                {
+                                    <span class="badge bg-@Cls(s.AvgPercent.Value) bg-opacity-10 text-@Cls(s.AvgPercent.Value) rounded-pill">@s.AvgPercent.Value.ToString("0.#")%</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">-</span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <button class="btn btn-sm btn-light text-primary" title="View details"
+                                        onclick="Toast.openModal('/Teacher/Students/Details/@s.UserId', 'modal-xl')">
+                                    <i class="bi bi-eye me-1"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <partial name="_Pager" model="(Model.Page, Model.TotalPages)" />
+}

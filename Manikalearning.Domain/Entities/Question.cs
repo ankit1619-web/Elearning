@@ -118,7 +118,7 @@ namespace Manikalearning.Domain.Entities
         [MaxLength(50)]
         public string TestType { get; set; }
         public int TotalQuestions { get; set; }
-        public int DurationMinutes { get; set; }
+        public int? DurationMinutes { get; set; }
         public decimal TotalMarks { get; set; }
         public decimal NegativeMarking { get; set; }
         public bool IsRandom { get; set; } = false;

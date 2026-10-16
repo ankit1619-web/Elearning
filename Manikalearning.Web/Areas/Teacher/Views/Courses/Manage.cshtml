@@ -1,3 +1,4 @@
+@using Manikalearning.Application.Features.Handlers.Teacher
 @model CourseManageDto
 
 @{
@@ -44,8 +45,8 @@
 {
     <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted bg-white">
         <i class="bi bi-collection fs-1 opacity-50 mb-2"></i>
-        <h6 class="fw-semibold mb-1">Abhi koi section nahi hai</h6>
-        <p class="small mb-0">Pehle ek section add karein (jaise "Chapter 1"), phir usme lectures.</p>
+        <h6 class="fw-semibold mb-1">No sections found</h6>
+        <p class="small mb-0">First add a section (e.g. "Chapter 1"), then add lectures inside it.</p>
     </div>
 }
 
@@ -72,9 +73,13 @@
                 <button class="btn btn-sm btn-light" title="Move up" onclick="TeacherAjax.post('/Teacher/Courses/MoveSection/@s.CourseSectionId', { up: true })"><i class="bi bi-arrow-up"></i></button>
                 <button class="btn btn-sm btn-light" title="Move down" onclick="TeacherAjax.post('/Teacher/Courses/MoveSection/@s.CourseSectionId', { up: false })"><i class="bi bi-arrow-down"></i></button>
                 <button class="btn btn-sm btn-light text-primary" title="Edit section"
-                        onclick="Toast.openModal('/Teacher/Courses/SectionPartial?courseId=@Model.CourseId&id=@s.CourseSectionId', 'modal-md')"><i class="bi bi-pencil-square"></i></button>
+                        onclick="Toast.openModal('/Teacher/Courses/SectionPartial?courseId=@Model.CourseId&id=@s.CourseSectionId', 'modal-md')">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
                 <button class="btn btn-sm btn-light text-danger" title="Delete section"
-                        onclick="TeacherAjax.confirmPost('Delete section?', 'Section tabhi delete hoga jab usme koi lecture na ho.', '/Teacher/Courses/DeleteSection/@s.CourseSectionId')"><i class="bi bi-trash"></i></button>
+                        onclick="TeacherAjax.confirmPost('Delete section?', 'The section will only be deleted if it contains no lectures.', '/Teacher/Courses/DeleteSection/@s.CourseSectionId')">
+                    <i class="bi bi-trash"></i>
+                </button>
             </div>
         </div>
 
@@ -120,16 +125,20 @@
                                     <button class="btn btn-sm btn-light" title="Move up" onclick="TeacherAjax.post('/Teacher/Courses/MoveLecture/@l.LectureId', { up: true })"><i class="bi bi-arrow-up"></i></button>
                                     <button class="btn btn-sm btn-light" title="Move down" onclick="TeacherAjax.post('/Teacher/Courses/MoveLecture/@l.LectureId', { up: false })"><i class="bi bi-arrow-down"></i></button>
                                     <button class="btn btn-sm btn-light text-primary" title="Edit"
-                                            onclick="Toast.openModal('/Teacher/Courses/LecturePartial?sectionId=@s.CourseSectionId&id=@l.LectureId', 'modal-xl')"><i class="bi bi-pencil-square"></i></button>
+                                            onclick="Toast.openModal('/Teacher/Courses/LecturePartial?sectionId=@s.CourseSectionId&id=@l.LectureId', 'modal-xl')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
                                     <button class="btn btn-sm btn-light text-danger" title="Delete"
-                                            onclick="TeacherAjax.confirmPost('Delete lecture?', 'Ye lecture hamesha ke liye hat jayega.', '/Teacher/Courses/DeleteLecture/@l.LectureId')"><i class="bi bi-trash"></i></button>
+                                            onclick="TeacherAjax.confirmPost('Delete lecture?', 'This lecture will be permanently removed.', '/Teacher/Courses/DeleteLecture/@l.LectureId')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                     }
                     @if (!s.Lectures.Any())
                     {
-                        <tr><td class="text-center text-muted small py-4">Is section me abhi koi lecture nahi hai.</td></tr>
+                        <tr><td class="text-center text-muted small py-4">No lectures found in this section yet.</td></tr>
                     }
                 </tbody>
             </table>

@@ -10,7 +10,7 @@
 
 <div class="modal-body" style="max-height:60vh; overflow-y:auto;">
     <div class="p-3 rounded-3 bg-light border mb-3">
-        <div class="small text-muted mb-1">Student ka sawal · @Model.Doubt.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt")</div>
+        <div class="small text-muted mb-1">Student's question · @Model.Doubt.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt")</div>
         <div class="text-dark" style="white-space:pre-wrap">@Model.Doubt.QuestionText</div>
     </div>
 
@@ -18,7 +18,7 @@
     {
         <div class="d-flex mb-2 @(r.IsFromStaff ? "justify-content-end" : "")">
             <div class="p-2 px-3 rounded-3 @(r.IsFromStaff ? "bg-primary bg-opacity-10" : "bg-light border")" style="max-width:80%">
-                <div class="small text-muted">@(r.IsFromStaff ? "Aap" : "Student") · @r.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt")</div>
+                <div class="small text-muted">@(r.IsFromStaff ? "You" : "Student") · @r.CreatedAt.ToLocalTime().ToString("dd MMM, hh:mm tt")</div>
                 <div style="white-space:pre-wrap">@r.Text</div>
             </div>
         </div>
@@ -33,7 +33,7 @@
         <input type="hidden" name="doubtId" value="@Model.Doubt.DoubtId" />
         <div class="px-3 pb-2">
             <textarea name="replyText" class="form-control shadow-none" rows="3" maxlength="2000" required
-                      placeholder="Apna jawab likhein..."></textarea>
+                      placeholder="Write your reply..."></textarea>
         </div>
         <div class="modal-footer border-top pt-2 d-flex justify-content-between">
             <button type="button" class="btn btn-sm btn-outline-secondary rounded-2"
@@ -48,5 +48,5 @@
 }
 else
 {
-    <div class="modal-footer"><span class="text-muted small me-auto">Ye doubt closed hai.</span></div>
+    <div class="modal-footer"><span class="text-muted small me-auto">This doubt has been closed.</span></div>
 }

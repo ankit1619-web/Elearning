@@ -13,7 +13,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Tests
         public Guid? SectionId { get; set; }
         public Guid? TopicId { get; set; }
         public string TestType { get; set; } = "MockTest";
-        public int DurationMinutes { get; set; }
+        public int? DurationMinutes { get; set; }
         public int TotalQuestions { get; set; }
         public decimal TotalMarks { get; set; }
         public decimal NegativeMarking { get; set; }

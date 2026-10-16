@@ -15,7 +15,7 @@ namespace Manikalearning.Application.DTOs
         public Guid? TopicId { get; set; }
         public string? TopicName { get; set; }
         public string TestType { get; set; } = string.Empty;
-        public int DurationMinutes { get; set; }
+        public int? DurationMinutes { get; set; }
         public int TotalQuestions { get; set; }
         public decimal TotalMarks { get; set; }
         public decimal NegativeMarking { get; set; }

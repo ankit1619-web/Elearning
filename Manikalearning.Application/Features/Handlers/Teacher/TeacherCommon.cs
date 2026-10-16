@@ -1,5 +1,6 @@
 ﻿using Manikalearning.Application.Interface;
 using Manikalearning.Domain.Entities;
+using Manikalearning.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +49,7 @@ namespace Manikalearning.Application.Features.Handlers.Teacher
      
     public static class Conv
     {
-        public static T Cast<T>(int value, T like)
+        public static T Cast<T>(T value, T like)
         {
             var t = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
             object boxed = t.IsEnum ? Enum.ToObject(t, value) : Convert.ChangeType(value, t);
