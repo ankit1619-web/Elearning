@@ -1,43 +1,53 @@
 ﻿using Manikalearning.Application.Features.Commands.Web;
+using Manikalearning.Application.Features.Handlers.Web;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers
 {
-    public class PYQController : BaseController
+    [Route("pyq-bank")]
+    public class PYQController : Controller
     {
-        public PYQController(IMediator mediator)
-        : base(mediator)
+        private const int MinCount = 5;
+        private const int MaxCount = 50;
+        private const int MaxAnswers = 100;
+
+        private readonly IMediator _mediator;
+
+        public PYQController(IMediator mediator) => _mediator = mediator;
+         
+        [HttpGet("")]
+        public async Task<IActionResult> Index(CancellationToken ct)
         {
-        }
-        public IActionResult Index()
-        {
-            return View();
+            var model = await _mediator.Send(new GetPyqBankQuery(), ct);
+            return View("PyqIndex", model);
         }
          
-        [HttpGet]
-        public async Task<IActionResult> StartPYQTest(Guid? paperId, Guid? sectionId, Guid? topicId)
-        { 
-            var query = new GetFilteredPYQsQuery(paperId, sectionId, topicId);
-            var testSession = await _mediator.Send(query);
+        [HttpGet("practice")]
+        public async Task<IActionResult> Practice(int? subjectId, int? year, int count = 10, CancellationToken ct = default)
+        {
+            count = Math.Clamp(count, MinCount, MaxCount);
 
-            if (testSession == null || !testSession.Questions.Any())
+            var model = await _mediator.Send(new GetPyqPracticeSetQuery(subjectId, year, count), ct);
+
+            if (model is null)
             {
-                return NotFound("No PYQs available for this selection.");
-            } 
-            return View("PYQTestInterface", testSession);
+                TempData["PyqMessage"] = "Is selection ke liye abhi questions available nahi hain.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View("PyqPractice", model);
         }
-        public IActionResult Reading()
+         
+        [HttpPost("practice/evaluate")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> Evaluate([FromBody] List<AnswerInput>? answers, CancellationToken ct)
         {
-            return View();
-        }
-        public IActionResult Practice()
-        {
-            return View();
-        }
-        public IActionResult Explanation()
-        {
-            return View();
+            if (answers is null || answers.Count == 0 || answers.Count > MaxAnswers)
+                return BadRequest(new { error = "Invalid answers." });
+
+            var result = await _mediator.Send(new EvaluatePyqAnswersQuery(answers), ct);
+            return Json(result);
         }
     }
 }

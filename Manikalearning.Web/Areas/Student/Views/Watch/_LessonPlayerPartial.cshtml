@@ -204,8 +204,7 @@
     }
 </script>
 
-<script>
-    // ---- watching / reading progress ----
+<script> 
     (function () {
         var lectureId = '@Model.LessonId';
         var resume = @Model.ResumeSeconds;
@@ -234,7 +233,7 @@
 
         function send(markComplete) {
             var p = Math.floor(pos()), d = Math.floor(dur());
-            if (!markComplete && !notesRead && p < 3) return;          // nothing worth saving yet
+            if (!markComplete && !notesRead && p < 3) return;      
             var token = $('input[name="__RequestVerificationToken"]').first().val();
             var fd = new FormData();
             fd.append('lectureId', lectureId);
@@ -247,28 +246,26 @@
             fetch('/Student/Watch/SaveProgress', { method: 'POST', body: fd, keepalive: true })
                 .then(function (r) { return r.ok ? r.json() : null; })
                 .then(function (res) { if (res && res.isCompleted) markDone(); })
-                .catch(function () { /* silent: the next tick retries */ });
+                .catch(function () { });
         }
-
-        // direct video file
+         
         if (v) {
             v.addEventListener('loadedmetadata', function () {
-                if (resume > 5 && resume < v.duration - 5) v.currentTime = resume;     // resume
+                if (resume > 5 && resume < v.duration - 5) v.currentTime = resume;     
             });
             v.addEventListener('timeupdate', function () { if (Date.now() - lastSent > SEND_EVERY_MS) send(false); });
             v.addEventListener('pause', function () { send(false); });
             v.addEventListener('ended', function () { send(false); });
         }
-
-        // YouTube embed (needs the IFrame API; start= already handles resume)
+         
         function initYt() {
             yt = new YT.Player('lessonYt', {
                 events: {
                     onStateChange: function (e) {
-                        if (e.data === 1) {                                              // playing
+                        if (e.data === 1) {                                            
                             if (window.__lpTimer) clearInterval(window.__lpTimer);
                             window.__lpTimer = setInterval(function () { send(false); }, SEND_EVERY_MS);
-                        } else if (e.data === 2 || e.data === 0) {                       // paused / ended
+                        } else if (e.data === 2 || e.data === 0) {                       
                             if (window.__lpTimer) { clearInterval(window.__lpTimer); window.__lpTimer = null; }
                             send(false);
                         }
@@ -288,11 +285,9 @@
                 }
             }
         }
-
-        // tab hidden / closed
+         
         document.addEventListener('visibilitychange', function () { if (document.hidden) send(false); });
-
-        // HTML notes: reached the end = read
+         
         var end = document.getElementById('notesEnd');
         if (end && 'IntersectionObserver' in window) {
             var io = new IntersectionObserver(function (entries) {
@@ -300,8 +295,7 @@
             });
             io.observe(end);
         }
-
-        // used by the page
+         
         window.markNotesRead = function () { notesRead = true; send(false); };
         window.markLessonDone = function () { send(true); };
         window.flushLessonProgress = function () {

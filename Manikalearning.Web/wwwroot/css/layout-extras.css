@@ -1,0 +1,149 @@
+/* =========================================================
+   Layout extras: smooth scroll, scrollbar, active menu,
+   back-to-top button
+   (site.css ke baad load hota hai, isliye ye override kar sakta hai)
+   ========================================================= */
+
+:root {
+    --le-primary: var(--primary, #4f46e5);
+    --le-primary-dark: var(--primary-dark, #4338ca);
+}
+
+/* ---------- Smooth scrolling ---------- */
+html {
+    scroll-behavior: smooth;
+    /* sticky header ke neeche section na chhupe */
+    scroll-padding-top: 90px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* ---------- Smooth, slim scrollbar ---------- */
+html {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #b9bdea #f3f4fb;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f3f4fb;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b9bdea;
+    border-radius: 999px;
+    border: 2px solid #f3f4fb;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--le-primary);
+}
+
+/* ---------- Active / inactive menu ---------- */
+.main-header .navbar-nav .nav-link {
+    position: relative;
+    color: #4b5563;
+    font-weight: 500;
+    transition: color .2s ease;
+}
+
+.main-header .navbar-nav .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--le-primary);
+    transform: translateX(-50%);
+    transition: width .25s ease;
+}
+
+.main-header .navbar-nav .nav-link:hover {
+    color: var(--le-primary);
+}
+
+.main-header .navbar-nav .nav-link:hover::after {
+    width: 40%;
+}
+
+.main-header .navbar-nav .nav-link.active {
+    color: var(--le-primary);
+    font-weight: 600;
+}
+
+.main-header .navbar-nav .nav-link.active::after {
+    width: 60%;
+}
+
+/* Mobile: active item ko halka background */
+@media (max-width: 991.98px) {
+    .main-header .navbar-nav .nav-link::after {
+        display: none;
+    }
+
+    .main-header .navbar-nav .nav-link.active {
+        background: rgba(79, 70, 229, .08);
+        border-radius: 10px;
+    }
+}
+
+/* ---------- Back to top (WhatsApp icon ke upar) ---------- */
+.back-to-top {
+    position: fixed;
+    right: 24px;
+    /* WhatsApp icon bottom:24px par maana hai; 56px icon + 14px gap.
+       Agar aapke .floating-whatsapp ki position alag hai to ye value badlein. */
+    bottom: 94px;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    color: #fff;
+    background: var(--le-primary);
+    box-shadow: 0 8px 22px rgba(79, 70, 229, .35);
+    cursor: pointer;
+    z-index: 1040;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s ease, background .2s ease;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background: var(--le-primary-dark);
+    transform: translateY(-3px);
+}
+
+.back-to-top:focus-visible {
+    outline: 3px solid rgba(79, 70, 229, .4);
+    outline-offset: 3px;
+}
+
+@media (max-width: 575px) {
+    .back-to-top {
+        right: 16px;
+        bottom: 84px;
+        width: 42px;
+        height: 42px;
+    }
+}

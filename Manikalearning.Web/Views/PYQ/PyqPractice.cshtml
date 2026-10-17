@@ -1,0 +1,212 @@
+﻿ @model ManikaLearning.Features.Pyq.PracticeSetDto
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <style>
+        .prac-wrap { max-width: 820px; margin: 0 auto; padding: 48px 0 72px; }
+        .prac-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .prac-head h1 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.5rem; margin: 0; }
+        .prac-count { color: #6b7280; font-weight: 600; white-space: nowrap; }
+
+        .prac-bar { height: 8px; background: #e9ebf7; border-radius: 99px; overflow: hidden; margin-bottom: 22px; }
+        .prac-bar span { display: block; height: 100%; width: 0; background: #4f46e5; transition: width .3s ease; }
+
+        .q-card { background: #fff; border: 1px solid #e8eaf3; border-radius: 20px; padding: 26px; box-shadow: 0 6px 24px rgba(30,41,90,.06); }
+        .q-tags { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .q-tag { font-size: .78rem; font-weight: 600; background: #eef0ff; color: #4f46e5; padding: 4px 10px; border-radius: 99px; }
+        .q-text { font-size: 1.1rem; font-weight: 600; line-height: 1.55; margin-bottom: 18px; white-space: pre-line; }
+
+        .opt { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; padding: 13px 16px; margin-bottom: 10px; border: 1.5px solid #e1e4f2; border-radius: 14px; background: #fff; transition: all .15s ease; }
+        .opt:hover { border-color: #a5a9ec; }
+        .opt .key { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #f1f2fb; font-weight: 700; font-size: .85rem; }
+        .opt.selected { border-color: #4f46e5; background: #f3f4ff; }
+        .opt.selected .key { background: #4f46e5; color: #fff; }
+        .opt.correct { border-color: #16a34a; background: #f0fdf4; }
+        .opt.correct .key { background: #16a34a; color: #fff; }
+        .opt.wrong { border-color: #dc2626; background: #fef2f2; }
+        .opt.wrong .key { background: #dc2626; color: #fff; }
+        .opt[disabled] { cursor: default; }
+
+        .explain { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #f8f9fe; color: #374151; font-size: .95rem; white-space: pre-line; }
+
+        .prac-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+        .prac-nav .btn { min-width: 110px; }
+
+        .result-box { text-align: center; padding: 30px 20px; }
+        .result-score { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 3rem; color: #4f46e5; line-height: 1; }
+        .result-stats { display: flex; justify-content: center; gap: 22px; margin: 16px 0 22px; flex-wrap: wrap; }
+        .result-stats div { font-weight: 600; color: #4b5563; }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    </style>
+}
+
+<div class="container">
+    <div class="prac-wrap">
+
+        <div class="prac-head">
+            <h1>@Model.Title</h1>
+            <span class="prac-count" id="progressText"></span>
+        </div>
+
+        <div class="prac-bar"><span id="progressBar"></span></div>
+
+        <div class="q-card" id="questionCard"></div>
+
+        <div class="prac-nav" id="navButtons">
+            <button type="button" class="btn btn-outline-secondary" id="prevBtn">
+                <i class="bi bi-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn btn-primary-custom" id="nextBtn">
+                Next <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var questions = @Json.Serialize(Model.Questions);
+            var answers = {};          // { questionId: "A" }
+            var index = 0;
+            var result = null;         // server se aaya result
+            var resultById = {};
+
+            var card = document.getElementById('questionCard');
+            var prevBtn = document.getElementById('prevBtn');
+            var nextBtn = document.getElementById('nextBtn');
+            var navButtons = document.getElementById('navButtons');
+            var progressText = document.getElementById('progressText');
+            var progressBar = document.getElementById('progressBar');
+
+            function el(tag, cls, text) {
+                var e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text !== undefined) e.textContent = text;   // textContent => XSS safe
+                return e;
+            }
+
+            function render() {
+                var q = questions[index];
+                card.innerHTML = '';
+
+                var tags = el('div', 'q-tags');
+                tags.appendChild(el('span', 'q-tag', q.subject));
+                if (q.year) tags.appendChild(el('span', 'q-tag', String(q.year)));
+                card.appendChild(tags);
+
+                card.appendChild(el('div', 'q-text', q.text));
+
+                var opts = [['A', q.optionA], ['B', q.optionB], ['C', q.optionC], ['D', q.optionD]];
+                var res = resultById[q.id];
+
+                opts.forEach(function (o) {
+                    var btn = el('button', 'opt');
+                    btn.type = 'button';
+                    btn.appendChild(el('span', 'key', o[0]));
+                    btn.appendChild(el('span', '', o[1]));
+
+                    if (res) {
+                        btn.disabled = true;
+                        if (o[0] === res.correct) btn.classList.add('correct');
+                        else if (o[0] === res.selected) btn.classList.add('wrong');
+                    } else if (answers[q.id] === o[0]) {
+                        btn.classList.add('selected');
+                    }
+
+                    btn.addEventListener('click', function () {
+                        if (result) return;
+                        answers[q.id] = o[0];
+                        render();
+                    });
+                    card.appendChild(btn);
+                });
+
+                if (res && res.explanation) {
+                    card.appendChild(el('div', 'explain', res.explanation));
+                }
+
+                progressText.textContent = (index + 1) + ' / ' + questions.length;
+                progressBar.style.width = (((index + 1) / questions.length) * 100) + '%';
+
+                prevBtn.disabled = index === 0;
+                var last = index === questions.length - 1;
+                nextBtn.innerHTML = result
+                    ? (last ? 'Summary <i class="bi bi-flag"></i>' : 'Next <i class="bi bi-arrow-right"></i>')
+                    : (last ? 'Submit <i class="bi bi-check2-circle"></i>' : 'Next <i class="bi bi-arrow-right"></i>');
+            }
+
+            function showSummary() {
+                card.innerHTML = '';
+                var box = el('div', 'result-box');
+                box.appendChild(el('div', 'result-score', result.correct + ' / ' + result.total));
+
+                var stats = el('div', 'result-stats');
+                [['#16a34a', 'Correct', result.correct],
+                 ['#dc2626', 'Wrong', result.wrong],
+                 ['#9ca3af', 'Skipped', result.skipped]].forEach(function (s) {
+                    var d = el('div');
+                    var dot = el('span', 'dot'); dot.style.background = s[0];
+                    d.appendChild(dot);
+                    d.appendChild(document.createTextNode(s[1] + ': ' + s[2]));
+                    stats.appendChild(d);
+                });
+                box.appendChild(stats);
+
+                var review = el('button', 'btn btn-outline-secondary me-2', 'Review answers');
+                review.type = 'button';
+                review.addEventListener('click', function () { index = 0; render(); });
+
+                var again = el('a', 'btn btn-primary-custom', 'More practice');
+                again.href = '/pyq-bank';
+
+                box.appendChild(review);
+                box.appendChild(again);
+                card.appendChild(box);
+                navButtons.style.display = 'none';
+            }
+
+            function submit() {
+                var unanswered = questions.filter(function (q) { return !answers[q.id]; }).length;
+                if (unanswered > 0 && !confirm(unanswered + ' question(s) chhoot gaye hain. Phir bhi submit karein?')) return;
+
+                nextBtn.disabled = true;
+
+                var payload = questions.map(function (q) {
+                    return { questionId: q.id, selected: answers[q.id] || null };
+                });
+
+                fetch('/pyq-bank/practice/evaluate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+                .then(function (data) {
+                    result = data;
+                    data.items.forEach(function (i) { resultById[i.questionId] = i; });
+                    showSummary();
+                })
+                .catch(function () {
+                    alert('Result nahi aa paya. Dobara try karein.');
+                    nextBtn.disabled = false;
+                });
+            }
+
+            prevBtn.addEventListener('click', function () {
+                if (index > 0) { index--; render(); }
+            });
+
+            nextBtn.addEventListener('click', function () {
+                var last = index === questions.length - 1;
+                if (!last) { index++; render(); return; }
+                if (result) showSummary(); else submit();
+            });
+
+            render();
+        })();
+    </script>
+}
