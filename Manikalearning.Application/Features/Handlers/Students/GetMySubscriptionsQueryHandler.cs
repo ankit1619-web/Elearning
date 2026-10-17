@@ -23,11 +23,11 @@ namespace Manikalearning.Application.Features.Handlers.Students
         public async Task<List<MySubscriptionDto>> Handle(GetMySubscriptionsQuery req, CancellationToken ct)
         {
             var now = DateTime.UtcNow;
-            var rows = await (from s in _subs.Entity().AsNoTracking()
+            var rows = await (from s in _subs.Entity().Include(c => c.Course).AsNoTracking()
                               join p in _plans.Entity().AsNoTracking() on s.PlanId equals p.PlanId
                               where s.UserId == req.UserId && s.Status != SubStatus.Pending   
                               orderby s.EndDate descending
-                              select new { s.SubscriptionId, s.PlanId, p.PlanName, s.StartDate, s.EndDate, s.Status })
+                              select new { s.SubscriptionId, s.PlanId, p.PlanName,s.Course.CourseName, s.StartDate, s.EndDate, s.Status })
                              .Take(20).ToListAsync(ct);
 
             return rows.Select(r =>
@@ -38,6 +38,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                     SubscriptionId = r.SubscriptionId,
                     PlanId = r.PlanId,
                     PlanName = r.PlanName,
+                    CourseName = r.CourseName,
                     StartDate = r.StartDate,
                     EndDate = r.EndDate,
                     IsActive = active,

@@ -1,0 +1,40 @@
+@* Shows inside <div class="player-container ratio ratio-16x9"> when the student's plan has no Lectures feature.
+   Usage:  <partial name="_VideoLocked" model="Model.LessonTitle" />   (model = lesson title, optional) *@
+@model string?
+
+<style>
+    .vl-wrap { position: relative; overflow: hidden; border-radius: 16px; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #3730a3 100%); display: flex; align-items: center; justify-content: center; text-align: center; padding: 1.5rem; }
+    .vl-wrap::before { content: ""; position: absolute; width: 320px; height: 320px; border-radius: 50%; right: -90px; top: -110px; background: radial-gradient(circle, rgba(129,140,248,.45), transparent 70%); }
+    .vl-wrap::after { content: ""; position: absolute; width: 260px; height: 260px; border-radius: 50%; left: -80px; bottom: -110px; background: radial-gradient(circle, rgba(56,189,248,.3), transparent 70%); }
+    .vl-inner { position: relative; z-index: 1; max-width: 460px; }
+    .vl-lock { width: 72px; height: 72px; border-radius: 22px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(6px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .vl-title { color: #fff; font-weight: 800; font-size: 1.35rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+    .vl-lesson { color: #c7d2fe; font-size: .85rem; font-weight: 600; margin: 0 0 .6rem; overflow-wrap: anywhere; }
+    .vl-text { color: #cbd5e1; font-size: .92rem; line-height: 1.5; margin: 0 0 1rem; }
+    .vl-chips { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; margin-bottom: 1.2rem; }
+    .vl-chip { display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; font-weight: 700; color: #e0e7ff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); padding: .3rem .7rem; border-radius: 999px; }
+    .vl-chip i { color: #86efac; }
+    .vl-btn { display: inline-flex; align-items: center; gap: .45rem; background: #fff; color: #312e81; font-weight: 800; font-size: .92rem; padding: .65rem 1.4rem; border-radius: 12px; text-decoration: none; box-shadow: 0 8px 22px rgba(0,0,0,.3); transition: transform .15s ease, box-shadow .15s ease; }
+    .vl-btn:hover { transform: translateY(-2px); color: #312e81; box-shadow: 0 12px 28px rgba(0,0,0,.4); }
+    @@media (max-width: 575.98px) { .vl-title { font-size: 1.1rem; } .vl-text { font-size: .82rem; } .vl-lock { width: 58px; height: 58px; font-size: 1.6rem; } }
+</style>
+
+<div class="vl-wrap">
+    <div class="vl-inner">
+        <div class="vl-lock"><i class="bi bi-lock-fill"></i></div>
+        <h4 class="vl-title">Video lectures are locked</h4>
+        @if (!string.IsNullOrWhiteSpace(Model))
+        {
+            <p class="vl-lesson"><i class="bi bi-play-circle me-1"></i>@Model</p>
+        }
+        <p class="vl-text">Your current plan does not include video lectures. Upgrade to a plan that does and start watching right away.</p>
+        <div class="vl-chips">
+            <span class="vl-chip"><i class="bi bi-check-circle-fill"></i> HD video lectures</span>
+            <span class="vl-chip"><i class="bi bi-check-circle-fill"></i> Notes &amp; PDFs</span>
+            <span class="vl-chip"><i class="bi bi-check-circle-fill"></i> Practice tests</span>
+        </div>
+        <a class="vl-btn" asp-area="Student" asp-controller="Subscription" asp-action="Index">
+            <i class="bi bi-stars"></i> View plans
+        </a>
+    </div>
+</div>

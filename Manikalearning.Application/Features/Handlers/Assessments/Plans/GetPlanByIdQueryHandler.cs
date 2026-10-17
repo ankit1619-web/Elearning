@@ -15,10 +15,12 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Plans
     public class GetPlanByIdQueryHandler : IRequestHandler<GetPlanByIdQuery, ResponseDto<PlanDto>>
     {
         private readonly IRepository<Plan> _planRepo;
+        private readonly IRepository<PlanFeature> _featureRepo;
 
-        public GetPlanByIdQueryHandler(IRepository<Plan> planRepo)
+        public GetPlanByIdQueryHandler(IRepository<Plan> planRepo, IRepository<PlanFeature> featureRepo)
         {
             _planRepo = planRepo;
+            _featureRepo = featureRepo;
         }
 
         public async Task<ResponseDto<PlanDto>> Handle(GetPlanByIdQuery request, CancellationToken cancellationToken)
@@ -31,10 +33,11 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Plans
                     .FirstOrDefaultAsync(p => p.PlanId == request.PlanId, cancellationToken);
 
                 if (plan == null)
-                {
                     return ResponseDto<PlanDto>.Failure("Subscription plan not found.");
-                }
-
+                var featureCodes = await _featureRepo.Entity().AsNoTracking()
+                                   .Where(f => f.PlanId == request.PlanId)
+                                   .Select(f => f.FeatureCode)
+                                   .ToListAsync(cancellationToken);
                 var dto = new PlanDto
                 {
                     PlanId = plan.PlanId,
@@ -43,7 +46,8 @@ namespace Manikalearning.Application.Features.Handlers.Assessments.Plans
                     DurationDays = plan.DurationDays,
                     Description = plan.Description,
                     IsActive = plan.IsActive,
-                    TotalCoursesMapped = plan.PlanCourses?.Count ?? 0
+                    TotalCoursesMapped = plan.PlanCourses?.Count ?? 0,
+                    Features = featureCodes
                 };
 
                 return ResponseDto<PlanDto>.Success(dto, "Plan details retrieved successfully.");

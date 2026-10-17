@@ -1,0 +1,371 @@
+﻿@using Manikalearning.Application.Features.Handlers.Teacher
+@model TeacherDashboardDto
+
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["HeaderTitle"] = "Dashboard";
+
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    var firstName = Model.TeacherName  ?? "Teacher";
+    var maxDay = Math.Max(1, Model.Daily.Any() ? Model.Daily.Max(d => d.Attempts) : 1);
+    var maxStudents = Math.Max(1, Model.TopCourses.Any() ? Model.TopCourses.Max(c => c.Students) : 1);
+}
+
+@section Styles {
+    <style>
+        .db-hero {
+            background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+            border-radius: 20px;
+            color: #fff;
+            padding: 26px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .db-hero::after {
+                content: "";
+                position: absolute;
+                right: -40px;
+                top: -40px;
+                width: 200px;
+                height: 200px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.1);
+            }
+
+            .db-hero::before {
+                content: "";
+                position: absolute;
+                right: 90px;
+                bottom: -70px;
+                width: 160px;
+                height: 160px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.07);
+            }
+
+            .db-hero .btn {
+                position: relative;
+                z-index: 1;
+            }
+
+        .db-card {
+            background: #fff;
+            border: 1px solid #eceef5;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(30,40,90,.04);
+        }
+
+        .db-stat {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+            .db-stat:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(30,40,90,.09);
+                color: inherit;
+            }
+
+        .db-ico {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+            .db-ico.blue {
+                background: #e7f0ff;
+                color: #0d6efd;
+            }
+
+            .db-ico.violet {
+                background: #f0eaff;
+                color: #6f42c1;
+            }
+
+            .db-ico.green {
+                background: #e3f6ec;
+                color: #198754;
+            }
+
+            .db-ico.amber {
+                background: #fff3dc;
+                color: #d98a00;
+            }
+
+        .db-num {
+            font-size: 1.65rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: #111827;
+        }
+
+        .db-sub {
+            font-size: .78rem;
+            color: #6b7280;
+        }
+
+        .db-title {
+            font-weight: 700;
+            color: #111827;
+            font-size: .95rem;
+        }
+
+        .db-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 120px;
+            border-bottom: 1px solid #e1e0d9;
+        }
+
+        .db-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            height: 100%;
+        }
+
+            .db-bar span {
+                display: block;
+                width: 100%;
+                max-width: 20px;
+                background: #2a78d6;
+                border-radius: 4px 4px 0 0;
+                min-height: 2px;
+            }
+
+                .db-bar span.zero {
+                    background: #e1e0d9;
+                }
+
+        .db-hbar {
+            height: 10px;
+            background: #2a78d6;
+            border-radius: 0 4px 4px 0;
+            min-width: 2px;
+        }
+
+        .db-hbar-track {
+            flex: 1;
+            border-left: 1px solid #c3c2b7;
+        }
+
+        .db-quick {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #eceef5;
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 600;
+            font-size: .86rem;
+            transition: all .15s ease;
+        }
+
+            .db-quick:hover {
+                background: #f4f7ff;
+                border-color: #bcd3fb;
+                color: #0d6efd;
+            }
+
+            .db-quick i {
+                font-size: 1.05rem;
+                color: #0d6efd;
+            }
+
+        .db-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e7f0ff;
+            color: #0d6efd;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            flex-shrink: 0;
+        }
+
+        .db-num-tab {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+}
+
+<div class="db-hero mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div style="position:relative;z-index:1">
+            <div class="small opacity-75 mb-1">@DateTime.Now.ToString("dddd, d MMMM yyyy")</div>
+            <h4 class="fw-bold mb-1">@greeting, @firstName ! </h4>
+            <div class="opacity-90 small">
+                @if (Model.OpenDoubts > 0)
+                {
+                    <span>You have <strong>@Model.OpenDoubts</strong> open @(Model.OpenDoubts == 1 ? "doubt" : "doubts") waiting for your answer.</span>
+                }
+                else
+                {
+                    <span>You are all caught up. No open doubts right now.</span>
+                }
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-light fw-semibold rounded-3" asp-area="Teacher" asp-controller="Doubts" asp-action="Index">
+                <i class="bi bi-chat-dots-fill me-1 text-primary"></i> Answer doubts
+            </a>
+            <a class="btn btn-outline-light fw-semibold rounded-3" asp-area="Teacher" asp-controller="Courses" asp-action="Index">
+                <i class="bi bi-journal-plus me-1"></i> My courses
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <a class="db-card db-stat" asp-area="Teacher" asp-controller="Courses" asp-action="Index">
+            <div class="db-ico blue"><i class="bi bi-journal-bookmark-fill"></i></div>
+            <div><div class="db-num">@Model.Courses.ToString("N0")</div><div class="db-sub">Courses</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a class="db-card db-stat" asp-area="Teacher" asp-controller="Students" asp-action="Index">
+            <div class="db-ico violet"><i class="bi bi-people-fill"></i></div>
+            <div><div class="db-num">@Model.Students.ToString("N0")</div><div class="db-sub">Enrolled students</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a class="db-card db-stat" asp-area="Teacher" asp-controller="Questions" asp-action="Index">
+            <div class="db-ico green"><i class="bi bi-patch-question-fill"></i></div>
+            <div><div class="db-num">@Model.Questions.ToString("N0")</div><div class="db-sub">Questions in bank</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a class="db-card db-stat" asp-area="Teacher" asp-controller="Tests" asp-action="Index">
+            <div class="db-ico amber"><i class="bi bi-clipboard2-check-fill"></i></div>
+            <div><div class="db-num">@Model.Tests.ToString("N0")</div><div class="db-sub">Tests (@Model.PublishedTests published)</div></div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="db-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="db-title">Test attempts, last 14 days</div>
+                    <div class="db-sub">Number of attempts started per day on your tests.</div>
+                </div>
+                <div class="text-end">
+                    <div class="db-num" style="font-size:1.4rem">@Model.AttemptsLast14Days.ToString("N0")</div>
+                    <div class="db-sub">total</div>
+                </div>
+            </div>
+            @if (Model.AttemptsLast14Days == 0)
+            {
+                <div class="text-center text-muted small py-5">
+                    <i class="bi bi-bar-chart fs-2 opacity-50 d-block mb-2"></i>
+                    No attempts in the last 14 days.
+                </div>
+            }
+            else
+            {
+                <div class="db-bars">
+                    @foreach (var d in Model.Daily)
+                    {
+                        var h = d.Attempts == 0 ? 2 : Math.Max(6, (int)Math.Round(d.Attempts * 100.0 / maxDay));
+                        <div class="db-bar" title="@d.Day.ToString("d MMM"): @d.Attempts @(d.Attempts == 1 ? "attempt" : "attempts")">
+                            <span class="@(d.Attempts == 0 ? "zero" : "")" style="height:@(h)%"></span>
+                        </div>
+                    }
+                </div>
+                <div class="d-flex justify-content-between db-sub mt-2">
+                    <span>@Model.Daily.First().Day.ToString("d MMM")</span>
+                    <span>@Model.Daily.Last().Day.ToString("d MMM")</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="db-card p-4 h-100">
+            <div class="db-title mb-3">Quick actions</div>
+            <div class="d-grid gap-2">
+                <a class="db-quick" asp-area="Teacher" asp-controller="Courses" asp-action="Index"><i class="bi bi-journal-plus"></i> Create or edit a course</a>
+                <a class="db-quick" asp-area="Teacher" asp-controller="Questions" asp-action="Index"><i class="bi bi-plus-circle"></i> Add questions</a>
+                <a class="db-quick" asp-area="Teacher" asp-controller="Tests" asp-action="Index"><i class="bi bi-clipboard2-plus"></i> Build a test</a>
+                <a class="db-quick" asp-area="Teacher" asp-controller="Analytics" asp-action="Index"><i class="bi bi-graph-up-arrow"></i> View analytics</a>
+                <a class="db-quick" asp-area="Teacher" asp-controller="Profile" asp-action="Index"><i class="bi bi-person-gear"></i> Edit profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="db-card p-4 h-100">
+            <div class="db-title mb-3">Top courses by students</div>
+            @if (!Model.TopCourses.Any())
+            {
+                <div class="text-center text-muted small py-4">You have not created any courses yet.</div>
+            }
+            else
+            {
+                foreach (var c in Model.TopCourses)
+                {
+                    var w = (int)Math.Round(c.Students * 100.0 / maxStudents);
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="fw-medium text-dark text-truncate pe-2">@c.CourseName</span>
+                            <span class="fw-semibold db-num-tab">@c.Students</span>
+                        </div>
+                        <div class="d-flex"><div class="db-hbar-track"><div class="db-hbar" style="width:@(w)%" title="@c.CourseName: @c.Students students"></div></div></div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="db-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="db-title">Recent test attempts</div>
+                <a class="small text-decoration-none" asp-area="Teacher" asp-controller="Analytics" asp-action="Index">View analytics</a>
+            </div>
+            @if (!Model.RecentAttempts.Any())
+            {
+                <div class="text-center text-muted small py-4">No one has attempted your tests yet.</div>
+            }
+            else
+            {
+                foreach (var a in Model.RecentAttempts)
+                {
+                    <div class="d-flex align-items-center gap-3 py-2 border-bottom">
+                        <div class="db-avatar">@(string.IsNullOrEmpty(a.StudentName) ? "S" : a.StudentName.Substring(0, 1).ToUpper())</div>
+                        <div class="flex-grow-1" style="min-width:0">
+                            <div class="fw-medium text-dark small text-truncate">@a.StudentName</div>
+                            <div class="db-sub text-truncate">@a.TestName</div>
+                        </div>
+                        <div class="db-sub text-nowrap">@a.StartedAt.ToString("d MMM, h:mm tt")</div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

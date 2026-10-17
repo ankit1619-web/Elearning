@@ -1,4 +1,5 @@
-﻿@model Manikalearning.Application.DTOs.LessonPlayerViewModel
+﻿@using Manikalearning.Application.DTOs
+@model Manikalearning.Application.DTOs.LessonPlayerViewModel
 
 @{  
     var here = Context.Request.Path + Context.Request.QueryString;
@@ -15,12 +16,12 @@
         if (videoUrl.Contains("watch?v="))
         {
             var videoId = videoUrl.Split("v=")[1].Split("&")[0];
-            embedVideoUrl = $"https://www.youtube.com/embed/{videoId}?rel=0&autoplay=1";
+            embedVideoUrl = $"https://www.youtube.com/embed/{videoId}?rel=0&autoplay=1&enablejsapi=1&start={Model.ResumeSeconds}";
         }
         else if (videoUrl.Contains("youtu.be/"))
         {
             var videoId = videoUrl.Split("youtu.be/")[1].Split("?")[0];
-            embedVideoUrl = $"https://www.youtube.com/embed/{videoId}?rel=0&autoplay=1";
+            embedVideoUrl = $"https://www.youtube.com/embed/{videoId}?rel=0&autoplay=1&enablejsapi=1&start={Model.ResumeSeconds}";
         }
     }
     else if (!videoUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
@@ -34,48 +35,66 @@
 }
  
  
-<div class="player-container ratio ratio-16x9 mb-4">
-    @if (!string.IsNullOrEmpty(Model.VideoUrl))
+    @if (!Model.CanWatchVideo)
     {
-        @if (isDirectVideoFile)
-        { 
-            <video controls controlsList="nodownload" class="w-100 h-100" style="object-fit: contain;">
-                <source src="@embedVideoUrl" type="video/mp4">
-                Your browser does not support video playback.
-            </video>
-        }
-        else
-        { 
-            <iframe src="@embedVideoUrl"
-                    title="@Model.LessonTitle"
-                    allowfullscreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-            </iframe>
-        }
+        <div class="player-container ratio mb-4">
+            <partial name="_VideoLocked" model="Model.LessonTitle" />
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.VideoUrl))
+    {
+       <div class="player-container ratio ratio-16x9 mb-4">
+            @if (isDirectVideoFile)
+            { 
+                <video id="lessonVideo" controls controlsList="nodownload" class="w-100 h-100" style="object-fit: contain;">
+                    <source src="@embedVideoUrl" type="video/mp4">
+                    Your browser does not support video playback.
+                </video>
+            }
+            else
+            { 
+                <iframe id="lessonYt" src="@embedVideoUrl"
+                        title="@Model.LessonTitle"
+                        allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                </iframe>
+            }
+        </div>
     }
     else
     {
-        <div class="d-flex flex-column justify-content-center align-items-center text-white p-4">
+        <div class="player-container ratio ratio-16x9 mb-4"><div class="d-flex flex-column justify-content-center align-items-center text-white p-4">
             <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;">
                 <span class="visually-hidden">Loading...</span>
             </div>
             <h4 class="fw-bold mb-1">We're getting things ready</h4>
             <p class="text-muted small">Loading your experience... This won't take long.</p>
-        </div>
+        </div></div>
     }
-</div>
+
 <div class="notes-card shadow-sm mb-4"> 
     <div class="notes-dark-header py-3 px-4">
         <h5 class="fw-bold mb-0 fs-5 text-white">@Model.LessonTitle</h5>
     </div>
      
     <div class="notes-action-bar px-4 py-3 bg-light border-bottom d-flex align-items-center justify-content-end gap-2 flex-wrap">
-        @if (!string.IsNullOrEmpty(Model.NotesUrl))
+        @if (Model.HasNotesPdf)
         {
-            <button type="button" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white" onclick="openSecurePdfPreview('@Model.NotesUrl')">
-                <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> PDF Notes
-            </button>
+            @if (Model.CanOpenNotes)
+            {
+                <button type="button" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white" onclick="openSecurePdfPreview('@Model.NotesUrl')">
+                    <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> PDF Notes
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white"
+                        onclick="Toast.openModal('/Student/Watch/FeatureLocked?code=@PlanFeatureCodes.Notes', 'modal-md')">
+                    <i class="bi bi-lock-fill me-1 text-secondary"></i> PDF Notes
+                </button>
+            }
         }
+       
         <button type="button" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white"
                 onclick="Toast.openModal('/Student/Watch/AskDoubtPartial/@Model.LessonId', 'modal-md')">
             <i class="bi bi-question-circle me-1 text-primary"></i> Ask Doubt
@@ -85,6 +104,17 @@
             asp-route-kind="topic" asp-route-key="@Model.LessonId" asp-route-back="@here">
              <span>Start Practice</span> <i class="bi bi-arrow-right"></i>
          </a>
+        <button type="button" id="btnMarkDone" class="btn btn-action-pill btn-sm px-3 py-1.5 fw-semibold border bg-white"
+                onclick="window.markLessonDone && window.markLessonDone()" @(Model.IsCompleted ? "disabled" : "")>
+            @if (Model.IsCompleted)
+            {
+                <i class="bi bi-check-circle-fill me-1 text-success"></i> <span>Completed</span>
+            }
+            else
+            {
+                <i class="bi bi-check-circle me-1 text-success"></i> <span>Mark as completed</span>
+            }
+        </button>
         <button type="button"
                 id="btn-bookmark-@Model?.LessonId"
                 class="btn btn-bookmark btn-sm px-2.5 py-1.5 @(Model?.IsBookmarked == true ? "active text-warning" : "text-secondary")"
@@ -100,6 +130,7 @@
             <div class="lecture-notes-html">
                 @Html.Raw(Model.Notes)
             </div>
+            <div id="notesEnd"></div>
         }
     </div>
 </div>
@@ -128,22 +159,23 @@
                        icon.removeClass('bi-bookmark-fill').addClass('bi-bookmark');
                    }
                } else {
-                   alert(res.message || "Bookmark process karne me issue aaya.");
+                    Toast.error(res.message || "We could not update the bookmark.");
                }
            },
            error: function () {
-               alert("Network error. Please try again.");
+               Toast.error("Network error. Please try again.");
            }
        });
    }
     async function openSecurePdfPreview(pdfPath) {
         if (!pdfPath) return;
-         
+
         if (pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
             window.open(pdfPath, '_blank');
+            if (window.markNotesRead) window.markNotesRead();
             return;
         }
- 
+
         var targetUrl = `/Student/Watch/GetMedia?fileName=${encodeURIComponent(pdfPath)}&mediaType=pdfs`;
 
         try {
@@ -152,22 +184,131 @@
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
-            if (!response.ok) {
-                alert('Unable to load PDF document.');
+            if (response.status === 403) {
+                var locked = response.headers.get('X-Feature-Locked');
+                if (locked) { Toast.openModal('/Student/Watch/FeatureLocked?code=' + encodeURIComponent(locked)); return; }
+                Toast.error('You do not have access to this file.');
                 return;
             }
+            if (!response.ok) { Toast.error('Unable to load PDF document.'); return; }
 
             var blob = await response.blob();
             var blobUrl = URL.createObjectURL(blob);
             window.open(blobUrl, '_blank');
-             
-            setTimeout(function () {
-                URL.revokeObjectURL(blobUrl);
-            }, 60000);
-
+            setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 60000);
+            if (window.markNotesRead) window.markNotesRead();
         } catch (error) {
             console.error('Error opening PDF preview:', error);
-            alert('An error occurred while opening the PDF.');
+            Toast.error('An error occurred while opening the PDF.');
         }
     }
+</script>
+
+<script>
+    // ---- watching / reading progress ----
+    (function () {
+        var lectureId = '@Model.LessonId';
+        var resume = @Model.ResumeSeconds;
+        var alreadyDone = @(Model.IsCompleted ? "true" : "false");
+        var SEND_EVERY_MS = 15000;
+
+        var v = document.getElementById('lessonVideo');
+        var ytEl = document.getElementById('lessonYt');
+        var yt = null, lastSent = 0, notesRead = false;
+
+        if (window.__lpTimer) { clearInterval(window.__lpTimer); window.__lpTimer = null; }
+
+        function pos() { return v ? (v.currentTime || 0) : (yt && yt.getCurrentTime ? yt.getCurrentTime() : 0); }
+        function dur() { return v ? (v.duration || 0) : (yt && yt.getDuration ? yt.getDuration() : 0); }
+
+        function markDone() {
+            var item = document.querySelector('.js-lecture-click[data-lesson-id="' + lectureId + '"]');
+            if (item) item.classList.add('done');
+            var btn = document.getElementById('btnMarkDone');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-check-circle-fill me-1 text-success"></i> <span>Completed</span>';
+            }
+            alreadyDone = true;
+        }
+
+        function send(markComplete) {
+            var p = Math.floor(pos()), d = Math.floor(dur());
+            if (!markComplete && !notesRead && p < 3) return;          // nothing worth saving yet
+            var token = $('input[name="__RequestVerificationToken"]').first().val();
+            var fd = new FormData();
+            fd.append('lectureId', lectureId);
+            fd.append('position', p);
+            fd.append('duration', d);
+            fd.append('notesRead', notesRead);
+            fd.append('markComplete', !!markComplete);
+            fd.append('__RequestVerificationToken', token);
+            lastSent = Date.now();
+            fetch('/Student/Watch/SaveProgress', { method: 'POST', body: fd, keepalive: true })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (res) { if (res && res.isCompleted) markDone(); })
+                .catch(function () { /* silent: the next tick retries */ });
+        }
+
+        // direct video file
+        if (v) {
+            v.addEventListener('loadedmetadata', function () {
+                if (resume > 5 && resume < v.duration - 5) v.currentTime = resume;     // resume
+            });
+            v.addEventListener('timeupdate', function () { if (Date.now() - lastSent > SEND_EVERY_MS) send(false); });
+            v.addEventListener('pause', function () { send(false); });
+            v.addEventListener('ended', function () { send(false); });
+        }
+
+        // YouTube embed (needs the IFrame API; start= already handles resume)
+        function initYt() {
+            yt = new YT.Player('lessonYt', {
+                events: {
+                    onStateChange: function (e) {
+                        if (e.data === 1) {                                              // playing
+                            if (window.__lpTimer) clearInterval(window.__lpTimer);
+                            window.__lpTimer = setInterval(function () { send(false); }, SEND_EVERY_MS);
+                        } else if (e.data === 2 || e.data === 0) {                       // paused / ended
+                            if (window.__lpTimer) { clearInterval(window.__lpTimer); window.__lpTimer = null; }
+                            send(false);
+                        }
+                    }
+                }
+            });
+        }
+        if (ytEl) {
+            if (window.YT && YT.Player) initYt();
+            else {
+                var prev = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = function () { if (prev) prev(); initYt(); };
+                if (!document.getElementById('ytApiScript')) {
+                    var tag = document.createElement('script');
+                    tag.id = 'ytApiScript'; tag.src = 'https://www.youtube.com/iframe_api';
+                    document.head.appendChild(tag);
+                }
+            }
+        }
+
+        // tab hidden / closed
+        document.addEventListener('visibilitychange', function () { if (document.hidden) send(false); });
+
+        // HTML notes: reached the end = read
+        var end = document.getElementById('notesEnd');
+        if (end && 'IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (entries) {
+                if (entries[0].isIntersecting) { notesRead = true; send(false); io.disconnect(); }
+            });
+            io.observe(end);
+        }
+
+        // used by the page
+        window.markNotesRead = function () { notesRead = true; send(false); };
+        window.markLessonDone = function () { send(true); };
+        window.flushLessonProgress = function () {
+            if (window.__lpTimer) { clearInterval(window.__lpTimer); window.__lpTimer = null; }
+            send(false);
+        };
+
+        if (alreadyDone) markDone();
+    })();
 </script>

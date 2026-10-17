@@ -1,11 +1,6 @@
 ﻿using FluentValidation;
 using Manikalearning.Application.Interface;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Manikalearning.Application.Features.Handlers.Students
 {

@@ -117,6 +117,9 @@
         border-radius: 999px;
     }
 
+    .lec-done { display: none; color: #16a34a; margin-left: auto; font-size: 1rem; flex-shrink: 0; }
+    .lecture-item.done .lec-done { display: inline-block; }
+
     .lecture-type-icon {
         font-size: 0.75rem;
         color: #6366f1;
@@ -185,6 +188,8 @@
                                                                 </span>
                                                             </div>
                                                         </div>
+                                                        @* once your lesson DTO has IsCompleted, use:  class="lec-done"  +  add "done" to the row class when lesson.IsCompleted *@
+                                                        <i class="bi bi-check-circle-fill lec-done" title="Completed"></i>
                                                     </div>
                                                 }
                                             </div>
@@ -211,6 +216,8 @@
                 var $this = $(this);
                 var courseId = $this.data('course-id');
                 var lessonId = $this.data('lesson-id');
+                 
+                if (window.flushLessonProgress) window.flushLessonProgress();
  
                 $('.js-lecture-click').removeClass('active'); $this.addClass('active');
  
@@ -232,7 +239,7 @@
                         $('#lessonPlayerContainer').html(`
                                     <div class="alert alert-danger p-4 text-center rounded-4">
                                         <i class="bi bi-exclamation-triangle fs-3 d-block mb-2"></i>
-                                        Lecture load karne me issue aaya. Please refresh and try again.
+                                        We could not load this lecture. Please refresh and try again.
                                     </div>
                                 `);
                     }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Assessments.Plans
 {
-    public record CreatePlanCommand(string PlanName, string Description, decimal Price,int DurationDays,bool IsActive)
+    public record CreatePlanCommand(string PlanName, string Description, decimal Price,int DurationDays,bool IsActive,List<string> Features)
     : IRequest<ResponseDto<Guid>>;
 
     public class CreatePlanCommandValidator : AbstractValidator<CreatePlanCommand>

@@ -35,6 +35,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             return new LessonPlayerViewModel
             {
                 CourseId = request.CourseId,
+                IsFree = lecture.IsFreePreview,
                 LessonId = lecture.LectureId,
                 LessonTitle = lecture.LectureTitle,
                 VideoUrl = lecture.VideoUrl,

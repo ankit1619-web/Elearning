@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Manikalearning.Application.Features.Handlers.Students
 {
-    public record CreateCheckoutCommand(Guid UserId, Guid PlanId, string? CouponCode) : IRequest<CheckoutDto>;
+    public record CreateCheckoutCommand(Guid UserId, Guid PlanId,  Guid CourseId, string? CouponCode) : IRequest<CheckoutDto>;
 
     public class CreateCheckoutCommandValidator : AbstractValidator<CreateCheckoutCommand>
     {
@@ -16,6 +16,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
         {
             RuleFor(x => x.UserId).NotEmpty();
             RuleFor(x => x.PlanId).NotEmpty();
+            RuleFor(x => x.CourseId).NotEmpty();
             RuleFor(x => x.CouponCode).MaximumLength(50)
                 .Matches("^[A-Za-z0-9_-]*$").WithMessage("Coupon code can only have letters, numbers, - and _.");
         }
@@ -27,8 +28,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
         private readonly IRepository<Coupon> _coupons;
         private readonly IRepository<Payment> _payments;
         private readonly IRepository<StudentSubscription> _subs;
-        private readonly IRazorpayClient _razorpay;
-
+        private readonly IRazorpayClient _razorpay; 
         private readonly IRepository<PlanCourse> _planCourses;
         private readonly IRepository<StudentCourse> _enrollments;
 
@@ -65,6 +65,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 SubscriptionId = Guid.NewGuid(),
                 UserId = req.UserId,
                 PlanId = plan.PlanId,
+                CourseId = req.CourseId,
                 PaymentId = paymentId,
                 StartDate = now,
                 EndDate = now.AddDays(plan.DurationDays),
@@ -94,7 +95,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
                 } 
                 
                 await SubscriptionActivator.ActivateAsync(_subs, sub, plan.DurationDays, now, ct);
-                await EnrollmentActivator.EnrollAsync(_planCourses, _enrollments, req.UserId, plan.PlanId, sub.StartDate, sub.EndDate, now, ct);
+                await EnrollmentActivator.EnrollAsync(_enrollments, req.UserId, plan.PlanId, req.CourseId, sub.StartDate, sub.EndDate, now, ct);
                 if (coupon != null) coupon.UsedCount++;
 
                 await _payments.AddAsync(new Payment
@@ -127,6 +128,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             var notes = new Dictionary<string, string>
             {
                 ["userId"] = req.UserId.ToString(),
+                ["courseId"] = req.CourseId.ToString(),
                 ["planId"] = plan.PlanId.ToString(),
                 ["coupon"] = coupon?.CouponCode ?? ""
             };

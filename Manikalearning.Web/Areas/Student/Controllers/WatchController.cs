@@ -42,6 +42,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             if (activeLessonId.HasValue && activeLessonId.Value != Guid.Empty)
             {
                 currentLesson = await _mediator.Send(new GetLessonPlayerQuery(userId, courseId, activeLessonId.Value), cancellationToken);
+                await ApplyPlanAccessAsync(currentLesson, cancellationToken);
             }
             var viewModel = new WatchIndexViewModel
             {
@@ -56,14 +57,20 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         [RequireLectureAccess("lessonId")]              
         public async Task<IActionResult> GetLesson(Guid courseId, Guid lessonId, CancellationToken cancellationToken)
         {
+            
             var lessonModel = await _mediator.Send(new GetLessonPlayerQuery(UserId, courseId, lessonId), cancellationToken);
-            return PartialView("_LessonPlayerPartial", lessonModel);
+            await ApplyPlanAccessAsync(lessonModel, cancellationToken);
+            return PartialView("_LessonPlayerPartial", lessonModel); 
         }
 
         [HttpGet("AskDoubtPartial/{lessonId:guid}")]
         [RequireLectureAccess("lessonId")]
-        public IActionResult AskDoubtPartial(Guid lessonId)
+        public async Task<IActionResult> AskDoubtPartial(Guid lessonId)
         {
+            var userId = UserId;
+            if (!await _mediator.Send(new HasFeatureQuery(userId, PlanFeatureCodes.Doubts)))
+                return PartialView("_FeatureLocked", PlanFeatureCodes.Doubts);
+
             return PartialView("_AskDoubtPartial", new AskDoubtViewModel { LessonId = lessonId });
         }
 
@@ -72,27 +79,34 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         public async Task<IActionResult> GetMedia([FromQuery] string fileName, [FromQuery] string mediaType = "pdfs", CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
-             
-            if (!string.Equals(Path.GetFileName(fileName), fileName, StringComparison.Ordinal)) return BadRequest("Invalid file name.");
+           //  if (!string.Equals(Path.GetFileName(fileName), fileName, StringComparison.Ordinal)) return BadRequest("Invalid file name.");
             if (!System.Text.RegularExpressions.Regex.IsMatch(mediaType ?? "", "^[A-Za-z]{1,20}$")) return BadRequest("Invalid media type.");
-             
+
+            var isPdf = mediaType!.Equals("pdfs", StringComparison.OrdinalIgnoreCase);
+            var feature = isPdf ? PlanFeatureCodes.Notes : PlanFeatureCodes.Lectures;
+
             var access = await _mediator.Send(new CheckMediaAccessQuery(UserId, fileName), cancellationToken);
             if (!access.HasAccess) return StatusCode(StatusCodes.Status403Forbidden);
-
-            var filePath = _fileService.GetFilePath(fileName, mediaType!);
-
-            if (!System.IO.File.Exists(filePath))
+             
+            if (!await _mediator.Send(new HasFeatureQuery(UserId, feature)))
             {
-                return NotFound("Requested media file does not exist.");
+                Response.Headers["X-Feature-Locked"] = feature;
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
-            var contentType = mediaType!.Equals("pdfs", StringComparison.OrdinalIgnoreCase)
-                ? "application/pdf"
-                : "video/mp4";
+            var filePath = _fileService.GetFilePath(fileName, mediaType);
+            if (!System.IO.File.Exists(filePath)) return NotFound("Requested media file does not exist.");
 
             Response.Headers.Append("Content-Disposition", $"inline; filename=\"{fileName}\"");
-
-            return PhysicalFile(filePath, contentType, enableRangeProcessing: true);
+            return PhysicalFile(filePath, isPdf ? "application/pdf" : "video/mp4", enableRangeProcessing: true);
+        }
+         
+        [HttpGet("FeatureLocked")]
+        [Authorize]
+        public IActionResult FeatureLocked([FromQuery] string code)
+        {
+            if (!PlanFeatureCodes.All.Contains(code, StringComparer.OrdinalIgnoreCase)) return BadRequest();
+            return PartialView("_FeatureLocked", code);
         }
 
         [HttpPost("AskDoubt")]
@@ -127,6 +141,13 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             {
                 return Unauthorized();
             }
+            if (!await _mediator.Send(new HasFeatureQuery(userId, PlanFeatureCodes.BookMark)))
+                return Json(new
+                {
+                    success = false,
+                    isBookmarked = false,
+                    message = "You do not have access to this feature."
+                });
 
             if (lectureId.HasValue)                                  
             {
@@ -143,6 +164,33 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 message = result.Message
             });
         }
-         
+        [HttpPost("SaveProgress")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveProgress([FromForm] Guid lectureId, [FromForm] int position, [FromForm] int duration,
+                                                      [FromForm] bool notesRead, [FromForm] bool markComplete, CancellationToken cancellationToken)
+        {
+            var userId = UserId;
+            var access = await _mediator.Send(new CheckLectureAccessQuery(userId, lectureId), cancellationToken);
+            if (!access.HasAccess) return Forbid();
+
+            var r = await _mediator.Send(
+                new SaveLectureProgressCommand(userId, lectureId, position, duration, notesRead, markComplete), cancellationToken);
+            return Json(new { success = true, isCompleted = r.IsCompleted, watchedSeconds = r.LastPositionSeconds });
+        }
+        private async Task ApplyPlanAccessAsync(LessonPlayerViewModel m, CancellationToken ct)
+        {
+            if (m.LessonId == Guid.Empty) return;
+            m.HasNotesPdf = !string.IsNullOrEmpty(m.NotesUrl);
+
+            if (m.IsFree) return;   
+
+            var userId = UserId;
+            m.CanWatchVideo = await _mediator.Send(new HasFeatureQuery(userId, PlanFeatureCodes.Lectures), ct);
+            m.CanOpenNotes = await _mediator.Send(new HasFeatureQuery(userId, PlanFeatureCodes.Notes), ct);
+            m.CanAskDoubt = await _mediator.Send(new HasFeatureQuery(userId, PlanFeatureCodes.Doubts), ct);
+             
+            if (!m.CanWatchVideo) m.VideoUrl = null;
+            if (!m.CanOpenNotes) { m.NotesUrl = null; m.Notes = null; }
+        }
     }
 }

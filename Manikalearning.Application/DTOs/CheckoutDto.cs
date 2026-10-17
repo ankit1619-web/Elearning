@@ -28,6 +28,7 @@
         public Guid SubscriptionId { get; set; }
         public Guid PlanId { get; set; }
         public string PlanName { get; set; } = "";
+        public string CourseName { get; set; } = "";
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }

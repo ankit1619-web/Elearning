@@ -11,15 +11,21 @@
 
 <form asp-area="Student" asp-controller="Watch" asp-action="AskDoubt" method="post" onsubmit="return Toast.submitModalForm(this);">
     @Html.AntiForgeryToken() 
+    
     <div class="modal-body p-4">
-        <input type="hidden"   asp-for="@Model.LessonId" />
+        <input type="hidden" asp-for="LessonId" />
 
-        <div class="mb-3">
-            <label for="txtDoubtText" class="form-label fw-semibold text-secondary">Your Question / Doubt</label>
-            <textarea class="form-control" asp-for="@Model.DoubtText" rows="4" placeholder="Type your doubt here in detail..." required></textarea>
+        <div class="mb-1">
+            <label asp-for="DoubtText" class="form-label fw-semibold text-secondary">Your question / doubt</label>
+            <textarea asp-for="DoubtText" class="form-control" rows="4" maxlength="2000" required
+                      placeholder="Type your doubt here in detail..."
+                      oninput="document.getElementById('doubtCount').textContent = this.value.length"></textarea>
+            <div class="d-flex justify-content-between mt-1">
+                <span asp-validation-for="DoubtText" class="text-danger small"></span>
+                <span class="text-muted small ms-auto"><span id="doubtCount">0</span> / 2000</span>
+            </div>
         </div>
     </div>
-
    
     <div class="modal-footer border-top-0 pt-0">
         <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using Microsoft.EntityFrameworkCore;
 namespace Manikalearning.Domain.Entities
 {
     [Table("Plans")]
@@ -20,9 +20,10 @@ namespace Manikalearning.Domain.Entities
         public ICollection<PlanCourse> PlanCourses { get; set; }
         public ICollection<StudentSubscription> StudentSubscriptions { get; set; }
     }
+
+    [PrimaryKey(nameof(PlanId), nameof(FeatureCode))]
     public class PlanFeature
-    {
-        [Key]
+    { 
         public Guid PlanId { get; set; }
         
         public string FeatureCode { get; set; } = "";
@@ -56,6 +57,11 @@ namespace Manikalearning.Domain.Entities
         public Guid PlanId { get; set; }
         [ForeignKey("PlanId")]
         public Plan Plan { get; set; }
+
+        [Required]
+        public Guid CourseId { get; set; }
+        [ForeignKey("CourseId")]
+        public Course Course { get; set; }
 
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
         public DateTime EndDate { get; set; }

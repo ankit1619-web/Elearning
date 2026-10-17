@@ -64,7 +64,7 @@ namespace Manikalearning.Application.Features.Handlers.Students
             {
                 var plan = await _plans.Entity().AsNoTracking().FirstAsync(p => p.PlanId == sub.PlanId, ct);
                 await SubscriptionActivator.ActivateAsync(_subs, sub, plan.DurationDays, now, ct);
-                await EnrollmentActivator.EnrollAsync(_planCourses, _enrollments, sub.UserId, sub.PlanId, sub.StartDate, sub.EndDate, now, ct);
+                await EnrollmentActivator.EnrollAsync(_enrollments, sub.UserId, sub.PlanId,sub.CourseId, sub.StartDate, sub.EndDate, now, ct);
             }
              
             if (order.Notes.TryGetValue("coupon", out var code) && !string.IsNullOrWhiteSpace(code))

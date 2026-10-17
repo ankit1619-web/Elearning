@@ -3,6 +3,7 @@ using Manikalearning.Application.Features.Commands.Assessments.Plans;
 using Manikalearning.Web.Areas.Admin.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Areas.Admin.Controllers
@@ -66,7 +67,8 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
                 Price = response.Data.Price,
                 DurationDays = response.Data.DurationDays,
                 Description = response.Data.Description,
-                IsActive = response.Data.IsActive
+                IsActive = response.Data.IsActive,
+                Features = response.Data.Features
             };
 
             return PartialView("_CreateUpdate", viewModel);

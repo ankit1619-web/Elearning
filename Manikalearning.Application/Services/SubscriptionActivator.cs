@@ -33,41 +33,52 @@ namespace Manikalearning.Application.Services
 
     public static class EnrollmentActivator
     {
-        // Plan active -> student is enrolled in EVERY course of that plan (table StudentCourses), valid until the plan ends.
-        public static async Task EnrollAsync(IRepository<PlanCourse> planCourses, IRepository<StudentCourse> enrollments,
-                                             Guid userId, Guid planId, DateTime start, DateTime end, DateTime now, CancellationToken ct)
-        {
-            var courseIds = await planCourses.Entity().AsNoTracking().Where(pc => pc.PlanId == planId).Select(pc => pc.CourseId).ToListAsync(ct);
-            if (courseIds.Count == 0) return;
+        public static async Task EnrollAsync(
+            IRepository<StudentCourse> enrollments,
+            Guid userId,
+            Guid planId,
+            Guid courseId,
+            DateTime start,
+            DateTime end,
+            DateTime now,
+            CancellationToken ct)
+        { 
+            var existing = await enrollments.Entity()
+                .Where(e => e.UserId == userId && e.CourseId == courseId)
+                .ToListAsync(ct);
 
-            var existing = await enrollments.Entity().Where(e => e.UserId == userId && courseIds.Contains(e.CourseId)).ToListAsync(ct);
+            var enrollment = existing.FirstOrDefault();
 
-            foreach (var courseId in courseIds)
+            if (enrollment == null)
             {
-                var e = existing.FirstOrDefault(x => x.CourseId == courseId);
-                if (e == null)
+                await enrollments.AddAsync(new StudentCourse
                 {
-                    await enrollments.AddAsync(new StudentCourse
-                    {
-                        StudentCourseId = Guid.NewGuid(),
-                        UserId = userId,
-                        CourseId = courseId,
-                        EnrolledAt = now,
-                        StartDate = start,
-                        ExpiryDate = end,
-                        IsActive = true
-                    });
-                }
-                else
-                {
-                    e.IsActive = true;
-                    if (e.ExpiryDate != null)                              // null = lifetime access given by admin: never shorten it
-                    {
-                        if (e.ExpiryDate < now) e.StartDate = start;       // old access had ended -> new period starts now
-                        e.ExpiryDate = e.ExpiryDate > end ? e.ExpiryDate : end;
-                    }
-                }
+                    StudentCourseId = Guid.NewGuid(),
+                    UserId = userId,
+                    CourseId = courseId,
+                    EnrolledAt = now,
+                    StartDate = start,
+                    ExpiryDate = end,
+                    IsActive = true
+                });
+                await enrollments.SaveChangesAsync();
             }
+            else
+            {
+                enrollment.IsActive = true;
+
+                if (enrollment.ExpiryDate != null) 
+                {
+                    if (enrollment.ExpiryDate < now)
+                    {
+                        enrollment.StartDate = start; 
+                    }
+
+                    enrollment.ExpiryDate = enrollment.ExpiryDate > end ? enrollment.ExpiryDate : end;
+                }
+                await enrollments.SaveChangesAsync();
+            }
+
         }
     }
 }

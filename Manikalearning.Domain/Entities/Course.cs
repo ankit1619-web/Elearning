@@ -124,13 +124,12 @@ namespace Manikalearning.Domain.Entities
         public bool IsCompleted { get; set; }
 
         public DateTime LastWatchedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation Properties
+         
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
 
         [ForeignKey(nameof(LectureId))]
-        public virtual CourseLecture Lecture { get; set; } = null!;
+        public virtual CourseLecture Lecture { get; set; } = null!; 
     }
 
     [Table("StudentCourses")]

@@ -1,10 +1,81 @@
-﻿@model Manikalearning.Web.Areas.Admin.ViewModels.PlanViewModel
+﻿@using PlanCodes = Manikalearning.Application.DTOs.PlanFeatureCodes 
+@model Manikalearning.Web.Areas.Admin.ViewModels.PlanViewModel
 
 @{
-    bool isEdit = Model != null   && Model.PlanId != Guid.Empty;
+    bool isEdit = Model != null && Model.PlanId != Guid.Empty;
     string title = isEdit ? "Edit Subscription Plan" : "Create New Plan";
     string actionName = isEdit ? "Edit" : "Create";
+    var selected = Model?.Features ?? new List<string>();
+
+    string Icon(string code) => code switch
+    {
+        PlanCodes.MockTests => "bi-clipboard2-check-fill",
+        PlanCodes.Pyq => "bi-clock-history",
+        PlanCodes.Doubts => "bi-chat-dots-fill",
+        PlanCodes.Lectures => "bi-play-circle-fill",
+        PlanCodes.Notes => "bi-file-earmark-text-fill",
+        PlanCodes.Analytics => "bi-graph-up-arrow",
+        _ => "bi-stars"
+    };
 }
+
+<style>
+    .pf-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        border: 1.5px solid #e4e7ef;
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: #fff;
+        cursor: pointer;
+        height: 100%;
+        transition: all .15s ease;
+        margin: 0;
+    }
+
+        .pf-feature:hover {
+            border-color: #9ec5fe;
+            background: #f6f9ff;
+        }
+
+        .pf-feature:has(input:checked) {
+            border-color: #0d6efd;
+            background: #eef4ff;
+            box-shadow: 0 0 0 3px rgba(13,110,253,.1);
+        }
+
+        .pf-feature .ico {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: #e7f0ff;
+            color: #0d6efd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pf-feature .name {
+            font-size: .85rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+
+        .pf-feature .desc {
+            font-size: .74rem;
+            color: #6b7280;
+            line-height: 1.25;
+            margin-top: 2px;
+        }
+
+        .pf-feature input {
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+</style>
 
 <div class="modal-header border-bottom-0 pb-0">
     <h5 class="modal-title fw-bold text-dark" id="globalModalTitle">@title</h5>
@@ -46,6 +117,34 @@
             <span asp-validation-for="Description" class="text-danger small"></span>
         </div>
 
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label text-muted small fw-semibold mb-0">Included Features</label>
+                <div class="small">
+                    <a href="#" class="text-decoration-none" onclick="planFeaturesToggle(true); return false;">Select all</a>
+                    <span class="text-muted mx-1">|</span>
+                    <a href="#" class="text-decoration-none" onclick="planFeaturesToggle(false); return false;">Clear</a>
+                </div>
+            </div>
+            <div class="row g-2" id="planFeatureList">
+                @foreach (var code in PlanCodes.All)
+                {
+                    <div class="col-sm-6">
+                        <label class="pf-feature" for="feat_@code">
+                            <input class="form-check-input shadow-none" type="checkbox" name="Features" value="@code" id="feat_@code"
+                            @(selected.Contains(code, StringComparer.OrdinalIgnoreCase) ? "checked" : "") />
+                            <span class="ico"><i class="bi @Icon(code)"></i></span>
+                            <span>
+                                <span class="name d-block">@PlanCodes.Label(code)</span>
+                                <span class="desc d-block">@PlanCodes.Description(code)</span>
+                            </span>
+                        </label>
+                    </div>
+                }
+            </div>
+            <div class="form-text">Students on this plan can use only the ticked features. Leave all unticked for a plan with no extra features.</div>
+        </div>
+
         <div class="d-flex align-items-center">
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input shadow-none" type="checkbox" asp-for="IsActive" id="IsActiveSwitch" />
@@ -61,3 +160,9 @@
         </button>
     </div>
 </form>
+
+<script>
+    function planFeaturesToggle(on) {
+        document.querySelectorAll('#planFeatureList input[type=checkbox]').forEach(function(c) { c.checked = on; });
+    }
+</script>

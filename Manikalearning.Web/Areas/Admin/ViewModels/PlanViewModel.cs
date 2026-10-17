@@ -27,15 +27,15 @@ namespace Manikalearning.Web.Areas.Admin.ViewModels
 
         [Display(Name = "Active Status")]
         public bool IsActive { get; set; } = true;
-         
+        public List<string> Features { get; set; } = new();
         public CreatePlanCommand ToCreateCommand()
         {
-            return new CreatePlanCommand(PlanName, Description??"", Price, DurationDays,IsActive);
+            return new CreatePlanCommand(PlanName, Description??"", Price, DurationDays,IsActive,Features);
         }
 
         public UpdatePlanCommand ToUpdateCommand()
         {
-            return new UpdatePlanCommand(PlanId, PlanName, Price, DurationDays, Description, IsActive);
+            return new UpdatePlanCommand(PlanId, PlanName, Price, DurationDays, Description, IsActive, Features);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Manikalearning.Application.Features.Commands.Assessments.Plans
          decimal Price,
          int DurationDays,
          string? Description,
-         bool IsActive
+         bool IsActive, List<string> Features
      ) : IRequest<ResponseDto<bool>>;
 
     public class UpdatePlanCommandValidator : AbstractValidator<UpdatePlanCommand>

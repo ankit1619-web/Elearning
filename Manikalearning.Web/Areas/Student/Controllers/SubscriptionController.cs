@@ -17,22 +17,28 @@ namespace Manikalearning.Web.Areas.Student.Controllers
         private readonly IMediator _mediator;
         public SubscriptionController(IMediator mediator) => _mediator = mediator;
 
-
-
         [HttpGet("")]
-        public async Task<IActionResult> Index(string? code, int page = 1, string? payment = null, CancellationToken ct = default)
+        public async Task<IActionResult> Index(string? code, Guid? courseId = null, int page = 1, string? payment = null, string? messagetype = null, string? message = null, CancellationToken ct = default)
         {
             var userId = CurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
             try
             {
+                var courses = await _mediator.Send(new GetPlanCoursesQuery(), ct);
+                var selected = courseId == null ? null : courses.FirstOrDefault(c => c.CourseId == courseId);
+
                 return View(new SubscriptionPageVm
                 {
-                    Plans = await _mediator.Send(new GetPlanQuery(code), ct),
+                    Courses = courses,
+                    SelectedCourseId = selected?.CourseId,
+                    SelectedCourseName = selected?.CourseName,
+                    Plans = selected == null ? new PlansResultDto() : await _mediator.Send(new GetPlanQuery(code, selected.CourseId), ct),
                     Payments = await _mediator.Send(new GetPaymentsQuery(userId.Value, page), ct),
                     Mine = await _mediator.Send(new GetMySubscriptionsQuery(userId.Value), ct),
-                    PaymentResult = payment
+                    PaymentResult = payment,
+                    MessageType = messagetype,
+                    Message = message
                 });
             }
             catch (ValidationException ex)
@@ -41,19 +47,21 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+         
 
         [HttpPost("Checkout")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(Guid planId, string? code, CancellationToken ct)
+        public async Task<IActionResult> Checkout(Guid planId, string? code, Guid? courseId, CancellationToken ct)
         {
             var userId = CurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account", new { area = "" });
-
+            if (planId == Guid.Empty) return RedirectToAction(nameof(Index), new { code, messagetype = "error", message = "Please select a plan." });
+            if(courseId == null || courseId == Guid.Empty) return RedirectToAction(nameof(Index), new { code, messagetype = "error", message = "Please select a course." });
             try
             {
-                var dto = await _mediator.Send(new CreateCheckoutCommand(userId.Value, planId, code), ct);
+                var dto = await _mediator.Send(new CreateCheckoutCommand(userId.Value, planId, (Guid)courseId, code), ct);
 
-                if (dto.IsFree)                                  
+                if (dto.IsFree)
                     return RedirectToAction(nameof(Index), new { payment = "success" });
 
                 return View("Pay", new PayPageVm
@@ -67,21 +75,23 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             }
             catch (ValidationException ex)
             {
-                TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Could not start the payment.";
-                return RedirectToAction(nameof(Index), new { code });
+                return RedirectToAction(nameof(Index), new { code, courseId, messagetype = "error", message = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Could not start the payment." });
             }
-            catch (InvalidOperationException)                   
+            catch (InvalidOperationException)
             {
-                TempData["ErrorMessage"] = "Payment service is not available right now. Please try again in a moment.";
-                return RedirectToAction(nameof(Index), new { code });
+                return RedirectToAction(nameof(Index), new { code, courseId, messagetype = "error", message = "Payment service is not available right now. Please try again in a moment." });
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction(nameof(Index), new { code, courseId, messagetype = "error", message = ex.Message });
             }
         }
 
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
         [HttpPost("PaymentCallback")]
-        public async Task<IActionResult> PaymentCallback([FromForm(Name = "razorpay_payment_id")] string? paymentId,[FromForm(Name = "razorpay_order_id")] string? orderId,
-            [FromForm(Name = "razorpay_signature")] string? signature,CancellationToken ct)
+        public async Task<IActionResult> PaymentCallback([FromForm(Name = "razorpay_payment_id")] string? paymentId, [FromForm(Name = "razorpay_order_id")] string? orderId,
+            [FromForm(Name = "razorpay_signature")] string? signature, CancellationToken ct)
         {
             try
             {
@@ -93,7 +103,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
                 return RedirectToAction(nameof(Index), new { payment = "failed" });
             }
         }
-         
+
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
         [AcceptVerbs("GET", "POST")]
@@ -104,12 +114,19 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
     }
 
+
+
     public class SubscriptionPageVm
     {
+        public List<PlanCourseOptionDto> Courses { get; set; } = new();
+        public Guid? SelectedCourseId { get; set; }
+        public string? SelectedCourseName { get; set; }
         public PlansResultDto Plans { get; set; } = new();
         public PaymentListDto Payments { get; set; } = new();
         public List<MySubscriptionDto> Mine { get; set; } = new();
         public string? PaymentResult { get; set; }
+        public string? MessageType { get; set; }
+        public string? Message { get; set; }
     }
 
     public class PayPageVm
