@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Web
 {
-    public class GetCourseDetailsQuery : IRequest<CourseDto>
+    public class GetCourseDetailsQuery : IRequest<WatchOverviewViewModel>
     {
         public Guid CourseId { get; set; }
 

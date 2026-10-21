@@ -14,6 +14,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Area("Student")]
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class ProfileController : Controller
     {
         private const long MaxPhotoBytes = 2 * 1024 * 1024;

@@ -147,3 +147,44 @@ html {
         height: 42px;
     }
 }
+
+:root {
+    --brand-indigo: #4f46e5;
+    --brand-dark-banner: #1c1a4e;
+}
+
+/* Common Dark Navy Banner matching Subscription Page */
+.page-header-banner {
+    background-color: var(--brand-dark-banner);
+    border-radius: 20px;
+    padding: 2.5rem 2.5rem;
+    color: #ffffff;
+    box-shadow: 0 10px 30px rgba(28, 26, 78, 0.15);
+    margin-bottom: 2.5rem;
+}
+
+    .page-header-banner h1 {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+    }
+
+    .page-header-banner p {
+        color: #cbd5e1;
+        font-size: 0.98rem;
+        max-width: 620px;
+    }
+
+.banner-badge {
+    background: rgba(79, 70, 229, 0.25);
+    color: #818cf8;
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}

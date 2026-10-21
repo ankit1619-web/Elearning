@@ -1,137 +1,458 @@
-﻿@model ManikaLearning.Features.Pyq.PyqBankDto
+﻿@using Manikalearning.Application.DTOs
+@model Manikalearning.Web.Areas.Student.Controllers.PyqBankPageVm
 @{
     ViewData["Title"] = "PYQ Bank";
+ 
+     Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    var guest = User.Identity?.IsAuthenticated != true;
+    var here = Context.Request.Path + Context.Request.QueryString;
+    var isYearTab = Model.ActiveTab.Equals("year", StringComparison.OrdinalIgnoreCase);
 }
 
 @section Styles {
     <style>
-        .pyq-hero { padding: 72px 0 36px; background: radial-gradient(800px 320px at 90% -10%, rgba(99,102,241,.13), transparent 60%); }
-        .pyq-hero h1 { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -.02em; font-size: clamp(2rem, 4.5vw, 3rem); margin: 14px 0 10px; }
-        .pyq-hero p { color: #5b6475; max-width: 560px; }
+        .pb-wrapper {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            color: #0f172a;
+            padding :25px;
+        }
 
-        .count-picker { display: inline-flex; background: #fff; border: 1px solid #e3e6f3; border-radius: 12px; padding: 4px; gap: 4px; margin-top: 18px; }
-        .count-picker button { border: 0; background: transparent; padding: 7px 16px; border-radius: 9px; font-weight: 600; color: #4b5563; }
-        .count-picker button.active { background: #4f46e5; color: #fff; }
+        .pb-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: #ffffff;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        }
 
-        .pyq-tabs { display: flex; gap: 8px; margin: 34px 0 20px; }
-        .pyq-tab { border: 1.5px solid #dfe2f3; background: #fff; padding: 9px 20px; border-radius: 999px; font-weight: 600; color: #4b5563; }
-        .pyq-tab.active { border-color: #4f46e5; background: #eef0ff; color: #4f46e5; }
+            .pb-hero h1 {
+                font-size: 1.8rem;
+                font-weight: 800;
+                margin-bottom: 0.4rem;
+            }
 
-        .pyq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
-        .pyq-card { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-radius: 16px; background: #fff; border: 1px solid #e8eaf3; text-decoration: none; color: #1e1b4b; box-shadow: 0 4px 16px rgba(30,41,90,.05); transition: all .2s ease; }
-        .pyq-card:hover { transform: translateY(-3px); border-color: #4f46e5; box-shadow: 0 10px 26px rgba(79,70,229,.14); }
-        .pyq-card .name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; }
-        .pyq-card .meta { font-size: .85rem; color: #6b7280; }
-        .pyq-card .go { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #eef0ff; color: #4f46e5; }
+            .pb-hero p {
+                color: #cbd5e1;
+                font-size: 0.95rem;
+                margin: 0;
+            }
 
-        .pyq-panel { display: none; }
-        .pyq-panel.active { display: block; }
-        .pyq-empty { color: #6b7280; padding: 24px 0; }
+        .pb-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff !important;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .pb-action-btn:hover, .pb-action-btn.active {
+                background: #ffffff;
+                color: #4f46e5 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                transform: translateY(-2px);
+            }
+
+        .pb-note {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 1.25rem;
+            border-radius: 14px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .pb-filter-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+
+            .pb-filter-card label {
+                display: block;
+                font-size: 0.78rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #64748b;
+                margin-bottom: 0.4rem;
+            }
+
+            .pb-filter-card select {
+                min-width: 220px;
+                padding: 0.65rem 1rem;
+                border: 1px solid #cbd5e1;
+                border-radius: 12px;
+                background-color: #f8fafc;
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #1e293b;
+            }
+
+        .pb-chips-wrapper {
+            margin-bottom: 1.8rem;
+        }
+
+        .pb-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .pb-chip {
+            padding: 0.6rem 1.1rem;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #475569;
+        }
+
+            .pb-chip small {
+                background: #f1f5f9;
+                color: #64748b;
+                padding: 0.15rem 0.5rem;
+                border-radius: 6px;
+            }
+
+            .pb-chip.active {
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+                color: #ffffff !important;
+                border-color: transparent;
+            }
+
+                .pb-chip.active small {
+                    background: rgba(255, 255, 255, 0.2);
+                    color: #ffffff;
+                }
+
+        .pb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .pb-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+
+            .pb-card:hover {
+                border-color: #c7d2fe;
+                transform: translateY(-3px);
+            }
+
+            .pb-card h2 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #0f172a;
+                margin: 0;
+            }
+
+        .pb-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            background: #eeef2ff;
+            color: #4f46e5;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .pb-start-btn {
+            margin-top: auto;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #ffffff !important;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+            .pb-start-btn:hover {
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            }
+
+        .yr-year {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .yr-cut {
+            font-size: 0.78rem;
+            color: #b45309;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+        }
+
+        .yr-sess {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .yr-sess-btn {
+            background: #f1f5f9;
+            color: #334155 !important;
+            border: 1px solid #e2e8f0;
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .pb-empty {
+            text-align: center;
+            padding: 3.5rem 1.5rem;
+            background: #ffffff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 20px;
+            color: #64748b;
+        }
+
+            .pb-empty i {
+                font-size: 3rem;
+                color: #818cf8;
+                display: block;
+                margin-bottom: 0.8rem;
+            }
     </style>
 }
 
-<section id="pyq" class="pyq-hero">
-    <div class="container">
-        <span class="section-badge">PREVIOUS YEAR QUESTIONS</span>
-        <h1>PYQ Bank</h1>
-        <p>Subject ya year chuno aur turant practice shuru karo. Login ki zaroorat nahi.</p>
+<div class="pb-wrapper dash">
+    <div class="pb-hero d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <h1>PYQ Practice Bank</h1>
+            <p>Choose a subject or year to practise previous year questions like the real exam.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="pb-action-btn @(!isYearTab ? "active" : "")" asp-controller="PYQ"
+               asp-action="Index" asp-route-tab="subject">
+                <i class="bi bi-collection"></i> By Subject
+            </a>
+            <a class="pb-action-btn @(isYearTab ? "active" : "")" asp-controller="PYQ"
+               asp-action="Index" asp-route-tab="year">
+                <i class="bi bi-calendar3"></i> By Year
+            </a>
+        </div>
+    </div>
 
-        @if (TempData["PyqMessage"] is string msg)
+    @if (guest)
+    {
+        <div class="pb-note shadow-sm">
+            <i class="bi bi-info-circle-fill fs-5"></i>
+            <span>No login needed to practise. Your answers are saved only when you are logged in with an active PYQ plan.</span>
+        </div>
+    }
+
+    @if (!isYearTab)
+    { 
+        <div class="pb-filter-card">
+            <form class="d-flex flex-wrap align-items-end gap-3" method="get" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">
+                <input type="hidden" name="tab" value="subject" />
+                <div>
+                    <label for="examId">Target Exam</label>
+                    <select id="examId" name="examId">
+                        <option value="">All Exams</option>
+                        @foreach (var e in Model.SubjectData.Exams)
+                        {
+                            <option value="@e.ExamId" selected="@(Model.SubjectData.ExamId == e.ExamId)">@e.ExamName</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold rounded-3 px-4 py-2" style="background: #4f46e5; border: none;">
+                        <i class="bi bi-funnel me-1"></i> Filter
+                    </button>
+                    @if (Model.SubjectData.ExamId != null)
+                    {
+                        <a class="btn btn-outline-secondary rounded-3 px-3 py-2 fw-semibold" asp-action="Index" asp-route-tab="subject">Clear</a>
+                    }
+                </div>
+            </form>
+        </div>
+
+        if (Model.SubjectData.Subjects.Count == 0)
         {
-            <div class="alert alert-warning mt-3 mb-0">@msg</div>
+            <section class="pb-empty">
+                <i class="bi bi-inbox-fill"></i>
+                <h5 class="fw-bold text-dark mb-1">No subjects available</h5>
+                <p class="small mb-0">There are no subjects configured for this selection yet.</p>
+            </section>
         }
-
-        <div class="count-picker" role="group" aria-label="Number of questions">
-            <button type="button" data-count="10" class="active">10 Qs</button>
-            <button type="button" data-count="20">20 Qs</button>
-            <button type="button" data-count="30">30 Qs</button>
-        </div>
-    </div>
-</section>
-
-<section class="pb-5">
-    <div class="container">
-
-        <div class="pyq-tabs" role="tablist">
-            <button type="button" class="pyq-tab active" data-target="#panel-subjects">Subject wise</button>
-            <button type="button" class="pyq-tab" data-target="#panel-years">Year wise</button>
-        </div>
-
-        <div id="panel-subjects" class="pyq-panel active">
-            @if (Model.Subjects.Count == 0)
-            {
-                <p class="pyq-empty">Abhi koi subject available nahi hai.</p>
-            }
-            else
-            {
-                <div class="pyq-grid">
-                    @foreach (var s in Model.Subjects)
+        else
+        {
+            <div class="pb-chips-wrapper">
+                <nav class="pb-chips" aria-label="Subjects">
+                    @foreach (var sub in Model.SubjectData.Subjects)
                     {
-                        <a class="pyq-card" data-base="/pyq-bank/practice?subjectId=@s.SubjectId"
-                           href="/pyq-bank/practice?subjectId=@s.SubjectId&count=10">
-                            <span>
-                                <span class="name d-block">@s.Name</span>
-                                <span class="meta">@s.QuestionCount.ToString("N0") questions</span>
-                            </span>
-                            <span class="go"><i class="bi bi-arrow-right"></i></span>
+                        <a class="pb-chip @(Model.SelectedSubjectId == sub.SubjectId ? "active" : "")"
+                           asp-action="Index" asp-route-tab="subject" asp-route-examId="@Model.SubjectData.ExamId" asp-route-subjectId="@sub.SubjectId">
+                            <span>@sub.SubjectName</span>
+                            <small>@sub.PaperName</small>
                         </a>
+                    }
+                </nav>
+            </div>
+
+            if (Model.Sections.Count > 0)
+            {
+                <div class="pb-grid">
+                    @foreach (var sec in Model.Sections)
+                    {
+                        <article class="pb-card">
+                            <h2>@sec.SectionName</h2>
+                            <span class="pb-count">
+                                <i class="bi bi-journal-check"></i> @sec.TotalQuestions @(sec.TotalQuestions == 1 ? "Question" : "Questions")
+                            </span>
+                            <a class="pb-start-btn" asp-area="Student" asp-controller="PyqTest" asp-action="Start"
+                               asp-route-kind="section" asp-route-key="@sec.SectionId" asp-route-back="@here">
+                                <span>Start Practice</span> <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </article>
                     }
                 </div>
             }
-        </div>
-
-        <div id="panel-years" class="pyq-panel">
-            @if (Model.Years.Count == 0)
-            {
-                <p class="pyq-empty">Abhi koi year available nahi hai.</p>
-            }
             else
             {
-                <div class="pyq-grid">
-                    @foreach (var y in Model.Years)
+                <section class="pb-empty">
+                    <i class="bi bi-journal-x"></i>
+                    <h5 class="fw-bold text-dark mb-1">No sections found</h5>
+                    <p class="small mb-0">No active practice sections exist under the selected subject.</p>
+                </section>
+            }
+        }
+    }
+    else
+    { 
+        <div class="pb-filter-card">
+            <form class="d-flex flex-wrap align-items-end gap-3" method="get" asp-area="Student" asp-controller="PYQPractice" asp-action="Index">
+                <input type="hidden" name="tab" value="year" />
+                <div>
+                    <label for="examId">Exam</label>
+                    <select id="examId" name="examId">
+                        <option value="">All Exams</option>
+                        @foreach (var e in Model.YearData.Exams)
+                        {
+                            <option value="@e.ExamId" selected="@(Model.YearData.ExamId == e.ExamId)">@e.ExamName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="paperId">Paper</label>
+                    <select id="paperId" name="paperId">
+                        <option value="">All Papers</option>
+                        @foreach (var g in Model.YearData.Papers.GroupBy(p => p.ExamName))
+                        {
+                            <optgroup label="@g.Key">
+                                @foreach (var p in g)
+                                {
+                                    <option value="@p.PaperId" selected="@(Model.YearData.PaperId == p.PaperId)">@p.PaperName</option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold rounded-3 px-4 py-2" style="background: #4f46e5; border: none;">
+                        <i class="bi bi-funnel me-1"></i> Filter
+                    </button>
+                    @if (Model.YearData.ExamId != null || Model.YearData.PaperId != null)
                     {
-                        <a class="pyq-card" data-base="/pyq-bank/practice?year=@y.Year"
-                           href="/pyq-bank/practice?year=@y.Year&count=10">
-                            <span>
-                                <span class="name d-block">@y.Year</span>
-                                <span class="meta">@y.QuestionCount.ToString("N0") questions</span>
-                            </span>
-                            <span class="go"><i class="bi bi-arrow-right"></i></span>
-                        </a>
+                        <a class="btn btn-outline-secondary rounded-3 px-3 py-2 fw-semibold" asp-action="Index" asp-route-tab="year">Clear</a>
                     }
                 </div>
-            }
+            </form>
         </div>
 
-    </div>
-</section>
+        if (Model.YearData.Years.Count == 0)
+        {
+            <div class="pb-empty">
+                <i class="bi bi-calendar-x"></i>
+                <h5 class="fw-bold text-dark mb-1">No PYQs Found</h5>
+                <p class="small mb-0">No previous year questions match your selected filter.</p>
+            </div>
+        }
+        else
+        {
+            <div class="pb-grid">
+                @foreach (var y in Model.YearData.Years)
+                {
+                    <article class="pb-card">
+                        <div>
+                            <div class="yr-year">@y.Year</div>
+                            <div class="text-muted small fw-semibold mt-1">
+                                <i class="bi bi-journal-check me-1"></i>@y.Total @(y.Total == 1 ? "question" : "questions")
+                            </div>
+                        </div>
 
-@section Scripts {
-    <script>
-        (function () {
-            var count = 10;
+                        <a class="pb-start-btn" asp-area="Student" asp-controller="PyqTest" asp-action="Start"
+                           asp-route-kind="year" asp-route-key="@y.Year"
+                           asp-route-examId="@Model.YearData.ExamId" asp-route-paperId="@Model.YearData.PaperId" asp-route-back="@here">
+                            <i class="bi bi-play-fill fs-5"></i> Start @y.Year Test
+                        </a>
 
-            // Tabs
-            document.querySelectorAll('.pyq-tab').forEach(function (tab) {
-                tab.addEventListener('click', function () {
-                    document.querySelectorAll('.pyq-tab').forEach(function (t) { t.classList.remove('active'); });
-                    document.querySelectorAll('.pyq-panel').forEach(function (p) { p.classList.remove('active'); });
-                    tab.classList.add('active');
-                    document.querySelector(tab.getAttribute('data-target')).classList.add('active');
-                });
-            });
+                        @if (y.IsCut)
+                        {
+                            <div class="yr-cut">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Large set: contains the first @PyqYearRules.MaxQuestionsPerTest questions. Select a paper/session to get full paper.
+                            </div>
+                        }
 
-            // Question count: sab card links update
-            document.querySelectorAll('.count-picker button').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    document.querySelectorAll('.count-picker button').forEach(function (b) { b.classList.remove('active'); });
-                    btn.classList.add('active');
-                    count = btn.getAttribute('data-count');
-                    document.querySelectorAll('.pyq-card').forEach(function (card) {
-                        card.href = card.getAttribute('data-base') + '&count=' + count;
-                    });
-                });
-            });
-        })();
-    </script>
-}
+                        @if (y.Sessions.Count > 0)
+                        {
+                            <div class="yr-sess">
+                                @foreach (var s in y.Sessions)
+                                {
+                                    <a class="yr-sess-btn" asp-area="Student" asp-controller="PyqTest" asp-action="Start"
+                                       asp-route-kind="year" asp-route-key="@y.Year" asp-route-session="@s.Session"
+                                       asp-route-examId="@Model.YearData.ExamId" asp-route-paperId="@Model.YearData.PaperId" asp-route-back="@here">
+                                        @s.Session (@s.Count)
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    }
+</div>

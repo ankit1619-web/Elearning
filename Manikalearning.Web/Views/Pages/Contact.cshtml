@@ -1,0 +1,120 @@
+﻿@model  ContactFormVm
+@{
+    ViewData["Title"] = "Contact Us";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="page-header-banner">
+        <span class="banner-badge">GET IN TOUCH</span>
+        <h1 class="mb-2">We'd Love to Hear From You</h1>
+        <p class="mb-0">Have questions about our course plans, test series, or technical support? Reach out to our team anytime.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4 h-100 bg-white">
+                <h4 class="fw-bold mb-4 text-dark">Contact Information</h4>
+
+                <div class="d-flex align-items-start mb-4">
+                    <div class="p-3 rounded-3 me-3 flex-shrink-0" style="background: rgba(79, 70, 229, 0.08); color: var(--brand-indigo);">
+                        <i class="bi bi-geo-alt-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Our Location</h6>
+                        <p class="text-muted small mb-0">Jaipur, Rajasthan, India</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start mb-4">
+                    <div class="p-3 rounded-3 me-3 flex-shrink-0" style="background: rgba(79, 70, 229, 0.08); color: var(--brand-indigo);">
+                        <i class="bi bi-envelope-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Email Support</h6>
+                        <p class="text-muted small mb-0">Manika.Learning.Academy@gmail.com</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start">
+                    <div class="p-3 rounded-3 me-3 flex-shrink-0" style="background: rgba(79, 70, 229, 0.08); color: var(--brand-indigo);">
+                        <i class="bi bi-telephone-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Phone Number</h6>
+                        <p class="text-muted small mb-0">+91 98765 43210</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4 bg-white">
+                <h4 class="fw-bold mb-4 text-dark">Send Us a Message</h4>
+                @if (TempData["ContactSuccess"] is string okMsg)
+                {
+                    <div class="alert alert-success d-flex align-items-start gap-2 rounded-3" role="status">
+                        <i class="bi bi-check-circle-fill mt-1"></i><div>@okMsg</div>
+                    </div>
+                }
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger rounded-3" role="alert">
+                        <div class="fw-semibold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Please fix the following:</div>
+                        <div asp-validation-summary="All" class="small mb-0"></div>
+                    </div>
+                }
+
+                <form asp-controller="Pages" asp-action="SubmitContact" method="post" class="row g-3" novalidate id="contactForm">
+                    @Html.AntiForgeryToken()
+
+                    @* honeypot: hidden from people, bots fill it *@
+                    <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+                        <label>Leave this field empty<input type="text" asp-for="Website" tabindex="-1" autocomplete="off" /></label>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Name" class="form-label fw-semibold text-secondary small">Your Name <span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control rounded-3 p-2.5" placeholder="John Doe" maxlength="100" required autocomplete="name" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label fw-semibold text-secondary small">Email Address <span class="text-danger">*</span></label>
+                        <input asp-for="Email" type="email" class="form-control rounded-3 p-2.5" placeholder="john@example.com" maxlength="150" required autocomplete="email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Subject" class="form-label fw-semibold text-secondary small">Subject <span class="text-danger">*</span></label>
+                        <input asp-for="Subject" class="form-control rounded-3 p-2.5" placeholder="Inquiry about course subscriptions" maxlength="200" required />
+                        <span asp-validation-for="Subject" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <label asp-for="Message" class="form-label fw-semibold text-secondary small">Message <span class="text-danger">*</span></label>
+                            <span class="small text-muted"><span id="msgCount">@(Model.Message?.Length ?? 0)</span> / 2000</span>
+                        </div>
+                        <textarea asp-for="Message" rows="4" class="form-control rounded-3 p-2.5" placeholder="Type your message here..." maxlength="2000" required
+                                  oninput="document.getElementById('msgCount').textContent = this.value.length"></textarea>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 pt-2">
+                        <button type="submit" id="btnSendContact" class="btn text-white px-4 py-2.5 rounded-pill fw-bold shadow-sm" style="background-color: var(--brand-indigo);">
+                            <i class="bi bi-send-fill me-2"></i>Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // stop double submits (the server rule-set is the source of truth; this only improves the experience)
+        document.getElementById('contactForm').addEventListener('submit', function() {
+            var b = document.getElementById('btnSendContact');
+            b.disabled = true;
+            b.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+        });
+    </script>
+}

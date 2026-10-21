@@ -1,53 +1,65 @@
-﻿using Manikalearning.Application.Features.Commands.Web;
-using Manikalearning.Application.Features.Handlers.Web;
+﻿using FluentValidation;
+using Manikalearning.Application.DTOs;
+using Manikalearning.Application.Features.Commands.Students;
+using Manikalearning.Application.Features.Handlers.Assessments.Pyq;
+using Manikalearning.Web.Areas.Student.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers
 {
-    [Route("pyq-bank")]
+    [Route("pyq")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class PYQController : Controller
     {
-        private const int MinCount = 5;
-        private const int MaxCount = 50;
-        private const int MaxAnswers = 100;
-
         private readonly IMediator _mediator;
 
         public PYQController(IMediator mediator) => _mediator = mediator;
-         
+
         [HttpGet("")]
-        public async Task<IActionResult> Index(CancellationToken ct)
+        public async Task<IActionResult> Index(
+            string tab = "subject",
+            Guid? examId = null,
+            Guid? subjectId = null,
+            Guid? paperId = null,
+            CancellationToken ct = default)
         {
-            var model = await _mediator.Send(new GetPyqBankQuery(), ct);
-            return View("PyqIndex", model);
-        }
-         
-        [HttpGet("practice")]
-        public async Task<IActionResult> Practice(int? subjectId, int? year, int count = 10, CancellationToken ct = default)
-        {
-            count = Math.Clamp(count, MinCount, MaxCount);
+            var vm = new PyqBankPageVm { ActiveTab = tab };
 
-            var model = await _mediator.Send(new GetPyqPracticeSetQuery(subjectId, year, count), ct);
-
-            if (model is null)
+            try
             {
-                TempData["PyqMessage"] = "Is selection ke liye abhi questions available nahi hain.";
-                return RedirectToAction(nameof(Index));
+                if (tab.Equals("year", StringComparison.OrdinalIgnoreCase))
+                {
+                    vm.YearData = await _mediator.Send(new GetPyqYearsQuery(examId, paperId), ct);
+                }
+                else
+                {
+                    var data = await _mediator.Send(new GetPyqBankSubjectsQuery(examId), ct);
+                    var selected = data.Subjects.Any(s => s.SubjectId == subjectId)
+                        ? subjectId
+                        : data.Subjects.FirstOrDefault()?.SubjectId;
+
+                    var sections = new List<SectionDto>();
+                    if (selected.HasValue)
+                    {
+                        var response = await _mediator.Send(new GetSectionsBySubjectQuery(selected.Value), ct);
+                        sections = response.Data ?? new List<SectionDto>();
+                    }
+
+                    vm.SubjectData = data;
+                    vm.SelectedSubjectId = selected;
+                    vm.Sections = sections;
+                }
             }
-
-            return View("PyqPractice", model);
+            catch (ValidationException)
+            {
+                return RedirectToAction(nameof(Index), new { tab });
+            } 
+            return View(vm);
         }
-         
-        [HttpPost("practice/evaluate")]
-        [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> Evaluate([FromBody] List<AnswerInput>? answers, CancellationToken ct)
-        {
-            if (answers is null || answers.Count == 0 || answers.Count > MaxAnswers)
-                return BadRequest(new { error = "Invalid answers." });
 
-            var result = await _mediator.Send(new EvaluatePyqAnswersQuery(answers), ct);
-            return Json(result);
-        }
-    }
-}
+        [HttpGet("Start/{sectionId:guid}")]
+        public IActionResult Start(Guid sectionId) =>
+            RedirectToAction("Start", "PyqTest", new { area = "Student", kind = "section", key = sectionId });
+    } 
+} 

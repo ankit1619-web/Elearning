@@ -1,15 +1,10 @@
 ﻿using FluentValidation;
 using Manikalearning.Application.DTOs;
-using Manikalearning.Application.Features.Commands.Assessments.Pyq;
 using Manikalearning.Application.Features.Commands.Students;
 using Manikalearning.Application.Features.Handlers.Assessments.Pyq;
-using Manikalearning.Web.Areas.Student.ViewModels;
-using Manikalearning.Web.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Text.Json;
 
 namespace Manikalearning.Web.Areas.Student.Controllers
 {
@@ -17,6 +12,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [AllowAnonymous]                                
     [Route("pyq-bank")]
     [Route("Student/[controller]")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class PYQPracticeController : Controller
     {
         private readonly IMediator _mediator;
@@ -62,7 +58,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
             {
                 return RedirectToAction(nameof(Index), new { tab });
             }
-
+            ViewData["IsUserAuthenticated"] = User.Identity?.IsAuthenticated ?? false;
             return View(vm);
         }
 

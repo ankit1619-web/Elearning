@@ -11,6 +11,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
     [RequireSubscription]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class MockTestsController : Controller
     {
         private readonly IMediator _mediator;

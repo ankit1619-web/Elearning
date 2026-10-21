@@ -1,4 +1,5 @@
-﻿@model Manikalearning.Web.Models.CourseVM
+﻿@using Manikalearning.Application.DTOs
+@model MyCoursesViewModel
 @{ 
     ViewData["Title"] = !string.IsNullOrWhiteSpace(Model.ExamName) ? $"{Model.ExamName} Courses" : "All Courses";
 }
@@ -11,7 +12,7 @@
         <div class="page-hero-content"> 
             <span class="hero-label">
                 <i class="bi bi-mortarboard-fill"></i>
-                EXPERT-LED COURSES
+                EXPERT COURSES
             </span>
             <h1>
                @if (!string.IsNullOrWhiteSpace(Model.ExamName))
@@ -64,7 +65,7 @@
             </div> 
             <div class="course-count"> 
                 <div class="count-number">
-                    @Model.Items.Count
+                    @Model.Courses.Count
                 </div> 
                 <div class="count-label">
                     Courses Available
@@ -85,16 +86,16 @@
 
                     </div>
                 }
-                @foreach (var course in Model.Items)
+                @foreach (var course in Model.Courses)
                 {
                     <div class="col-xl-4 col-lg-4 col-md-6 course-item"
-                         data-name="@course.CourseName.ToLower()" >
+                         data-name="@course.Title.ToLower()" >
                         <div class="exam-card">
                             <div class="exam-card-header">
                                 <div class="exam-card-icon">
                                     <i class="bi bi-mortarboard-fill"></i>
                                 </div>
-                                @* @if (isFree)
+                                 @if (course.IsFree)
                                 {
                                     <span class="app-card-badge">
                                         <i class="bi bi-unlock-fill"></i>
@@ -102,20 +103,17 @@
                                     </span>
                                 }
                                 else
-                                { *@
-                                    <span class="app-card-badge">
-
-                                        <i class="bi bi-patch-check-fill"></i>
-
-                                        Premium
-
+                                {  
+                                    <span class="app-card-badge"> 
+                                        <i class="bi bi-patch-check-fill"></i> 
+                                        Premium 
                                     </span>
-                                @* }  *@
+                                 }   
                             </div>
                             <div class="exam-card-body">
                                 <div class="exam-title-row">
                                     <h3 class="exam-title">
-                                        @course.CourseName
+                                        @course.Title
                                     </h3>
                                     <i class="bi bi-arrow-up-right card-arrow"></i>
                                 </div>
@@ -129,7 +127,7 @@
                                         </div> 
                                         <div class="stat-content">
                                             <strong>
-                                                @course.TotalLectures  
+                                                @course.TotalLessons  
                                             </strong>
                                             <span>
                                                   Lectures
@@ -138,18 +136,18 @@
                                     </div> 
                                 </div> 
                                 <div class="exam-meta">
-                                    @* @if (isFree)
-                                {
-                                    <div class="course-free-price">
-                                        FREE
-                                    </div>
-                                }  
-                                else
-                                { *@
-                                    <strong class="course-price">
-                                        ₹@course.Price.ToString("N0")
-                                    </strong>
-                                    @* } *@
+                                   @if (course.IsFree)
+                                   {
+                                       <div class="course-free-price">
+                                           FREE
+                                       </div>
+                                   }  
+                                   else
+                                   { 
+                                      <strong class="course-price">
+                                          ₹@course.Price.ToString("N0")
+                                      </strong>
+                                    } 
                                 </div>
                             </div> 
                             <div class="exam-card-footer">

@@ -18,6 +18,7 @@ namespace Manikalearning.Infrastructure.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         // Domain Sets
+        public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<StudentProfile> StudentProfiles { get; set; }
         public DbSet<Paper> Papers { get; set; }

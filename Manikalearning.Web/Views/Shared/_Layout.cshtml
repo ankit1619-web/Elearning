@@ -70,11 +70,9 @@
                 <a class="navbar-brand brand"
                        asp-controller="Home"
                        asp-action="Index">
-
                     <span class="brand-icon">
                         <i class="bi bi-mortarboard-fill"></i>
                     </span>
-
                     <span>
                         Manika<span>Learning</span>
                     </span>
@@ -141,23 +139,37 @@
                             </a>
                         </li>  
                     </ul>
-                      
                     <div class="nav-actions">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            var area = User.IsInRole("Admin") ? "Admin"
+                                     : User.IsInRole("Teacher") ? "Teacher"
+                                     : User.IsInRole("Student") ? "Student"
+                                     : null;
 
-                        <a asp-controller="Account"
-                               asp-action="Login"
-                               class="login-link">
-                            Login
-                        </a>
+                            @if (area != null)
+                            {
+                                <a asp-area="@area" asp-controller="Dashboard" asp-action="Index"
+                                   class="btn btn-primary-custom">
+                                    <i class="bi bi-speedometer2"></i>
+                                    Go to Dashboard
+                                </a>
+                            }
 
-                        <a asp-controller="Account"
-                               asp-action="Register"
-                               class="btn btn-primary-custom">
-                            Get Started
-                            <i class="bi bi-arrow-up-right"></i>
-                        </a>
-
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="login-link border-0 bg-transparent">Logout</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-area="" asp-controller="Account" asp-action="Login" class="login-link">Login</a> 
+                            <a asp-area="" asp-controller="Account" asp-action="Register" class="btn btn-primary-custom">
+                                Get Started
+                                <i class="bi bi-arrow-up-right"></i>
+                            </a>
+                        }
                     </div>
+
 
                 </div>
 
@@ -173,54 +185,7 @@
         @RenderBody()
 
     </main>
-
-     
-
-  @*   <section class="final-cta">
-
-        <div class="container">
-
-            <div class="cta-box">
-
-                <div>
-
-                    <span class="section-badge">
-                        START YOUR PREPARATION
-                    </span>
-
-                    <h2>
-                        Your next attempt
-                        <br />
-                        can be your <span>best one.</span>
-                    </h2>
-
-                    <p>
-                        Practice smarter, understand your mistakes
-                        and prepare with confidence.
-                    </p>
-
-                </div>
-
-                <div>
-
-                    <a asp-controller="Account"
-                           asp-action="Register"
-                           class="btn btn-light btn-lg px-4">
-
-                        Start Preparing
-                        <i class="bi bi-arrow-right ms-2"></i>
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section> *@
-
-     
+      
 
     <footer class="site-footer">
 
@@ -271,46 +236,26 @@
 
                     <h6>Platform</h6>
 
-                    <a href="/Exams">Exams</a>
-                    <a href="/PYQ">PYQs</a>
-                    <a href="/Practice">Practice</a>
-                    <a href="/Tests">Mock Tests</a>
-
-                </div>
-
+                    <a asp-controller="Exams" asp-action="Index">Exams</a>
+                    <a asp-controller="PYQ" asp-action="Index">PYQs</a>
+                    <a asp-controller="PYQ" asp-action="Index">Practice</a>
+                    <a asp-controller="Course" asp-action="Index">Courses</a>
+                </div>   
 
                 <div class="col-6 col-lg-2">
-
-                    <h6>Learn</h6>
-
-                    <a href="/Courses">Courses</a>
-                    <a href="#">Free Content</a>
-                    <a href="#">Study Material</a>
-                    <a href="#">Results</a>
-
-                </div>
-
-
-                <div class="col-6 col-lg-2">
-
                     <h6>Company</h6>
-
-                    <a href="#">About Us</a>
-                    <a href="#">Contact</a>
-                    <a href="#">Careers</a>
-                    <a href="#">FAQs</a>
-
+                    <a asp-controller="Pages" asp-action="About">About Us</a>
+                    <a asp-controller="Pages" asp-action="Contact">Contact</a>
+                    <a asp-controller="Pages" asp-action="Careers">Careers</a>
+                    <a asp-controller="Pages" asp-action="Faq">FAQs</a>
                 </div>
-
 
                 <div class="col-6 col-lg-2">
-
-                    <h6>Legal</h6> 
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Refund Policy</a> 
+                    <h6>Legal</h6>
+                    <a asp-controller="Pages" asp-action="Privacy">Privacy Policy</a>
+                    <a asp-controller="Pages" asp-action="Terms">Terms & Conditions</a>
+                    <a asp-controller="Pages" asp-action="Refund">Refund Policy</a>
                 </div>
-
             </div> 
 
             <hr />

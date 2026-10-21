@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Frequently Asked Questions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4"> 
+    <div class="page-header-banner">
+        <span class="banner-badge">HELP CENTER</span>
+        <h1 class="mb-2">Frequently Asked Questions</h1>
+        <p class="mb-0">Find quick answers to common queries regarding test series, course subscriptions, and platform features.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="accordion accordion-flush space-y-3" id="faqAccordion">
+                <div class="accordion-item border rounded-4 overflow-hidden shadow-sm mb-3 bg-white">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button fw-bold py-3 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Do I need to log in to access PYQ practice questions?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary">
+                            No! You can access and practice Previous Year Questions directly from our PYQ Bank without requiring a mandatory login.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border rounded-4 overflow-hidden shadow-sm mb-3 bg-white">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold py-3 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            How do Course Subscription plans work?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary">
+                            Selecting a course plan gives you full access to exclusive mock test series, detailed explanations, subject-wise analytics, and downloadable study material for your validity period.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

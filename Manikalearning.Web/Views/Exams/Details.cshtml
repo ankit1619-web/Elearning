@@ -35,7 +35,7 @@
                 <p class="exam-detail-description">
                     @Model.Description
                 </p>
-                <div class="hero-buttons">
+                @* <div class="hero-buttons">
                     <a asp-controller="PYQ" asp-action="Index" asp-route-examId="@Model.ExamId" class="btn btn-primary btn-lg">
                         <i class="bi bi-journal-text"></i>
                         Practice PYQs
@@ -50,7 +50,7 @@
 
                     </a>
 
-                </div>
+                </div> *@
 
             </div>  
             <div class="col-lg-4">
@@ -303,11 +303,10 @@
                                         }
 
                                     </div>
-
-
+ 
                                     <a asp-controller="Course"
                                            asp-action="Details"
-                                           asp-route-id="@course.CourseId"
+                                       asp-route-course="@course.CourseId"
                                            class="course-button">
 
                                         View Course
@@ -429,7 +428,7 @@
 
          
 
-        <div class="content-header tests-header"> 
+      @*   <div class="content-header tests-header"> 
             <div> 
                 <span class="section-label">
                     TEST SERIES
@@ -543,11 +542,11 @@
             }
 
         </div>   
-         
+          *@
     </div>
 
 </section>
- 
+@*  
 <section class="section-padding bg-light">
 
     <div class="container">
@@ -790,6 +789,6 @@
 
     </div>
 
-</section>
+</section> *@
 
  

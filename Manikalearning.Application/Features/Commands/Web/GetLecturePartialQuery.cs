@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Manikalearning.Application.Features.Commands.Web
 {
-    public record GetLecturePartialQuery(Guid LectureId) : IRequest<CourseLectureDto>;
+    public record GetLecturePartialQuery(Guid LectureId,Guid CourseId) : IRequest<LessonPlayerViewModel>;
 }

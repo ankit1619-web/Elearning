@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers;
 
+[Route("")]
+[Route("home")]
+[Route("home/index")]
+[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public class HomeController : BaseController
 {
     public HomeController(IMediator mediator)

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Manikalearning.Application.DTOs;
-using Manikalearning.Application.Features.Commands.Assessments.Bookmarks;
 using Manikalearning.Application.Features.Handlers.Students;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +11,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Area("Student")]
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class BookmarksController : Controller
     {
         private readonly IMediator _mediator;

@@ -1,11 +1,13 @@
 ﻿ 
 using Manikalearning.Application.Features.Commands.Authentication;
+using Manikalearning.Web.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers
-{ 
+{
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class AccountController : Controller
     {
         private readonly IMediator _mediator;
@@ -14,8 +16,8 @@ namespace Manikalearning.Web.Controllers
         {
             _mediator = mediator;
         }
-
-        [HttpGet]
+         
+        [HttpGet,]
         public IActionResult Register()
         { 
             if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -57,8 +59,9 @@ namespace Manikalearning.Web.Controllers
 
             return View(command);
         }
+
         [HttpGet]
-        [AllowAnonymous]
+        [AllowAnonymous] 
         public IActionResult Login(string? returnUrl = null)
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -196,7 +199,7 @@ namespace Manikalearning.Web.Controllers
         }
          
         [HttpGet]
-        [AllowAnonymous]
+        [AllowAnonymous] 
         public IActionResult AccessDenied()
         {
             return View();

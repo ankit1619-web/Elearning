@@ -7,81 +7,51 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Manikalearning.Application.Features.Handlers.Web
 {
-    public class GetCourseDetailsQueryHandler : IRequestHandler<GetCourseDetailsQuery, CourseDto>
+    public class GetCourseDetailsQueryHandler : IRequestHandler<GetCourseDetailsQuery, WatchOverviewViewModel>
     {
-        private readonly IRepository<Course> _courseRepository;
-        private readonly IRepository<CourseSection> _courseSectionRepository;
-        private readonly IRepository<CourseLecture> _courseLectureRepository;
+        private readonly IRepository<Course> _courseRepository; 
 
         public GetCourseDetailsQueryHandler(
-            IRepository<Course> courseRepository,
-            IRepository<CourseSection> courseSectionRepository,
-            IRepository<CourseLecture> courseLectureRepository)
+            IRepository<Course> courseRepository)
         {
-            _courseRepository = courseRepository;
-            _courseSectionRepository = courseSectionRepository;
-            _courseLectureRepository = courseLectureRepository;
+            _courseRepository = courseRepository; 
         }
 
-        public async Task<CourseDto> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<WatchOverviewViewModel> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
         {
-            var course = await _courseRepository.Entity()
-                .Where(c => c.CourseId == request.CourseId)
-                .Select(c => new CourseDto
-                {
-                    Id = c.CourseId,
-                    CourseName = c.CourseName,
-                    Description = c.Description,
-                    Price = c.Price
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+            var course = await _courseRepository.Query()
+                .AsNoTracking()
+                .Include(c => c.CourseSections)
+                    .ThenInclude(cs => cs.CourseLectures)
+                .FirstOrDefaultAsync(c => c.CourseId == request.CourseId, cancellationToken); 
 
             if (course == null)
             {
                 throw new KeyNotFoundException($"Course with ID {request.CourseId} was not found.");
             }
-             
-            var sections = await _courseSectionRepository.Entity()
-                .Where(s => s.CourseId == request.CourseId && s.IsActive)
-                .OrderBy(s => s.DisplayOrder)
-                .ToListAsync(cancellationToken);
 
-            var sectionIds = sections.Select(s => s.CourseSectionId).ToList();
-             
-            var lectures = await _courseLectureRepository.Entity()
-                .Where(l => sectionIds.Contains(l.CourseSectionId) && l.IsPublished)
-                .OrderBy(l => l.DisplayOrder)
-                .ToListAsync(cancellationToken);
-             
-            course.Sections = sections.Select(s => new CourseSectionDto
+            var totalLectures = course.CourseSections.SelectMany(cs => cs.CourseLectures).Count();
+            return new WatchOverviewViewModel
             {
-                CourseSectionId = s.CourseSectionId,
-                CourseId = s.CourseId,
-                SectionName = s.SectionName,
-                Description = s.Description,
-                DisplayOrder = s.DisplayOrder,
-                IsActive = s.IsActive,
-                Lectures = lectures
-                    .Where(l => l.CourseSectionId == s.CourseSectionId)
-                    .Select(l => new CourseLectureDto
+                CourseId = course.CourseId,
+                CourseTitle = course.CourseName,
+                CourseDescription = course.Description,
+                TotalModules = course.CourseSections.Count,
+                Price = course.Price,
+                TotalLessons = totalLectures,
+                Modules = course.CourseSections.Select(cs => new ModuleDto
+                {
+                    ModuleId = cs.CourseSectionId,
+                    Title = cs.SectionName,
+                    Lessons = cs.CourseLectures.OrderBy(l => l.DisplayOrder).Select(l => new LessonDto
                     {
-                        LectureId = l.LectureId,
-                        CourseSectionId = l.CourseSectionId,
-                        LectureTitle = l.LectureTitle,
-                        Description = l.Description,
-                        VideoUrl = l.VideoUrl,
-                        VideoDurationSeconds = l.VideoDurationSeconds,
-                        NotesUrl = l.NotesUrl,
-                        IsFreePreview = l.IsFreePreview,
-                        DisplayOrder = l.DisplayOrder,
-                        IsPublished = l.IsPublished,
-                        CreatedAt = l.CreatedAt
+                        LessonId = l.LectureId,
+                        Title = l.LectureTitle,
+                        Duration = l.VideoDurationSeconds.ToString()!,
+                        IsFree = l.IsFreePreview
                     }).ToList()
-            }).ToList();
-
-            course.TotalLectures = lectures.Count;
-
-            return course;
+                }).ToList()
+            }; 
         }
     }
 } 

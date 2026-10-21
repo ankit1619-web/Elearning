@@ -11,6 +11,7 @@ namespace Manikalearning.Web.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize(Roles = "Admin,Teacher")]
     [Route("Admin/[controller]")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class DoubtsController : Controller
     {
         private readonly IMediator _mediator;

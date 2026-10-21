@@ -7,37 +7,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Manikalearning.Application.Features.Handlers.Web
 {
-    public class GetLecturePartialQueryHandler : IRequestHandler<GetLecturePartialQuery, CourseLectureDto>
+    public class GetLecturePartialQueryHandler : IRequestHandler<GetLecturePartialQuery, LessonPlayerViewModel>
     {
 
-        private readonly IRepository<CourseLecture> _courseLectureRepository;
+        private readonly IRepository<CourseLecture> _lectureRepository;
 
         public GetLecturePartialQueryHandler(IRepository<CourseLecture> courseLectureRepository)
         {
-            _courseLectureRepository = courseLectureRepository;
+            _lectureRepository = courseLectureRepository;
         }
 
-        public async Task<CourseLectureDto> Handle(GetLecturePartialQuery request, CancellationToken cancellationToken)
-        { 
-            var lecture = await _courseLectureRepository.Entity()
-                .Where(l => l.LectureId == request.LectureId)
-                .Select(l => new CourseLectureDto
-                {
-                    LectureId = l.LectureId,
-                    CourseSectionId = l.CourseSectionId,
-                    LectureTitle = l.LectureTitle,
-                    Description = l.Description,
-                    VideoUrl = l.VideoUrl,
-                    VideoDurationSeconds = l.VideoDurationSeconds,
-                    NotesUrl = l.NotesUrl,
-                    IsFreePreview = l.IsFreePreview,
-                    DisplayOrder = l.DisplayOrder,
-                    IsPublished = l.IsPublished
-                     
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+        public async Task<LessonPlayerViewModel> Handle(GetLecturePartialQuery request, CancellationToken cancellationToken)
+        {
+            var lecture = await _lectureRepository.Query()
+                .AsNoTracking()
+                .Include(l => l.CourseSection)
+                .FirstOrDefaultAsync(l => l.LectureId == request.LectureId && l.CourseSection.CourseId == request.CourseId, cancellationToken);
 
-            return lecture;
+            if (lecture == null)
+            {
+                throw new KeyNotFoundException($"Lecture ID {request.LectureId} not found in Course {request.CourseId}.");
+            }
+            return new LessonPlayerViewModel
+            {
+                CourseId = request.CourseId,
+                IsFree = lecture.IsFreePreview,
+                LessonId = lecture.LectureId,
+                LessonTitle = lecture.LectureTitle,
+                VideoUrl = lecture.VideoUrl,
+                NotesUrl = lecture.NotesUrl,
+                Notes = lecture.Notes
+            }; 
         }
     }
 }

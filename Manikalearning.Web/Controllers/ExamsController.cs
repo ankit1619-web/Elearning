@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers
 {
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class ExamsController : BaseController
     {
         public ExamsController(IMediator mediator)

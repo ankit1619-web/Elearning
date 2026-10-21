@@ -13,7 +13,8 @@ namespace Manikalearning.Web.Areas.Student.Controllers
 {
     [Area("Student")]
     [Authorize(Roles = "Student")]
-    [Route("Student/[controller]")] 
+    [Route("Student/[controller]")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class WatchController : Controller
     {
         private readonly IFileStorageService _fileService;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Manikalearning.Web.Controllers
 {
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public abstract class BaseController : Controller
     {
         protected readonly IMediator _mediator;

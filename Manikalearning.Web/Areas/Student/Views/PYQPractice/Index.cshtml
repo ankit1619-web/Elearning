@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "PYQ Bank";
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
-    
+     
     var guest = User.Identity?.IsAuthenticated != true;
     var here = Context.Request.Path + Context.Request.QueryString;
     var isYearTab = Model.ActiveTab.Equals("year", StringComparison.OrdinalIgnoreCase);

@@ -10,6 +10,7 @@ namespace Manikalearning.Web.Areas.Student.Controllers
     [Area("Student")]
     [Authorize(Roles = "Student")]
     [Route("Student/[controller]")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class PerformanceController : Controller
     {
         private readonly IMediator _mediator;

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Manikalearning.Application.Features.Handlers.Web
 { 
-    public class GetCoursesPageQueryHandler : IRequestHandler<GetCoursesPageQuery, List<CourseDto>>
+    public class GetCoursesPageQueryHandler : IRequestHandler<GetCoursesPageQuery, MyCoursesViewModel>
     {
         private readonly IRepository<Course> _courseRepository;
         private readonly IRepository<ExamCourse> _examCourseRepository;
@@ -21,61 +21,63 @@ namespace Manikalearning.Application.Features.Handlers.Web
             _logger = logger;
         }
 
-        public async Task<List<CourseDto>> Handle(GetCoursesPageQuery request,
+        public async Task<MyCoursesViewModel> Handle(GetCoursesPageQuery request,
             CancellationToken cancellationToken)
         {
             try
             {
-                IQueryable<Course> query; 
-                string? examName = null;
+                var query = _courseRepository.Entity().Include(c => c.CourseSections)
+                    .ThenInclude(cs => cs.CourseLectures)
+                .Where(c => c.IsPublished);
                 if (request.ExamId.HasValue)
                 {
-                    var examCourse = await _examCourseRepository
-                      .Query()
-                      .AsNoTracking()
-                      .Include(x => x.Exam)
-                      .Where(x => x.ExamId == request.ExamId.Value)
-                      .Select(x => new
-                      {
-                          x.CourseId,
-                          ExamName = x.Exam != null
-                              ? x.Exam.ExamName
-                              : null
-                      })
-                      .ToListAsync(cancellationToken);
-
-                    examName = examCourse
-                        .Select(x => x.ExamName)
-                        .FirstOrDefault();
-
-                    var courseIds = examCourse
-                        .Select(x => x.CourseId)
-                        .ToList();  
-                    query = _courseRepository
-                        .Query()
-                        .Where(x => courseIds.Contains(x.CourseId));
+                    var examCourseIds = await _examCourseRepository.Entity()
+                        .Where(ec => ec.ExamId == request.ExamId.Value)
+                        .Select(ec => ec.CourseId)
+                        .ToListAsync(cancellationToken);
+                    query = query.Where(c => examCourseIds.Contains(c.CourseId));
                 }
-                else
+                if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
-                    query = _courseRepository.Query();
+                    query = query.Where(c => c.CourseName.Contains(request.SearchTerm));
                 }
-
-                var courses = await query
-                    .AsNoTracking()
-                    .OrderByDescending(x => x.CreatedAt)
-                    .ToListAsync(cancellationToken);
-
-                return courses
-                    .Select(x => new CourseDto
+               
+                var rawCourses = await query.Select(c => new
+                {
+                    CourseId = c.CourseId,
+                    Title = c.CourseName,
+                    ThumbnailUrl = "/images/course-default.jpg", 
+                    Description = c.Description ,
+                    Price=c.Price,
+                    IsFree=c.IsFree,
+                    DiscountPrice=c.DiscountPrice,
+                    TotalSections = c.CourseSections.Count(cs => cs.IsActive),
+                    TotalLectures = c.CourseSections
+                     .Where(cs => cs.IsActive)
+                     .SelectMany(cs => cs.CourseLectures)
+                     .Count(cl => cl.IsPublished)
+                }).ToListAsync(cancellationToken);
+                string? examName = null;
+                var coursesList = rawCourses.Select(c =>
+                {
+                    int total = c.TotalLectures;   
+                    return new EnrolledCourseDto
                     {
-                        Id = x.CourseId,
-                        ExamName=examName,
-                        CourseName = x.CourseName,
-                        Description = x.Description,
-                        ShortDescription = x.Description,  
-                        Price = x.Price 
-                    })
-                    .ToList();
+                        CourseId = c.CourseId,
+                        Title = c.Title,
+                        IsFree = c.IsFree,
+                        DiscountPrice = c.DiscountPrice,
+                        ThumbnailUrl = c.ThumbnailUrl,
+                        TotalModules = c.TotalSections,
+                        TotalLessons = total ,
+                        Price = c.Price
+                    };
+                }).ToList();
+                return new MyCoursesViewModel
+                {
+                    Courses = coursesList,  
+                    SearchQuery = request.SearchTerm ?? string.Empty
+                };
             }
             catch (Exception ex)
             {

@@ -10,12 +10,16 @@ namespace Manikalearning.Application.DTOs
         public int TotalModules { get; set; }
         public int TotalLessons { get; set; }
         public int CompletedLessons { get; set; }
+        public decimal Price { get; set; }
+        public decimal? DiscountPrice { get; set; }
         public int ProgressPercentage { get; set; }
         public DateTime EnrolledDate { get; set; }
         public DateTime? LastAccessedDate { get; set; }
         public Guid? NextLessonId { get; set; }
         public string? NextLessonTitle { get; set; }
+        public string? Description { get; set; }
         public bool IsCompleted { get; set; }
+        public bool IsFree { get; set; }
     }
 
     public class MyCoursesViewModel
@@ -24,6 +28,7 @@ namespace Manikalearning.Application.DTOs
         public int TotalEnrolled { get; set; }
         public int InProgressCount { get; set; }
         public int CompletedCount { get; set; }
+        public string ExamName { get; set; } = "";
         public string SelectedFilter { get; set; } = "All";
         public string SearchQuery { get; set; } = string.Empty;
     }
@@ -37,6 +42,8 @@ namespace Manikalearning.Application.DTOs
         public Guid CourseId { get; set; }
         public string CourseTitle { get; set; } = string.Empty;
         public string? CourseDescription { get; set; }
+        public decimal Price { get; set; }
+        public decimal? DiscountPrice { get; set; }
         public int TotalModules { get; set; }
         public int TotalLessons { get; set; }
         public int ProgressPercentage { get; set; }
